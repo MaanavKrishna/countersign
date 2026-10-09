@@ -178,6 +178,15 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
             <span className="font-mono text-lg font-bold tracking-wide text-trust-ink" aria-hidden="true">COPPER · LANTERN · RIVER</span>
             <span className="text-[15px] font-bold text-ink group-hover:underline">Pair your family →</span>
           </Link>
+          {process.env.NEXT_PUBLIC_INBOX_ADDRESS && (
+            <div className="flex flex-col gap-2 rounded-md border-[1.5px] border-line bg-card p-6">
+              <span className="eyebrow">Got it by email?</span>
+              <span className="condensed text-[26px] leading-none font-black uppercase">Forward it</span>
+              <span className="text-[15px] leading-normal text-body">
+                Send any suspicious email to <b className="font-mono break-all text-ink">{process.env.NEXT_PUBLIC_INBOX_ADDRESS}</b> and get the full case file back by email.
+              </span>
+            </div>
+          )}
           <Link href="/shield" className="group flex flex-col gap-3.5 rounded-md bg-night p-7 text-white no-underline">
             <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.12em] text-[#FF8A70] uppercase">
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
