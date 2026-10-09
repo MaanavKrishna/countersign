@@ -47,8 +47,8 @@ const metrics = (rows: Row[]) => ({
   hard: summarize(rows.filter((r) => r.set === "hard")),
 });
 
-const full = (combination: boolean) => async (t: string) => {
-  const r = await collectCase({ text: t, image: null }, { ai: true, combination });
+const full = (v: "v1" | "final") => async (t: string) => {
+  const r = await collectCase({ text: t, image: null }, v === "v1" ? { ai: true, combination: false, judgment: false } : { ai: true });
   return { band: r.report.band, risk: r.report.risk };
 };
 
@@ -59,15 +59,15 @@ describe.skipIf(!process.env.EVAL)("ablation eval", () => {
       const r = await collectCase({ text: t, image: null }, { ai: false });
       return { band: r.report.band, risk: r.report.risk };
     });
-    const v1 = await runArm(full(false));
-    const v2 = await runArm(full(true));
+    const v1 = await runArm(full("v1"));
+    const v2 = await runArm(full("final"));
     const results: EvalResults = {
       generatedAt: new Date().toISOString(),
       hardSetCommit: "34e3ba0",
       arms: [
         { id: "llm-only", label: "Single LLM prompt (typical entry)", metrics: metrics(llm), rows: llm },
         { id: "evidence-only", label: "Deterministic checks only (no AI)", metrics: metrics(det), rows: det },
-        { id: "countersign-v1", label: "Countersign v1 (before the impersonation fix)", metrics: metrics(v1), rows: v1 },
+        { id: "countersign-v1", label: "Countersign v1 (evidence + tactics only)", metrics: metrics(v1), rows: v1 },
         { id: "countersign", label: "Countersign", metrics: metrics(v2), rows: v2 },
       ],
     };

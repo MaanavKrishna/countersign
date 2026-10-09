@@ -75,6 +75,7 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit, op
   const tacticsPromise: Promise<TacticsResult | null> = (opts.ai ? extractTactics(text, image) : Promise.resolve(null))
     .then((r) => {
       if (!r) return null;
+      if (opts.judgment === false) r = { ...r, findings: r.findings.filter((f) => !f.signalId.startsWith("model_judgment_")) };
       all.push(...r.findings);
       emit({ type: "tactics", tactics: r.tactics });
       const judged = r.findings.filter((f) => f.signalId.startsWith("model_judgment_"));
