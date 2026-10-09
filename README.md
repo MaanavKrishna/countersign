@@ -1,11 +1,15 @@
 # Countersign — prove it's really them
 
-**ForgeHacks 2026 · AI + Cybersecurity track**
+**ForgeHacks 2026 · AI + Cybersecurity track** · **Live:** https://countersign-maanavkrishnas-projects.vercel.app
+
+> AI can fake a voice. It can't fake our secret.
 
 A *countersign* is the secret reply a sentry demands to prove a stranger is a friend. Countersign brings that idea to AI-era fraud:
 
-1. **Message Investigator.** Paste a suspicious email, text or listing (or a screenshot). An AI agent investigates it with real lookups (domain registration, DNS, email authentication, lookalike detection and redirect chains) while you watch the evidence graph grow. A transparent scoring model, not the AI, decides the verdict. A defense agent then argues the message is genuine before the judge stamps it **FORGERY**, **UNVERIFIED** or **COUNTERSIGNED**.
-2. **Call Shield.** Put a call on speaker. Countersign transcribes it in the browser, spots scam scripts as they unfold ("grandson in jail", "bank fraud department", "IRS agent") and, when a caller claims to be someone you know, gives you a **challenge question from your private Memory Vault**. A voice clone can copy a voice; it can't copy a shared memory.
+1. **Family Countersign.** Two phones paired once, in person, show the same three words, changing every minute. When "your grandson" calls asking for bail money, ask for the countersign. A voice clone can't produce it. Fully offline, no account, nothing leaves the phone.
+2. **Message Investigator.** Paste a suspicious email, text or listing, or drop a screenshot (QR codes inside it are decoded too). An AI agent investigates it with real lookups (domain registration, DNS, email authentication, lookalike and homoglyph detection, redirect chains) while you watch the evidence graph grow. A transparent scoring model, not the AI, decides the verdict. A defense agent then argues the message is genuine before the judge stamps it **FORGERY**, **UNVERIFIED** or **COUNTERSIGNED**, in the message's own language.
+3. **Call Shield.** Put a call on speaker. Countersign transcribes it in the browser, spots scam scripts as they unfold ("grandson in jail", "bank fraud department", "IRS agent"), shows the countersign the caller must say, and offers a one-tap text to a trusted family member, because scams depend on "don't tell anyone".
+4. **Meets people where scams arrive.** Install it as an app on Android and use **Share → Countersign** straight from your messages app.
 
 ## Family Countersign: the secret a voice clone can't fake
 
@@ -163,14 +167,19 @@ npm run eval        # end-to-end accuracy on labelled cases (uses the model API)
 ## Project layout
 
 ```
+src/lib/countersign/        Family Countersign: protocol (HMAC rolling codes), pairing store, alert
 src/lib/indicators.ts       extract URLs, domains, senders, phones, payment terms, headers
+src/lib/injection.ts        detect text written to manipulate AI scanners
+src/lib/combination.ts      identity claim + request for money/codes/access
 src/lib/scoring.ts          signal registry + noisy-OR scoring
 src/lib/tools/              rdap, dns, lookalike, emailAuth, traceUrl, sandbox
 src/lib/agent/              investigator loop, tactic labeller, debate, call shield
 src/lib/pipeline.ts         orchestrates the investigation and streams events
+src/lib/eval/               labelled easy + pre-registered hard sets, baseline, metrics
 src/app/api/investigate     SSE endpoint
 src/app/api/shield          live-call assessment endpoint
-src/components/             report UI, evidence graph, Call Shield
+src/app/family, /share      pairing + live codes; Android share target
+src/components/             report UI, evidence graph, Call Shield, rolling code
 ```
 
 ## License

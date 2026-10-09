@@ -169,6 +169,15 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
         </section>
 
         <aside className="flex min-w-0 flex-[1_1_340px] flex-col gap-5">
+          <Link href="/family" className="group flex flex-col gap-3 rounded-md border-2 border-ink bg-card p-7 no-underline shadow-block">
+            <span className="eyebrow text-trust-ink">New · works offline</span>
+            <span className="condensed text-[34px] leading-none font-black text-ink uppercase">Family Countersign</span>
+            <span className="text-base leading-normal text-body">
+              AI can fake a voice. It can&apos;t fake your secret. Pair phones once, then both show the same three words, changing every minute.
+            </span>
+            <span className="font-mono text-lg font-bold tracking-wide text-trust-ink" aria-hidden="true">COPPER · LANTERN · RIVER</span>
+            <span className="text-[15px] font-bold text-ink group-hover:underline">Pair your family →</span>
+          </Link>
           <Link href="/shield" className="group flex flex-col gap-3.5 rounded-md bg-night p-7 text-white no-underline">
             <span className="flex items-center gap-2.5 font-mono text-xs tracking-[0.12em] text-[#FF8A70] uppercase">
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -178,7 +187,7 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
             </span>
             <span className="condensed text-[34px] leading-none font-black uppercase">Call Shield</span>
             <span className="text-base leading-normal text-[#D5DAE1]">
-              Put the call on speaker. Countersign listens for the scam script as it unfolds and gives you a question only the real person could answer.
+              Put the call on speaker. Countersign spots the scam script as it unfolds and shows the countersign the real person must say.
             </span>
             <span className="text-[15px] font-bold group-hover:underline">Start listening →</span>
           </Link>
