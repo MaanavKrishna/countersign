@@ -100,7 +100,7 @@ function reduce(s: InvestigationState, a: Action): InvestigationState {
   }
 }
 
-export type ImageInput = { mediaType: string; base64: string; previewUrl: string } | null;
+export type ImageInput = { mediaType: string; base64: string; previewUrl: string; qr: string | null } | null;
 
 export function useInvestigation() {
   const [state, dispatch] = useReducer(reduce, initial);

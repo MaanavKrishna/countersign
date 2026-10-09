@@ -83,7 +83,7 @@ export async function investigate(
     const said = textOf(response.content);
     const closingIdx = said.indexOf("CLOSING:");
     const narration = (closingIdx >= 0 ? said.slice(0, closingIdx) : said).trim();
-    if (narration) emit({ type: "thought", text: narration.split("\n")[0].slice(0, 200) });
+    if (narration) emit({ type: "thought", text: narration.split("\n")[0].replace(/\*\*|`/g, "").slice(0, 200) });
     if (closingIdx >= 0) prosecution = said.slice(closingIdx + "CLOSING:".length).trim();
 
     messages.push({ role: "assistant", content: response.content });

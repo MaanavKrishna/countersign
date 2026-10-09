@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { defang } from "@/lib/domain";
+import { decodeQrFromImageData, qrNote } from "@/lib/qr";
 import { SAMPLES } from "@/lib/samples";
 import { useInvestigation, type ImageInput } from "@/lib/useInvestigation";
 import { AnnotatedMessage, Debate, ResponseKit } from "./CaseParts";
@@ -22,9 +24,12 @@ async function toImageInput(file: File): Promise<ImageInput> {
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(img.width * scale);
   canvas.height = Math.round(img.height * scale);
-  canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  // "Quishing": a QR code in the screenshot hides a link the text never shows.
+  const qr = decodeQrFromImageData(ctx.getImageData(0, 0, canvas.width, canvas.height));
   const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
-  return { mediaType: "image/jpeg", base64: dataUrl.split(",")[1], previewUrl: url };
+  return { mediaType: "image/jpeg", base64: dataUrl.split(",")[1], previewUrl: url, qr };
 }
 
 export function Investigator({ initialText = "", autorun = false }: { initialText?: string; autorun?: boolean }) {
@@ -46,9 +51,10 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
 
   const start = (t: string, img: ImageInput) => {
     if (!t.trim() && !img) return;
-    setSubmitted({ text: t, image: img });
+    const full = (t + qrNote(img?.qr ?? null)).trim();
+    setSubmitted({ text: full, image: img });
     window.scrollTo({ top: 0, behavior: "smooth" });
-    void run(t, img);
+    void run(full, img);
   };
 
   const onFiles = async (files: FileList | null) => {
@@ -102,12 +108,15 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
               className="min-h-[220px] resize-y border-0 bg-transparent p-4.5 font-mono text-[15px] leading-relaxed text-ink outline-none placeholder:text-faint"
             />
             {image && (
-              <div className="flex items-center gap-3 px-4.5 pb-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={image.previewUrl} alt="Screenshot to investigate" className="h-16 w-auto rounded border border-line" />
-                <button type="button" onClick={() => setImage(null)} className="min-h-11 rounded px-3 text-sm font-semibold text-alert-ink hover:bg-alert-soft">
-                  Remove screenshot
-                </button>
+              <div className="flex flex-col gap-2 px-4.5 pb-3">
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image.previewUrl} alt="Screenshot to investigate" className="h-16 w-auto rounded border border-line" />
+                  <button type="button" onClick={() => setImage(null)} className="min-h-11 rounded px-3 text-sm font-semibold text-alert-ink hover:bg-alert-soft">
+                    Remove screenshot
+                  </button>
+                </div>
+                {image.qr && <p className="m-0 font-mono text-xs font-semibold break-all text-alert-ink">QR code found: {defang(image.qr)}. It will be investigated too.</p>}
               </div>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-dash px-4.5 py-3.5">
