@@ -72,6 +72,27 @@ flowchart LR
 
 Bands: ≥ 0.70 **FORGERY** · 0.35–0.70 **UNVERIFIED** · < 0.35 **COUNTERSIGNED**. Full table: [`src/lib/scoring.ts`](src/lib/scoring.ts).
 
+## Results
+
+End-to-end eval (`npm run eval`) on 8 labelled real-world cases, using a fast LLM and live lookups:
+
+| Case | Truth | Verdict | Risk |
+|---|---|---|---|
+| PayPal "account limited" phishing email | scam | FORGERY | 0.996 |
+| USPS redelivery smishing text | scam | FORGERY | 0.946 |
+| "Hi Mum, new number" WhatsApp | scam | FORGERY | 0.763 |
+| Crypto "investment advisor" DM | scam | FORGERY | 0.953 |
+| CEO wire-transfer (BEC) email | scam | FORGERY | 0.878 |
+| Fake "Windows Defender" tech-support popup | scam | UNVERIFIED | 0.642 |
+| Genuine GitHub security alert | legit | COUNTERSIGNED | 0.000 |
+| Genuine Amazon shipping email | legit | COUNTERSIGNED | 0.000 |
+
+- **Strict accuracy: 7/8.** The tech-support popup was rated UNVERIFIED rather than FORGERY. It has no links or sender domain to check, so only tactic evidence counts.
+- **Never dangerous: 8/8.** No scam was cleared as genuine, and no genuine message was stamped a forgery.
+- Each investigation takes about 10–16 seconds.
+
+We didn't tune weights to this set; it's a sanity check, not a benchmark.
+
 ## Safety and privacy by design
 
 - **The Memory Vault never leaves the device.** Questions and answer hints live in `localStorage`. The Call Shield API only receives the transcript and says *when* to challenge. The question is picked locally, and only you check the answer.
