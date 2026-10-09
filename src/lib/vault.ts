@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { matchesPerson } from "./people";
 
 // The Memory Vault lives only in this browser's localStorage. It is never sent
 // to the server: the Call Shield API only says *when* to challenge, and the
@@ -61,10 +62,6 @@ export function useVault() {
 /** Pick vault questions for whoever the caller claims to be (first-name match), others after. */
 export function questionsFor(entries: VaultEntry[], claimed: string | null): VaultEntry[] {
   if (!claimed) return entries;
-  const words = claimed.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 1);
-  const matches = (e: VaultEntry) => {
-    const p = e.person.toLowerCase();
-    return words.some((w) => p.includes(w));
-  };
-  return [...entries.filter(matches), ...entries.filter((e) => !matches(e))];
+  const hit = (e: VaultEntry) => matchesPerson(e.person, claimed);
+  return [...entries.filter(hit), ...entries.filter((e) => !hit(e))];
 }

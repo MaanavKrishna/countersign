@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ShieldAssessment, ShieldStage, Tactic } from "@/lib/types";
+import { alertText, smsLink } from "@/lib/countersign/alert";
+import { useFamily } from "@/lib/countersign/store";
+import { matchesPerson } from "@/lib/people";
 import { questionsFor, useVault } from "@/lib/vault";
+import { RollingCode } from "./RollingCode";
 import { Logo, Nav } from "./SiteHeader";
 
 // Minimal typing for the Web Speech API (Chrome / Edge / Safari).
@@ -63,6 +67,7 @@ function Highlight({ text, tactics, hot }: { text: string; tactics: Tactic[]; ho
 
 export function CallShield() {
   const { entries } = useVault();
+  const { pairings, contact } = useFamily();
   const [mode, setMode] = useState<"idle" | "mic" | "sim">("idle");
   const [lines, setLines] = useState<Line[]>([]);
   const [assessment, setAssessment] = useState<ShieldAssessment | null>(null);
@@ -215,6 +220,7 @@ export function CallShield() {
   const stage: ShieldStage = outcome === "failed" ? "danger" : assessment?.stage ?? "calm";
   const s = STAGE[stage];
   const candidates = questionsFor(entries, assessment?.claimedIdentity ?? null);
+  const paired = pairings.find((p) => matchesPerson(p.them, assessment?.claimedIdentity ?? null)) ?? null;
   const question = candidates.length ? candidates[challengeIdx % candidates.length] : null;
   const showChallenge = !!assessment && (assessment.challengeNow || stage === "danger") && outcome === null;
   const who = assessment?.claimedIdentity ?? "them";
@@ -288,6 +294,17 @@ export function CallShield() {
             </div>
             <aside className="flex min-w-0 flex-[1_1_340px] flex-col gap-3 rounded-md border-[1.5px] p-6" style={{ borderColor: s.line, background: s.panel }}>
               <p className="m-0 font-mono text-xs tracking-[0.12em] uppercase" style={{ color: s.muted }}>
+                Family Countersign
+              </p>
+              <p className="m-0 text-[17px] leading-normal">
+                {pairings.length > 0
+                  ? `Paired with ${pairings.map((p) => p.them).join(", ")}. If they "call", Countersign shows the words they must say.`
+                  : "Pair phones with family so a cloned voice can't pass as them."}
+              </p>
+              <Link href="/family" className="self-start font-bold text-white underline-offset-4 hover:underline">
+                {pairings.length > 0 ? "Manage family →" : "Pair a family member →"}
+              </Link>
+              <p className="m-0 mt-3 font-mono text-xs tracking-[0.12em] uppercase" style={{ color: s.muted }}>
                 Memory Vault
               </p>
               <p className="m-0 text-[17px] leading-normal">
@@ -314,8 +331,29 @@ export function CallShield() {
 
               {showChallenge && (
                 <div className="animate-pop flex flex-col gap-4 rounded-md bg-white p-7 text-ink" style={{ boxShadow: `10px 10px 0 ${s.hot}` }}>
-                  <p className="m-0 font-mono text-xs tracking-[0.12em] text-alert-deep uppercase">Countersign challenge · from your Memory Vault</p>
-                  {question ? (
+                  <p className="m-0 font-mono text-xs tracking-[0.12em] text-alert-deep uppercase">
+                    {paired ? "Countersign challenge · from your paired phones" : "Countersign challenge · from your Memory Vault"}
+                  </p>
+                  {paired ? (
+                    <>
+                      <p className="m-0 text-lg text-body">
+                        Ask: <b>&ldquo;{paired.them}, what&apos;s our countersign?&rdquo;</b> The real {paired.them} will read it from their phone.
+                      </p>
+                      <p className="m-0 font-mono text-xs tracking-[0.12em] text-trust-ink uppercase">They should say</p>
+                      <div className="text-ink">
+                        <RollingCode pairing={paired} which="theirs" size="lg" />
+                      </div>
+                      <p className="m-0 text-[15px] text-muted">A cloned voice can&apos;t know these words. They change every minute.</p>
+                      <div className="flex flex-wrap gap-3">
+                        <button type="button" onClick={() => setOutcome("passed")} className="min-h-[52px] rounded border-2 border-ink px-5.5 font-extrabold tracking-[0.04em] uppercase">
+                          Words match
+                        </button>
+                        <button type="button" onClick={() => setOutcome("failed")} className="min-h-[52px] rounded bg-alert-ink px-5.5 font-extrabold tracking-[0.04em] text-white uppercase">
+                          Wrong or refused
+                        </button>
+                      </div>
+                    </>
+                  ) : question ? (
                     <>
                       <p className="m-0 text-lg text-body">Ask {assessment?.claimedIdentity ? `“${assessment.claimedIdentity}”` : "the caller"} this — out loud, word for word:</p>
                       <p className="m-0 text-[32px] leading-[1.05] font-black sm:text-[44px]" style={{ fontStretch: "75%" }}>
@@ -349,6 +387,16 @@ export function CallShield() {
                     </>
                   )}
                 </div>
+              )}
+
+              {stage === "danger" && contact && (
+                <a
+                  href={smsLink(contact.phone, alertText(assessment?.claimedIdentity ?? null, assessment?.tactics ?? []))}
+                  className="flex min-h-14 items-center gap-3 self-start rounded border-2 border-white px-5 text-lg font-extrabold no-underline hover:bg-white/10"
+                  style={{ color: "#fff" }}
+                >
+                  Break the secrecy: text {contact.name} now →
+                </a>
               )}
 
               {assessment && assessment.tactics.length > 0 && (

@@ -7,6 +7,43 @@ A *countersign* is the secret reply a sentry demands to prove a stranger is a fr
 1. **Message Investigator.** Paste a suspicious email, text or listing (or a screenshot). An AI agent investigates it with real lookups (domain registration, DNS, email authentication, lookalike detection and redirect chains) while you watch the evidence graph grow. A transparent scoring model, not the AI, decides the verdict. A defense agent then argues the message is genuine before the judge stamps it **FORGERY**, **UNVERIFIED** or **COUNTERSIGNED**.
 2. **Call Shield.** Put a call on speaker. Countersign transcribes it in the browser, spots scam scripts as they unfold ("grandson in jail", "bank fraud department", "IRS agent") and, when a caller claims to be someone you know, gives you a **challenge question from your private Memory Vault**. A voice clone can copy a voice; it can't copy a shared memory.
 
+## Family Countersign: the secret a voice clone can't fake
+
+Detecting fakes is an arms race the defender loses, because generators keep improving. Family Countersign changes the question from *"does this sound real?"* to *"does the caller have our secret?"*
+
+1. **Pair once, in person.** One phone shows a QR code; the other scans it with its ordinary camera. Both now hold the same 256-bit secret. No account, no server.
+2. **Both phones show the same three words, changing every minute**, e.g. `COPPER · LANTERN · RIVER`.
+3. **When "Ethan" calls asking for money,** Call Shield detects the scam script and shows Grandma the words Ethan must say. The real Ethan reads them off his phone; a clone can't.
+4. **Break the secrecy.** Scams rely on "don't tell Mom", so one tap texts a trusted family member.
+
+### Protocol (v1)
+
+```
+pairing:   secret = 32 random bytes (crypto.getRandomValues)
+           link   = https://<site>/family/pair#v=1&s=<base64url secret>&a=<creator>&b=<partner>
+           creator stores role "a"; the scanning phone stores role "b"
+code:      step   = floor(unix_seconds / 60)
+           mac    = HMAC-SHA256(key = secret, msg = "countersign/v1|" + from + ">" + to + "|" + step)
+           words  = BIP39[mac bits 0–10], BIP39[bits 11–21], BIP39[bits 22–32]
+display:   "Say this when you call <them>" = code(from = my role,    to = their role, step)
+           "<them> should say"             = code(from = their role, to = my role,    step)
+           plus the previous step's code during the first 20 s (clock-skew grace)
+storage:   localStorage only; nothing leaves the device
+```
+
+### Threat model
+
+| Threat | Mitigation |
+|---|---|
+| Voice or video clone of a family member | The clone lacks the secret, so it can't produce the words |
+| Scammer researches family trivia on social media | Words are random and change every 60 s; there's nothing to research (unlike security questions) |
+| Guessing | 3 words × 11 bits = 33 bits per code: about 1 in 8.6 billion per guess, and it expires in a minute |
+| Code overheard or replayed later | Valid only for the current minute plus 20 s of grace |
+| **Relay attack:** scammer calls the real Ethan pretending to be Grandma and asks for "the code" | Codes are **directional**, a different code per direction, and Ethan's screen says "say this only when *you* called", so Grandma's expected code is never shown on Ethan's phone |
+| Pairing secret intercepted | Pairing happens in person by QR, and the secret travels only in the URL fragment, which browsers never send to servers. It's removed from the address bar after pairing |
+| Lost phone | Phone lock protects it; unpair and pair again to rotate the secret |
+| No internet during the call | Fully offline: Web Crypto + local storage |
+
 ## The problem
 
 AI removed the classic tells. Phishing emails now have perfect grammar, and a few seconds of audio from social media is enough to clone a grandchild's voice. "Look for typos" and "you'd recognize their voice" no longer work. People need help with two things:
