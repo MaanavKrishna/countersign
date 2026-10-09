@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 export const MODEL = process.env.AI_MODEL ?? "";
+if (!MODEL && process.env.NODE_ENV !== "test") console.warn("AI_MODEL is not set; AI steps will fail and investigations fall back to deterministic checks.");
 
 let client: Anthropic | null = null;
 

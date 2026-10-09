@@ -111,7 +111,7 @@ Next.js 16 (App Router, route handlers streaming Server-Sent Events) · TypeScri
 ```bash
 cd countersign
 npm install
-cp .env.example .env.local   # add ANTHROPIC_API_KEY (and optionally URLSCAN_API_KEY)
+cp .env.example .env.local   # add ANTHROPIC_API_KEY and AI_MODEL (and optionally URLSCAN_API_KEY)
 npm run dev
 ```
 
