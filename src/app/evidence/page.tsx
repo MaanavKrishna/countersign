@@ -90,7 +90,7 @@ export default function EvidencePage() {
               <a className="font-semibold text-trust" href={`${REPO}/commit/${data.hardSetCommit}`}>
                 commit {data.hardSetCommit}
               </a>
-              . &ldquo;Countersign v1&rdquo; is the version before we added the impersonation-plus-request signal, after the first run showed tactic-only scams were under-scored.
+              . &ldquo;Countersign v1&rdquo; runs without the two signals added later: identity-claim-plus-request, and the model&apos;s overall read.
             </p>
           )}
 
