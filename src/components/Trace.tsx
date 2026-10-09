@@ -9,6 +9,7 @@ const TOOL_NAMES: Record<string, string> = {
   sandbox_scan: "Sandbox browser",
   injection_check: "AI-manipulation check",
   impersonation_check: "Impersonation check",
+  overall_judgment: "AI's overall read (one weighted signal)",
   provider_signals: "Mail provider signals",
 };
 

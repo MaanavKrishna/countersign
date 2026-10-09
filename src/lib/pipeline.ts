@@ -77,6 +77,11 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit, op
       if (!r) return null;
       all.push(...r.findings);
       emit({ type: "tactics", tactics: r.tactics });
+      const judged = r.findings.filter((f) => f.signalId.startsWith("model_judgment_"));
+      if (judged.length) {
+        emit({ type: "tool_start", id: "judgment", name: "overall_judgment", args: {} });
+        emit({ type: "tool_result", id: "judgment", name: "overall_judgment", summary: judged[0].detail, findings: judged });
+      }
       if (r.tactics.length) {
         emit({
           type: "graph",

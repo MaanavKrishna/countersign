@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { finding } from "../scoring";
+import { judgmentFinding } from "../judgment";
 import type { Finding, Tactic } from "../types";
 import { MODEL, UNTRUSTED_RULE, anthropic, untrusted } from "./client";
 
@@ -25,6 +26,8 @@ export const TACTIC_LABELS: Record<(typeof CATEGORIES)[number], string> = {
 const TacticsSchema = z.object({
   messageText: z.string().describe("The message's full visible text. If the input is a screenshot, transcribe it."),
   language: z.string().describe("English name of the language the message is written in, e.g. 'English', 'Spanish', 'Hindi'"),
+  overall: z.enum(["scam", "unsure", "legitimate"]).describe("Your overall judgment of the whole message"),
+  overallWhy: z.string().describe("One short sentence explaining the overall judgment"),
   tactics: z.array(
     z.object({
       category: z.enum(CATEGORIES),
@@ -44,7 +47,7 @@ Label only tactics that are actually present, each tied to an exact verbatim quo
 - secrecy: "don't tell anyone", "keep this confidential"
 - reward: prizes, refunds, unexpected money, too-good deals
 - payment: gift cards, crypto, wire transfer, Zelle/Venmo/Cash App to a person, prepaid cards
-- credentials: passwords, one-time codes, card numbers, SSN, "verify your identity" via link
+- credentials: the message ASKS the reader to provide or enter passwords, one-time codes, card numbers or SSN, or to "verify your identity" via a link. A message that GIVES the reader a code and tells them not to share it is not a credential request.
 - remote_access: install an app, AnyDesk/TeamViewer, "let me connect to your computer"
 - relationship: "Hi Mum, new number", claims to be a relative or friend in need
 - emotional: fear, panic, guilt, romance
@@ -82,5 +85,6 @@ export async function extractTactics(
   const findings = kept.map((t) =>
     finding(`tactic_${t.category}`, `"${t.quote.trim()}" — ${t.why}`, TACTIC_LABELS[t.category]),
   );
-  return { tactics, findings, messageText: out.messageText || text, language: out.language || "English" };
+  const judged = judgmentFinding(out.overall, out.overallWhy);
+  return { tactics, findings: judged ? [...findings, judged] : findings, messageText: out.messageText || text, language: out.language || "English" };
 }

@@ -40,6 +40,7 @@ export const SIGNALS: Record<string, Signal> = {
   ai_directed_instructions: { weight: 0.55, label: "Hidden instructions aimed at AI scanners", kind: "risk" },
   provider_phishing_flag: { weight: 0.35, label: "Mail provider's phishing model flagged it", kind: "risk" },
   impersonation_with_ask: { weight: 0.6, label: "Claims an identity and asks for money, codes or access", kind: "risk" },
+  model_judgment_scam: { weight: 0.5, label: "The AI's overall read: a scam", kind: "risk" },
   // Manipulation tactics (from the message text)
   tactic_urgency: { weight: 0.15, label: "Artificial urgency", kind: "risk" },
   tactic_threat: { weight: 0.15, label: "Threat or fear", kind: "risk" },
@@ -55,6 +56,7 @@ export const SIGNALS: Record<string, Signal> = {
   trust_auth_aligned: { weight: 0.45, label: "Authenticated by the brand's own domain", kind: "trust" },
   trust_links_on_brand: { weight: 0.3, label: "All links stay on the brand's own domains", kind: "trust" },
   trust_domain_established: { weight: 0.25, label: "Long-established domain", kind: "trust" },
+  model_judgment_legit: { weight: 0.35, label: "The AI's overall read: genuine", kind: "trust" },
   // Neutral
   neutral: { weight: 0, label: "Checked", kind: "neutral" },
   inconclusive: { weight: 0, label: "Lookup inconclusive", kind: "neutral" },
