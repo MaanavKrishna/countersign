@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SAMPLES } from "@/lib/samples";
 import { useInvestigation, type ImageInput } from "@/lib/useInvestigation";
 import { AnnotatedMessage, Debate, ResponseKit } from "./CaseParts";
@@ -27,11 +27,21 @@ async function toImageInput(file: File): Promise<ImageInput> {
   return { mediaType: "image/jpeg", base64: dataUrl.split(",")[1], previewUrl: url };
 }
 
-export function Investigator() {
+export function Investigator({ initialText = "", autorun = false }: { initialText?: string; autorun?: boolean }) {
   const { state, run, reset } = useInvestigation();
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initialText);
   const [image, setImage] = useState<ImageInput>(null);
-  const [submitted, setSubmitted] = useState<{ text: string; image: ImageInput } | null>(null);
+  const [submitted, setSubmitted] = useState<{ text: string; image: ImageInput } | null>(
+    autorun && initialText.trim() ? { text: initialText, image: null } : null,
+  );
+  // Shared from another app (Android share sheet): start investigating straight away.
+  const autoran = useRef(false);
+  useEffect(() => {
+    if (autorun && initialText.trim() && !autoran.current) {
+      autoran.current = true;
+      void run(initialText, null);
+    }
+  }, [autorun, initialText, run]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const start = (t: string, img: ImageInput) => {
