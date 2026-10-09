@@ -101,3 +101,6 @@ export type ShieldAssessment = {
   challengeNow: boolean;
   challengeTopic: string | null;
 };
+
+export type RunOptions = { ai: boolean };
+export type CaseResult = { report: Report; findings: Finding[]; toolsRun: number; elapsedMs: number };

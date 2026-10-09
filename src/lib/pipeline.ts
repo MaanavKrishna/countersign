@@ -9,13 +9,15 @@ import { detectAiDirectedText } from "./injection";
 import { finding, score } from "./scoring";
 import { runTool, type ToolRun } from "./tools";
 import { EXHIBIT_ID, factNodeId } from "./tools/graphIds";
-import type { Finding, InvestigationEvent, Report, Tactic } from "./types";
+import type { Finding, InvestigationEvent, Report, RunOptions, Tactic } from "./types";
 
 type Emit = (e: InvestigationEvent) => void;
 
 export type InvestigationInput = {
   text: string;
   image: { mediaType: "image/png" | "image/jpeg" | "image/webp" | "image/gif"; base64: string } | null;
+  /** Evidence a channel already has (e.g. a mail provider's risk scores). */
+  extraFindings?: Finding[];
 };
 
 const GENERIC_ACTIONS = [
@@ -29,7 +31,7 @@ const GENERIC_COMPROMISED = [
   "Watch your statements and credit report for the next 60 days.",
 ];
 
-export async function runInvestigation(input: InvestigationInput, emit: Emit): Promise<void> {
+export async function runInvestigation(input: InvestigationInput, emit: Emit, opts: RunOptions = { ai: true }): Promise<void> {
   const started = Date.now();
   const text = input.text.slice(0, 20000);
   const image: Anthropic.ImageBlockParam | null = input.image
@@ -54,6 +56,13 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
     pushScore();
   }
 
+  if (input.extraFindings?.length) {
+    all.push(...input.extraFindings);
+    emit({ type: "tool_start", id: "provider", name: "provider_signals", args: {} });
+    emit({ type: "tool_result", id: "provider", name: "provider_signals", summary: "Signals from the mail provider", findings: input.extraFindings });
+    pushScore();
+  }
+
   const onTool = (name: string, run: ToolRun, args: Record<string, unknown>) => {
     all.push(...run.findings);
     if (run.graph.nodes.length || run.graph.edges.length) emit({ type: "graph", delta: run.graph });
@@ -62,8 +71,9 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
   };
 
   // Tactic labelling runs in parallel with the tool investigation.
-  const tacticsPromise: Promise<TacticsResult | null> = extractTactics(text, image)
+  const tacticsPromise: Promise<TacticsResult | null> = (opts.ai ? extractTactics(text, image) : Promise.resolve(null))
     .then((r) => {
+      if (!r) return null;
       all.push(...r.findings);
       emit({ type: "tactics", tactics: r.tactics });
       if (r.tactics.length) {
@@ -85,15 +95,17 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
 
   let prosecution = "";
   let checked = { lookalike: new Set<string>(), rdap: new Set<string>(), trace: new Set<string>(), emailAuth: false };
-  let aiOk = true;
-  try {
-    emit({ type: "thought", text: "Opening the case file and planning which lookups to run." });
-    const res = await investigate(text, image, ind, emit, onTool);
-    prosecution = res.prosecution;
-    checked = res.checked;
-  } catch (err) {
-    aiOk = false;
-    emit({ type: "error", message: `AI investigator unavailable (${(err as Error).message}). Running the standard checks instead.`, recoverable: true });
+  let aiOk = opts.ai;
+  if (opts.ai) {
+    try {
+      emit({ type: "thought", text: "Opening the case file and planning which lookups to run." });
+      const res = await investigate(text, image, ind, emit, onTool);
+      prosecution = res.prosecution;
+      checked = res.checked;
+    } catch (err) {
+      aiOk = false;
+      emit({ type: "error", message: `AI investigator unavailable (${(err as Error).message}). Running the standard checks instead.`, recoverable: true });
+    }
   }
 
   // Safety net: run the deterministic checks the agent skipped, so the score
@@ -111,7 +123,7 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
   if (aiOk) {
     try {
       if (prosecution) emit({ type: "debate", role: "prosecution", text: prosecution });
-      const caseFile = { messageText, findings: all, tactics, prosecution, risk, band };
+      const caseFile = { messageText, findings: all, tactics, prosecution, risk, band, language: tacticsResult?.language };
       const defense = await argueDefense(caseFile);
       emit({ type: "debate", role: "defense", text: defense });
       ruling = await judge(caseFile, defense);
