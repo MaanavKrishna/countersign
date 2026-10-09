@@ -77,10 +77,19 @@ export function classifyDomain(rawHost: string): LookalikeResult {
   const skel = skeleton(label);
   const hasNonAscii = /[^\x00-\x7f]/.test(unicodeHost);
 
-  // 1. Brand domain buried in subdomains: paypal.com.secure-check.ru
+  // 1. Brand hidden in front of the real domain: paypal.com.secure-check.ru,
+  //    usps.com-redelivery.top, amazon.verify-account.net
+  const reg = registrableDomain(host);
+  const subLabels = host.slice(0, Math.max(0, host.length - reg.length)).split(".").filter(Boolean);
   for (const b of BRANDS) {
     for (const bd of b.domains) {
-      if ((host !== bd && host.startsWith(`${bd}.`)) || host.includes(`.${bd}.`)) {
+      const bl = bd.split(".")[0];
+      if (
+        (host !== bd && host.startsWith(`${bd}.`)) ||
+        host.includes(`.${bd}.`) ||
+        host.startsWith(`${bd}-`) ||
+        subLabels.some((l) => l === bl || (bl.length >= 5 && skeleton(l) === bl))
+      ) {
         return { brand: b, kind: "subdomain" };
       }
     }

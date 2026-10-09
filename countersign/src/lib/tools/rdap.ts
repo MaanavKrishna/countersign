@@ -69,7 +69,7 @@ export async function rdapLookup(rawDomain: string, now = Date.now()): Promise<T
     if (res.status === 404) {
       return {
         summary: `No registration record found for ${domain}.`,
-        findings: [finding("inconclusive", `The registry has no record of ${domain} — it may be unregistered or on a TLD without RDAP.`)],
+        findings: [finding("domain_not_registered", `The registry has no record of ${domain}: it was never registered, or it has already been taken down.`)],
         graph: { nodes: [{ id: dn, label: domain, kind: "domain" }], edges: [] },
       };
     }

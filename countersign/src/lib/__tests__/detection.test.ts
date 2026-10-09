@@ -23,6 +23,7 @@ describe("domain helpers", () => {
   });
   it("defangs links", () => {
     expect(defang("https://evil.com/x")).toBe("hxxps://evil[.]com/x");
+    expect(defang("pay $1.99 at usps.com-redelivery.top")).toBe("pay $1.99 at usps[.]com-redelivery[.]top");
   });
 });
 
@@ -80,6 +81,8 @@ describe("lookalike detection", () => {
   });
   it("catches brand in subdomain", () => {
     expect(classifyDomain("paypal.com.account-check.ru").kind).toBe("subdomain");
+    expect(classifyDomain("usps.com-redelivery.top").kind).toBe("subdomain");
+    expect(classifyDomain("amazon.verify-account.net").kind).toBe("subdomain");
   });
   it("catches brand token in unrelated domain", () => {
     const r = classifyDomain("paypal-secure-login.com");

@@ -46,5 +46,5 @@ export function hostFromUrl(raw: string): string | null {
 export function defang(text: string): string {
   return text
     .replace(/\bhttp(s?):\/\//gi, (_m, s: string) => `hxxp${s}://`)
-    .replace(/([a-z0-9-])\.([a-z0-9-])/gi, "$1[.]$2");
+    .replace(/\b(?:[a-z0-9-]+\.)+[a-z]{2,24}\b/gi, (host) => host.replace(/\./g, "[.]"));
 }

@@ -11,6 +11,7 @@ export const SIGNALS: Record<string, Signal> = {
   domain_age_lt_7d: { weight: 0.6, label: "Domain registered this week", kind: "risk" },
   domain_age_lt_30d: { weight: 0.5, label: "Domain registered this month", kind: "risk" },
   domain_age_lt_180d: { weight: 0.2, label: "Domain under 6 months old", kind: "risk" },
+  domain_not_registered: { weight: 0.3, label: "Domain has no registration record", kind: "risk" },
   // Lookalikes and brand misuse
   lookalike_brand_domain: { weight: 0.7, label: "Lookalike of a brand domain", kind: "risk" },
   homoglyph_domain: { weight: 0.7, label: "Disguised characters in domain", kind: "risk" },

@@ -103,7 +103,7 @@ export function extractIndicators(input: string): Indicators {
   const domains = uniq([...urlHosts, ...emailHosts].map(registrableDomain));
 
   const phones = uniq(
-    (text.match(/(?:\+?\d[\d\s().-]{7,}\d)/g) ?? [])
+    (text.match(/(?<![A-Za-z0-9])(?:\+?\d[\d\s().-]{7,}\d)/g) ?? [])
       .map((p) => p.trim())
       .filter((p) => {
         const digits = p.replace(/\D/g, "");

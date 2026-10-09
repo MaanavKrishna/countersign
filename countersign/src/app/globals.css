@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-paper: #e9ebee;
+  --color-card: #ffffff;
+  --color-ink: #111418;
+  --color-ink-2: #222831;
+  --color-body: #333a44;
+  --color-muted: #4a525e;
+  --color-faint: #6b7380;
+  --color-line: #c9ced5;
+  --color-dash: #a9b0ba;
+  --color-alert: #e5381b;
+  --color-alert-ink: #c42a10;
+  --color-alert-deep: #8e1e0a;
+  --color-alert-wash: #ffe0d8;
+  --color-alert-soft: #fff4f1;
+  --color-trust: #1e4fd8;
+  --color-trust-ink: #163c9e;
+  --color-trust-wash: #e3e9fb;
+  --color-amber: #b86e00;
+  --color-amber-wash: #fff1d6;
+  --color-hl: #eaff5c;
+  --color-night: #111418;
+  --color-night-2: #1e242c;
+  --color-night-line: #2b313a;
+  --color-danger-bg: #2a0c06;
+  --color-danger-panel: #1a0703;
+  --color-danger-line: #5c2a20;
+  --color-danger-hot: #ff5a3a;
+  --color-danger-text: #ffd9cf;
+  --color-danger-muted: #c99a90;
+
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --shadow-block: 8px 8px 0 #111418;
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  --animate-rise: rise 0.4s ease-out both;
+  --animate-stamp: stamp 0.5s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes stamp {
+  0% { opacity: 0; transform: rotate(-8deg) scale(2.2); }
+  70% { opacity: 1; transform: rotate(-8deg) scale(0.94); }
+  100% { opacity: 1; transform: rotate(-8deg) scale(1); }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.condensed {
+  font-stretch: 70%;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-trust);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
