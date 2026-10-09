@@ -1,8 +1,11 @@
 import { assessCall } from "@/lib/agent/shield";
+import { clientIp, shieldLimiter } from "@/lib/ratelimit";
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  const gate = shieldLimiter.check(clientIp(req.headers));
+  if (!gate.ok) return Response.json({ error: "Slow down" }, { status: 429, headers: { "retry-after": String(gate.retryAfterSec) } });
   let transcript = "";
   try {
     const body = (await req.json()) as { transcript?: unknown };

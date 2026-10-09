@@ -1,4 +1,5 @@
 import { runInvestigation, type InvestigationInput } from "@/lib/pipeline";
+import { clientIp, investigateLimiter } from "@/lib/ratelimit";
 import type { InvestigationEvent } from "@/lib/types";
 
 export const maxDuration = 120;
@@ -8,6 +9,13 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 export async function POST(req: Request) {
+  const gate = investigateLimiter.check(clientIp(req.headers));
+  if (!gate.ok) {
+    return Response.json(
+      { error: `Too many investigations from your network. Try again in ${gate.retryAfterSec}s.` },
+      { status: 429, headers: { "retry-after": String(gate.retryAfterSec) } },
+    );
+  }
   let body: { text?: unknown; image?: { mediaType?: unknown; base64?: unknown } | null };
   try {
     body = await req.json();
