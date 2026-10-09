@@ -11,6 +11,31 @@ type RdapResponse = {
 };
 
 const DAY = 86_400_000;
+const UA = { "user-agent": "Countersign/1.0 (fraud investigation; hackathon project)", accept: "application/rdap+json" };
+
+// IANA's RDAP bootstrap maps each TLD to its registry's RDAP server. Querying
+// the registry directly avoids depending on a third-party redirector.
+let bootstrap: Promise<Map<string, string>> | null = null;
+function rdapBaseFor(tld: string): Promise<string | null> {
+  bootstrap ??= fetch("https://data.iana.org/rdap/dns.json", { signal: AbortSignal.timeout(5000) })
+    .then((r) => r.json() as Promise<{ services: [string[], string[]][] }>)
+    .then((j) => {
+      const m = new Map<string, string>();
+      for (const [tlds, urls] of j.services) for (const t of tlds) m.set(t, urls.find((u) => u.startsWith("https")) ?? urls[0]);
+      return m;
+    })
+    .catch(() => {
+      bootstrap = null;
+      return new Map<string, string>();
+    });
+  return bootstrap.then((m) => m.get(tld) ?? null);
+}
+
+async function fetchRdap(domain: string): Promise<Response> {
+  const base = await rdapBaseFor(domain.split(".").pop()!);
+  const url = base ? `${base.replace(/\/?$/, "/")}domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`;
+  return fetch(url, { headers: UA, signal: AbortSignal.timeout(6000), redirect: "follow" });
+}
 
 function registrarName(entities: RdapEntity[] | undefined): string | null {
   const reg = entities?.find((e) => e.roles?.includes("registrar"));
@@ -40,11 +65,7 @@ export async function rdapLookup(rawDomain: string, now = Date.now()): Promise<T
   const domain = registrableDomain(rawDomain);
   const dn = domainNodeId(domain);
   try {
-    const res = await fetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, {
-      headers: { accept: "application/rdap+json" },
-      signal: AbortSignal.timeout(6000),
-      redirect: "follow",
-    });
+    const res = await fetchRdap(domain);
     if (res.status === 404) {
       return {
         summary: `No registration record found for ${domain}.`,

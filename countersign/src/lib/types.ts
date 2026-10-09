@@ -84,6 +84,7 @@ export type InvestigationEvent =
   | { type: "graph"; delta: GraphDelta }
   | { type: "score"; risk: number; band: Band }
   | { type: "tactics"; tactics: Tactic[] }
+  | { type: "sandbox"; url: string; screenshot: string }
   | { type: "debate"; role: "prosecution" | "defense" | "judge"; text: string }
   | { type: "report"; report: Report }
   | { type: "error"; message: string; recoverable: boolean }

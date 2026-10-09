@@ -77,7 +77,7 @@ async function followRedirects(start: URL): Promise<{ hops: Hop[]; blocked: stri
   let current: URL = start;
   for (let i = 0; i <= MAX_HOPS; i++) {
     if (!(await hostIsPublic(current.hostname))) {
-      return { hops, blocked: `${current.hostname} resolves to a private or unknown address — not contacted.`, error: null };
+      return { hops, blocked: `${current.hostname} resolves to a private or unknown address — not contacted`, error: null };
     }
     let res: Response;
     try {
@@ -153,7 +153,7 @@ export async function traceUrl(raw: string): Promise<ToolOutput & { finalHost: s
     findings.push(finding("neutral", `${chain || startHost}${brand ? ` — stays on ${brand.name}'s own site` : ""}.`, "Link structure looks normal"));
   }
   return {
-    summary: `${chain || startHost}${notes ? ` — ${notes}` : ""}. Only headers were requested; the page was never opened.`,
+    summary: `${chain || startHost}${notes ? ` — ${notes}` : ""}.${blocked ? "" : " Only headers were requested; the page was never opened."}`,
     findings,
     graph,
     finalHost,
