@@ -7,6 +7,11 @@ describe("impersonation + ask", () => {
     const f = impersonationAsk([finding("tactic_authority", "Chase"), finding("tactic_credentials", "6-digit code")], []);
     expect(f.map((x) => x.signalId)).toEqual(["impersonation_with_ask"]);
   });
+  it("describes what is being asked for in plain words", () => {
+    const [f] = impersonationAsk([finding("lookalike_brand_domain", "x"), finding("tactic_credentials", '"confirm your card"', "Credential request")], []);
+    expect(f.detail).toContain("asks for codes or account details");
+    expect(f.detail).not.toContain("request for credential request");
+  });
   it("counts a named brand as a claimed identity", () => {
     expect(impersonationAsk([finding("tactic_payment", "Cash App deposit")], ["Amazon"])).toHaveLength(1);
   });
