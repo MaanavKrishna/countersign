@@ -52,12 +52,16 @@ export async function codesForDisplay(p: Pairing, ms: number) {
   const step = stepAt(ms);
   const other: Role = p.role === "a" ? "b" : "a";
   const into = (ms / 1000) % STEP_SECONDS;
-  const [mine, theirs, theirsPrevious] = await Promise.all([
+  // Clock-skew grace both ways: a caller whose phone is behind still says the
+  // previous code early in the minute; one whose phone is ahead already says
+  // the next code late in the minute.
+  const [mine, theirs, theirsPrevious, theirsNext] = await Promise.all([
     codeFor(p.secret, p.role, other, step),
     codeFor(p.secret, other, p.role, step),
     into < GRACE_SECONDS ? codeFor(p.secret, other, p.role, step - 1) : Promise.resolve(null),
+    into >= STEP_SECONDS - GRACE_SECONDS ? codeFor(p.secret, other, p.role, step + 1) : Promise.resolve(null),
   ]);
-  return { mine, theirs, theirsPrevious, secondsLeft: Math.ceil(STEP_SECONDS - into) };
+  return { mine, theirs, theirsPrevious, theirsNext, secondsLeft: Math.ceil(STEP_SECONDS - into) };
 }
 
 export function pairingLink(origin: string, me: string, them: string, secret: string): string {

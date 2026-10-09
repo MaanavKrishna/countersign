@@ -35,4 +35,9 @@ describe("renderReportEmail", () => {
   it("caps the displayed risk at 99%", () => {
     expect(renderReportEmail({ ...c, report: { ...c.report, risk: 0.999 } }, "x").subject).toContain("99% risk");
   });
+  it("defangs a model-written headline that names the fake domain", () => {
+    const o = renderReportEmail({ ...c, report: { ...c.report, headline: "paypa1-secure.com is not PayPal" } }, "x");
+    expect(o.subject).toContain("paypa1-secure[.]com");
+    expect(o.text).not.toMatch(/paypa1-secure\.com/);
+  });
 });

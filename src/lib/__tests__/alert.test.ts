@@ -29,4 +29,8 @@ describe("break-the-secrecy alert", () => {
   it("doesn't match on relationship words alone", () => {
     expect(matchesPerson("Ethan (grandson)", "your grandson")).toBe(false);
   });
+  it("defangs links quoted from the scammer", () => {
+    const t = alertText("PayPal", [{ label: "Credential request", quote: "log in at paypa1-secure.com" }]);
+    expect(t).toContain("paypa1-secure[.]com");
+  });
 });

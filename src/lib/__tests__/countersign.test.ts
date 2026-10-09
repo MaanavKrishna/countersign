@@ -40,6 +40,14 @@ describe("Family Countersign protocol", () => {
     expect(stepAt(t)).toBe(1001);
     expect(g.theirsPrevious).toEqual(await codeFor(SECRET, "b", "a", 1000));
   });
+  it("accepts the next step when the caller's clock runs ahead", async () => {
+    const t = 1_000 * STEP_SECONDS * 1000 + 50_000; // 50s into step 1000; caller already at 1001
+    const grandma: Pairing = { id: "1", me: "Grandma", them: "Ethan", role: "a", secret: SECRET, createdAt: 0 };
+    const g = await codesForDisplay(grandma, t);
+    expect(g.theirsNext).toEqual(await codeFor(SECRET, "b", "a", 1001));
+    const mid = await codesForDisplay(grandma, 1_000 * STEP_SECONDS * 1000 + 30_000);
+    expect(mid.theirsNext).toBeNull();
+  });
   it("round-trips pairing links with the secret only in the fragment", () => {
     const link = pairingLink("https://cs.example", "Grandma", "Ethan Ray", SECRET);
     const u = new URL(link);

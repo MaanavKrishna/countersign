@@ -31,4 +31,9 @@ describe("qr", () => {
     }
     expect(decodeQrFromImageData({ data, width: w, height: w })).toBe("https://parking-pay.top/meter/4412");
   });
+  it("never forwards a Family Countersign pairing link to the investigator", () => {
+    expect(qrNote("https://countersign.example/family/pair#v=1&s=SECRET&a=Grandma&b=Ethan")).toBe(
+      "\n\n[QR code in the screenshot is a Family Countersign pairing code. It was not sent.]",
+    );
+  });
 });

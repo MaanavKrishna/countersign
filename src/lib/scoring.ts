@@ -65,7 +65,11 @@ export const SIGNALS: Record<string, Signal> = {
 const IMPERSONATION = new Set([
   "lookalike_brand_domain", "homoglyph_domain", "brand_in_subdomain", "brand_token_unrelated_domain",
   "brand_mismatch_sender", "freemail_claims_brand", "dmarc_fail", "sandbox_brand_phish", "impersonation_with_ask",
+  "ai_directed_instructions",
 ]);
+
+// Trust evidence that an impersonation or an injection attempt can fake or sway.
+const UNTRUSTWORTHY_UNDER_ATTACK = new Set(["trust_domain_established", "model_judgment_legit"]);
 
 export const TACTIC_SIGNALS = Object.keys(SIGNALS).filter((k) => k.startsWith("tactic_"));
 
@@ -97,7 +101,7 @@ export function score(findings: Finding[]): { risk: number; band: Band } {
   let trust = 1;
   for (const f of strongest.values()) {
     if (f.kind === "risk") notRisk *= 1 - f.weight;
-    else if (f.kind === "trust" && !(impersonation && f.signalId === "trust_domain_established")) trust *= 1 - f.weight;
+    else if (f.kind === "trust" && !(impersonation && UNTRUSTWORTHY_UNDER_ATTACK.has(f.signalId))) trust *= 1 - f.weight;
   }
   const risk = Math.round((1 - notRisk) * trust * 1000) / 1000;
   return { risk, band: bandFor(risk) };

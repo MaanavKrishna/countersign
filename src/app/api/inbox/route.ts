@@ -2,6 +2,7 @@ import { Mailroom, verifyWebhook } from "agentboxd";
 import { after } from "next/server";
 import { toInvestigationInput } from "@/lib/channels/agentboxd";
 import { firstDelivery } from "@/lib/channels/dedupe";
+import { shouldInvestigate } from "@/lib/channels/inboxPolicy";
 import { collectCase } from "@/lib/report/collect";
 import { renderReportEmail } from "@/lib/report/emailText";
 
@@ -34,6 +35,8 @@ export async function POST(req: Request) {
     const mr = new Mailroom();
     const msg = await mr.messages.get(messageId);
     if (msg.direction !== "inbound") return;
+    // Dedupe on the signed message id, skip auto-replies, spoofable senders and floods.
+    if (!shouldInvestigate(msg).ok) return;
     const result = await collectCase(toInvestigationInput(msg));
     const live = process.env.NEXT_PUBLIC_SITE_URL ?? "https://countersign-maanavkrishnas-projects.vercel.app";
     const { subject, text } = renderReportEmail(result, live);

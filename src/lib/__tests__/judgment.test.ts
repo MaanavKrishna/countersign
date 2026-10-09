@@ -17,4 +17,10 @@ describe("model's overall judgment as evidence", () => {
     expect(score(light).band).toBe("unverified");
     expect(score([...light, judgmentFinding("scam", "x")!]).band).toBe("forgery");
   });
+  it("ignores a 'genuine' vote when impersonation or injection evidence is present", () => {
+    const imp = [finding("impersonation_with_ask", "")];
+    expect(score([...imp, judgmentFinding("legitimate", "x")!]).risk).toBeCloseTo(score(imp).risk, 3);
+    const inj = [finding("ai_directed_instructions", "")];
+    expect(score([...inj, judgmentFinding("legitimate", "x")!]).band).not.toBe("countersigned");
+  });
 });

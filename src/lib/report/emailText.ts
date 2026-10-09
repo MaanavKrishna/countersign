@@ -14,7 +14,7 @@ export function renderReportEmail(c: CaseResult, liveUrl: string): { subject: st
   const lines = [
     `${WORD[r.band]} · ${pct}% risk · ${r.scamType}`,
     "",
-    r.headline,
+    defang(r.headline),
     defang(r.summary),
     "",
     evidence.length ? "EVIDENCE" : "",
@@ -30,5 +30,5 @@ export function renderReportEmail(c: CaseResult, liveUrl: string): { subject: st
     "Links from the suspicious message are shown defanged (hxxp, [.]) so they can't be clicked.",
     `Countersign checked ${c.toolsRun} things in ${(c.elapsedMs / 1000).toFixed(0)}s · ${liveUrl}`,
   ];
-  return { subject: `${WORD[r.band]} (${pct}% risk): ${r.headline}`, text: lines.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n") };
+  return { subject: `${WORD[r.band]} (${pct}% risk): ${defang(r.headline)}`, text: lines.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n") };
 }

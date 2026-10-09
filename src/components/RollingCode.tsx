@@ -20,7 +20,7 @@ export function RollingCode({ pairing, which, size = "md" }: { pairing: Pairing;
 
   if (!codes) return <div className="h-14 animate-pulse rounded bg-black/5" aria-hidden="true" />;
   const words = which === "mine" ? codes.mine : codes.theirs;
-  const prev = which === "theirs" ? codes.theirsPrevious : null;
+  const alt = which === "theirs" ? (codes.theirsPrevious ?? codes.theirsNext) : null;
   const big = size === "lg";
   return (
     <div className="flex flex-col gap-2">
@@ -43,7 +43,7 @@ export function RollingCode({ pairing, which, size = "md" }: { pairing: Pairing;
           />
         </svg>
       </div>
-      {prev && <p className="m-0 font-mono text-xs opacity-70">Just changed. Also accept: {prev.join(" · ")}</p>}
+      {alt && <p className="m-0 font-mono text-xs opacity-70">Their clock may differ slightly. Also accept: {alt.join(" · ")}</p>}
     </div>
   );
 }
