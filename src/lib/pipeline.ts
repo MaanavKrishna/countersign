@@ -5,6 +5,7 @@ import { extractTactics, type TacticsResult } from "./agent/tactics";
 import { brandByName, brandForDomain, type Brand } from "./brands";
 import { hostFromUrl, registrableDomain } from "./domain";
 import { extractIndicators } from "./indicators";
+import { detectAiDirectedText } from "./injection";
 import { finding, score } from "./scoring";
 import { runTool, type ToolRun } from "./tools";
 import { EXHIBIT_ID, factNodeId } from "./tools/graphIds";
@@ -44,6 +45,14 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
     const s = score(all);
     emit({ type: "score", ...s });
   };
+
+  const injected = detectAiDirectedText(text);
+  if (injected.length) {
+    all.push(...injected);
+    emit({ type: "tool_start", id: "injection", name: "injection_check", args: {} });
+    emit({ type: "tool_result", id: "injection", name: "injection_check", summary: injected[0].detail, findings: injected });
+    pushScore();
+  }
 
   const onTool = (name: string, run: ToolRun, args: Record<string, unknown>) => {
     all.push(...run.findings);

@@ -7,6 +7,7 @@ const TOOL_NAMES: Record<string, string> = {
   email_auth: "Email authentication",
   trace_url: "Link trace",
   sandbox_scan: "Sandbox browser",
+  injection_check: "AI-manipulation check",
 };
 
 function argText(args: Record<string, unknown>): string {

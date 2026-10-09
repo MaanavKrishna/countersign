@@ -37,6 +37,8 @@ export const SIGNALS: Record<string, Signal> = {
   redirect_to_ip: { weight: 0.4, label: "Link redirects to a raw IP address", kind: "risk" },
   sandbox_malicious: { weight: 0.8, label: "Sandbox flagged the page as malicious", kind: "risk" },
   sandbox_brand_phish: { weight: 0.5, label: "Page imitates a brand", kind: "risk" },
+  ai_directed_instructions: { weight: 0.55, label: "Hidden instructions aimed at AI scanners", kind: "risk" },
+  provider_phishing_flag: { weight: 0.35, label: "Mail provider's phishing model flagged it", kind: "risk" },
   // Manipulation tactics (from the message text)
   tactic_urgency: { weight: 0.15, label: "Artificial urgency", kind: "risk" },
   tactic_threat: { weight: 0.15, label: "Threat or fear", kind: "risk" },
