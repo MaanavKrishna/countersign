@@ -8,6 +8,8 @@ const TOOL_NAMES: Record<string, string> = {
   trace_url: "Link trace",
   sandbox_scan: "Sandbox browser",
   injection_check: "AI-manipulation check",
+  impersonation_check: "Impersonation check",
+  provider_signals: "Mail provider signals",
 };
 
 function argText(args: Record<string, unknown>): string {

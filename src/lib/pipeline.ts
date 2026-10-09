@@ -6,6 +6,7 @@ import { brandByName, brandForDomain, type Brand } from "./brands";
 import { hostFromUrl, registrableDomain } from "./domain";
 import { extractIndicators } from "./indicators";
 import { detectAiDirectedText } from "./injection";
+import { impersonationAsk } from "./combination";
 import { finding, score } from "./scoring";
 import { runTool, type ToolRun } from "./tools";
 import { EXHIBIT_ID, factNodeId } from "./tools/graphIds";
@@ -114,6 +115,14 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit, op
   linkTrust(ind, all);
 
   const tacticsResult = await tacticsPromise;
+  if (opts.combination !== false) {
+    const combo = impersonationAsk(all, ind.claimedBrands);
+    if (combo.length) {
+      all.push(...combo);
+      emit({ type: "tool_start", id: "combination", name: "impersonation_check", args: {} });
+      emit({ type: "tool_result", id: "combination", name: "impersonation_check", summary: combo[0].detail, findings: combo });
+    }
+  }
   const tactics: Tactic[] = tacticsResult?.tactics ?? [];
   const messageText = tacticsResult?.messageText ?? text;
   const { risk, band } = score(all);
