@@ -24,6 +24,7 @@ export const TACTIC_LABELS: Record<(typeof CATEGORIES)[number], string> = {
 
 const TacticsSchema = z.object({
   messageText: z.string().describe("The message's full visible text. If the input is a screenshot, transcribe it."),
+  language: z.string().describe("English name of the language the message is written in, e.g. 'English', 'Spanish', 'Hindi'"),
   tactics: z.array(
     z.object({
       category: z.enum(CATEGORIES),
@@ -53,7 +54,7 @@ function normalize(s: string) {
   return s.toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim();
 }
 
-export type TacticsResult = { tactics: Tactic[]; findings: Finding[]; messageText: string };
+export type TacticsResult = { tactics: Tactic[]; findings: Finding[]; messageText: string; language: string };
 
 export async function extractTactics(
   text: string,
@@ -71,7 +72,7 @@ export async function extractTactics(
     messages: [{ role: "user", content }],
   });
   const out = res.parsed_output;
-  if (!out) return { tactics: [], findings: [], messageText: text };
+  if (!out) return { tactics: [], findings: [], messageText: text, language: "English" };
 
   // Anti-hallucination: a quote must really appear in the message text.
   const haystack = normalize(text || out.messageText);
@@ -81,5 +82,5 @@ export async function extractTactics(
   const findings = kept.map((t) =>
     finding(`tactic_${t.category}`, `"${t.quote.trim()}" — ${t.why}`, TACTIC_LABELS[t.category]),
   );
-  return { tactics, findings, messageText: out.messageText || text };
+  return { tactics, findings, messageText: out.messageText || text, language: out.language || "English" };
 }

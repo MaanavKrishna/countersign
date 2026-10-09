@@ -10,6 +10,7 @@ export type CaseFile = {
   prosecution: string;
   risk: number;
   band: Band;
+  language?: string;
 };
 
 function evidenceList(findings: Finding[]): string {
@@ -77,7 +78,9 @@ export async function judge(c: CaseFile, defense: string): Promise<Ruling | null
 ${UNTRUSTED_RULE}
 
 The verdict band is fixed by a deterministic evidence score and you cannot change it. Write the headline, summary and ruling consistent with that band. If you are convinced the score is badly wrong, explain in reviewNote — the user will see it.
-Actions must never tell the user to use any link, phone number or email address from the message; tell them to go to the organization through a channel they already trust. Never invent phone numbers or URLs.`,
+Actions must never tell the user to use any link, phone number or email address from the message; tell them to go to the organization through a channel they already trust. Never invent phone numbers or URLs.
+
+Write ruling, headline, summary, scamType, actions and ifCompromised in the same language as the suspicious message (for example Spanish for a Spanish message). Keep brand names and URLs unchanged.`,
     messages: [
       {
         role: "user",
@@ -87,7 +90,9 @@ Prosecution: ${c.prosecution || "(no closing argument)"}
 
 Defense: ${defense || "(no defense offered)"}
 
-Evidence score: ${(c.risk * 100).toFixed(0)}% → verdict band ${BAND_WORDS[c.band]}.`,
+Evidence score: ${(c.risk * 100).toFixed(0)}% → verdict band ${BAND_WORDS[c.band]}.${c.language && c.language.toLowerCase() !== "english" ? `
+
+The message is in ${c.language}. Write every field of your ruling in ${c.language}.` : ""}`,
       },
     ],
   });

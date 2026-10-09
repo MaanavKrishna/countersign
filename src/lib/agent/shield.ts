@@ -18,7 +18,7 @@ const ShieldSchema = z.object({
       quote: z.string().describe("Exact words from the transcript, 2–10 words"),
     }),
   ),
-  advice: z.string().describe("One calm sentence, under 20 words, telling the listener what to do right now"),
+  advice: z.string().describe("One calm sentence, under 20 words, in the same language the caller is speaking, telling the listener what to do right now"),
   challengeNow: z
     .boolean()
     .describe("True when the caller claims to be a specific person or organization AND is asking for money, secrecy, codes, or access"),
