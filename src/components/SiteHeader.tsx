@@ -8,6 +8,7 @@ const NAV = [
   { href: "/shield", label: "Call Shield" },
   { href: "/family", label: "Family" },
   { href: "/vault", label: "Memory Vault" },
+  { href: "/evidence", label: "Evidence" },
 ] as const;
 
 export function Logo({ tone = "light" }: { tone?: "light" | "dark" }) {
