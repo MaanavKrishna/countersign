@@ -115,24 +115,18 @@ Bands: ≥ 0.70 **FORGERY** · 0.35–0.70 **UNVERIFIED** · < 0.35 **COUNTERSIG
 
 ## Results
 
-End-to-end eval (`npm run eval`) on 8 labelled real-world cases, using a fast LLM and live lookups:
+Every number is reproducible with `npm run eval` and published at **[/evidence](https://countersign-maanavkrishnas-projects.vercel.app/evidence)**. We compare four systems on 24 textbook cases (classic scam wording, prompt-injection attacks, Spanish) and a **hard set of 14 that was committed before any system was run on it** ([commit 34e3ba0](https://github.com/MaanavKrishna/countersign/commit/34e3ba0)): polished fakes whose only giveaway is the infrastructure, plus genuine but alarming alerts.
 
-| Case | Truth | Verdict | Risk |
-|---|---|---|---|
-| PayPal "account limited" phishing email | scam | FORGERY | 0.996 |
-| USPS redelivery smishing text | scam | FORGERY | 0.946 |
-| "Hi Mum, new number" WhatsApp | scam | FORGERY | 0.763 |
-| Crypto "investment advisor" DM | scam | FORGERY | 0.953 |
-| CEO wire-transfer (BEC) email | scam | FORGERY | 0.878 |
-| Fake "Windows Defender" tech-support popup | scam | UNVERIFIED | 0.642 |
-| Genuine GitHub security alert | legit | COUNTERSIGNED | 0.000 |
-| Genuine Amazon shipping email | legit | COUNTERSIGNED | 0.000 |
+| System | Textbook (24) | Hard (14) | False alarms | Scams cleared as genuine |
+|---|---|---|---|---|
+| Single LLM prompt (what most checkers are) | 24/24 | 14/14 | 0 | 0 |
+| Deterministic checks only (no AI) | 12/24 | 12/14 | 0 | 6 |
+| Countersign v1 (evidence + tactics) | 22/24 | 14/14 | 0 | 0 |
+| **Countersign** | **24/24** | **14/14** | **0** | **0** |
 
-- **Strict accuracy: 7/8.** The tech-support popup was rated UNVERIFIED rather than FORGERY. It has no links or sender domain to check, so only tactic evidence counts.
-- **Never dangerous: 8/8.** No scam was cleared as genuine, and no genuine message was stamped a forgery.
-- Each investigation takes about 10–16 seconds.
+**How we got here, honestly.** Run 1 showed tactic-only scams under-scored. We added an "identity claim + request" signal and ran the pre-registered hard set; that produced one false alarm on a genuine verification-code text. After that run we fixed two things, a message that *gives* a code is not one that *asks* for it, and the model's overall read now counts as one weighted signal that code can still outvote. The final numbers above come after those changes.
 
-We didn't tune weights to this set; it's a sanity check, not a benchmark.
+**What this means.** A strong model is hard to beat at classification alone, and we match it rather than claim to beat it. Countersign's value is elsewhere: every verdict shows the evidence behind it, the AI never sets the verdict on its own, the deterministic layer keeps working without the model, and **Family Countersign verifies identity in the one case no detector can handle: a perfect voice clone.**
 
 ## Safety and privacy by design
 

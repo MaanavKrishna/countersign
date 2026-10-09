@@ -94,6 +94,24 @@ export default function EvidencePage() {
             </p>
           )}
 
+          <section className="flex flex-col gap-3 rounded-md border-[1.5px] border-line bg-card p-6">
+            <h2 className="condensed m-0 text-2xl font-black uppercase">How we got here</h2>
+            <ol className="m-0 flex flex-col gap-3 pl-5 leading-relaxed text-body">
+              <li>
+                <b className="text-ink">Run 1 (24 textbook cases).</b> A single model prompt got 24/24. Countersign got 20/24: it never cleared a scam, but rated four tactic-only scams (no links or sender to check) as UNVERIFIED rather than FORGERY.
+              </li>
+              <li>
+                <b className="text-ink">We pre-registered a hard set</b> of 14 polished fakes and scary-but-real alerts, and added one signal: an identity claim combined with a request for money, codes or access. Run 2: single prompt 38/38, Countersign 36/38 with one false alarm (a genuine verification-code text).
+              </li>
+              <li>
+                <b className="text-ink">Two fixes after run 2</b>, and we say so: a message that <i>gives</i> a code is no longer read as one that <i>asks</i> for it, and the model&apos;s overall read now counts as one weighted signal, which code can still outvote. The tables above are run 3.
+              </li>
+              <li>
+                <b className="text-ink">What this means.</b> On classification alone, a strong model is hard to beat, and we don&apos;t claim to. Countersign&apos;s job is different: show the evidence behind every verdict, never let the AI set the verdict alone, and, with Family Countersign, prove identity in the one case no detector can: a perfect voice clone.
+              </li>
+            </ol>
+          </section>
+
           <details className="rounded-md border-[1.5px] border-line bg-card p-5">
             <summary className="cursor-pointer font-bold">Every case, every system</summary>
             <div className="mt-4 overflow-x-auto">
