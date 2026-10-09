@@ -109,6 +109,7 @@ Next.js 16 (App Router, route handlers streaming Server-Sent Events) · TypeScri
 ## Run it
 
 ```bash
+git clone https://github.com/MaanavKrishna/countersign.git
 cd countersign
 npm install
 cp .env.example .env.local   # add ANTHROPIC_API_KEY and AI_MODEL (and optionally URLSCAN_API_KEY)
@@ -134,3 +135,7 @@ src/app/api/investigate     SSE endpoint
 src/app/api/shield          live-call assessment endpoint
 src/components/             report UI, evidence graph, Call Shield
 ```
+
+## License
+
+MIT. See [LICENSE](LICENSE).
