@@ -79,14 +79,20 @@ export function extractIndicators(input: string): Indicators {
   const text = input.slice(0, 20000);
   const { headers, body } = parseHeaders(text);
 
+  // Only the body and the sender-identity headers carry evidence; routing headers
+  // (Received, Authentication-Results, To) name infrastructure, not the scammer.
+  const scan = headers
+    ? [headers["from"], headers["reply-to"], headers["return-path"], headers["subject"], body].filter(Boolean).join("\n")
+    : text;
+
   const emails = uniq(
-    (text.match(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi) ?? []).map((e) => e.toLowerCase()),
+    (scan.match(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi) ?? []).map((e) => e.toLowerCase()),
   );
 
-  const schemeUrls = text.match(/\bhttps?:\/\/[^\s<>"'`)\]]+/gi) ?? [];
+  const schemeUrls = scan.match(/\bhttps?:\/\/[^\s<>"'`)\]]+/gi) ?? [];
   // Bare domains, optionally with a path: "bit.ly/3xK9pQ", "usps-track.top"
   const bareCandidates =
-    text.match(/(?<![@\w.\/-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?:\/[^\s<>"'`)\]]*)?/gi) ?? [];
+    scan.match(/(?<![@\w.\/-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}(?:\/[^\s<>"'`)\]]*)?/gi) ?? [];
   const bare = bareCandidates.filter((c) => {
     const host = c.split("/")[0].toLowerCase();
     const t = host.split(".").pop()!;
@@ -103,7 +109,7 @@ export function extractIndicators(input: string): Indicators {
   const domains = uniq([...urlHosts, ...emailHosts].map(registrableDomain));
 
   const phones = uniq(
-    (text.match(/(?<![A-Za-z0-9])(?:\+?\d[\d\s().-]{7,}\d)/g) ?? [])
+    (scan.match(/(?<![A-Za-z0-9])(?:\+?\d[\d\s().-]{7,}\d)/g) ?? [])
       .map((p) => p.trim())
       .filter((p) => {
         const digits = p.replace(/\D/g, "");
@@ -112,7 +118,7 @@ export function extractIndicators(input: string): Indicators {
   );
 
   const money = uniq(
-    text.match(/(?:[$£€₹]\s?\d[\d,]*(?:\.\d+)?(?:\s?(?:k|m))?)|(?:\b\d[\d,]*(?:\.\d+)?\s?(?:dollars|usd|btc|eth|usdt)\b)/gi) ?? [],
+    scan.match(/(?:[$£€₹]\s?\d[\d,]*(?:\.\d+)?(?:\s?(?:k|m))?)|(?:\b\d[\d,]*(?:\.\d+)?\s?(?:dollars|usd|btc|eth|usdt)\b)/gi) ?? [],
   );
 
   const paymentMethods = uniq(PAYMENT_TERMS.filter(([re]) => re.test(text)).map(([, label]) => label));

@@ -57,6 +57,11 @@ export const SIGNALS: Record<string, Signal> = {
   inconclusive: { weight: 0, label: "Lookup inconclusive", kind: "neutral" },
 };
 
+const IMPERSONATION = new Set([
+  "lookalike_brand_domain", "homoglyph_domain", "brand_in_subdomain", "brand_token_unrelated_domain",
+  "brand_mismatch_sender", "freemail_claims_brand", "dmarc_fail", "sandbox_brand_phish",
+]);
+
 export const TACTIC_SIGNALS = Object.keys(SIGNALS).filter((k) => k.startsWith("tactic_"));
 
 export function finding(signalId: string, detail: string, label?: string): Finding {
@@ -81,11 +86,13 @@ export function score(findings: Finding[]): { risk: number; band: Band } {
     const prev = strongest.get(f.signalId);
     if (!prev || f.weight > prev.weight) strongest.set(f.signalId, f);
   }
+  // An old domain can't vouch for a message that impersonates someone else.
+  const impersonation = [...strongest.keys()].some((id) => IMPERSONATION.has(id));
   let notRisk = 1;
   let trust = 1;
   for (const f of strongest.values()) {
     if (f.kind === "risk") notRisk *= 1 - f.weight;
-    else if (f.kind === "trust") trust *= 1 - f.weight;
+    else if (f.kind === "trust" && !(impersonation && f.signalId === "trust_domain_established")) trust *= 1 - f.weight;
   }
   const risk = Math.round((1 - notRisk) * trust * 1000) / 1000;
   return { risk, band: bandFor(risk) };

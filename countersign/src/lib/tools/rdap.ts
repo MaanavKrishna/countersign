@@ -1,6 +1,10 @@
 import { brandForDomain } from "../brands";
 import { registrableDomain } from "../domain";
 import { finding } from "../scoring";
+import { SHORTENERS } from "./traceUrl";
+
+// Shared infrastructure is old by definition; its age says nothing about the sender.
+const INFRASTRUCTURE = new Set([...SHORTENERS, "gmail.com", "googlemail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "proton.me", "protonmail.com", "gmx.com", "mail.ru", "yandex.com", "github.io", "netlify.app", "vercel.app", "pages.dev", "web.app", "firebaseapp.com", "blogspot.com", "wixsite.com", "weebly.com", "000webhostapp.com", "sites.google.com", "forms.gle", "docs.google.com"]);
 import type { Finding, ToolOutput } from "../types";
 import { domainNodeId, factNodeId } from "./graphIds";
 
@@ -92,14 +96,17 @@ export async function rdapLookup(rawDomain: string, now = Date.now()): Promise<T
     const factId = factNodeId(domain, "age");
     return {
       summary: `${domain} registered ${describeAge(days)}${registrar ? ` (${registrar})` : ""}.`,
-      findings: brandForDomain(domain) ? findings.filter((f) => f.kind !== "trust") : findings,
-      graph: {
-        nodes: [
-          { id: dn, label: domain, kind: "domain", suspicious: young || undefined },
-          { id: factId, label: `registered ${describeAge(days)}`, kind: "fact", suspicious: young || undefined },
-        ],
-        edges: [{ source: dn, target: factId, deceptive: young || undefined }],
-      },
+      findings: brandForDomain(domain) || INFRASTRUCTURE.has(domain) ? findings.filter((f) => f.kind !== "trust") : findings,
+      // Only a young domain earns a node in the evidence graph.
+      graph: young
+        ? {
+            nodes: [
+              { id: dn, label: domain, kind: "domain", suspicious: true },
+              { id: factId, label: `registered ${describeAge(days)}`, kind: "fact", suspicious: true },
+            ],
+            edges: [{ source: dn, target: factId, deceptive: true }],
+          }
+        : { nodes: [], edges: [] },
     };
   } catch (err) {
     return {

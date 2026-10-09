@@ -7,10 +7,10 @@ import type { GraphEdge, GraphNode } from "@/lib/types";
 type SimNode = SimulationNodeDatum & GraphNode & { w: number; h: number };
 type SimLink = { source: SimNode | string; target: SimNode | string; edge: GraphEdge };
 
-const HEIGHT = 440;
+const HEIGHT = 540;
 
 function nodeWidth(n: GraphNode) {
-  return Math.min(240, n.label.length * 7.4 + 28);
+  return Math.min(210, n.label.length * 7.4 + 28);
 }
 
 function safeLabel(label: string) {
@@ -59,11 +59,11 @@ export function EvidenceGraph({ nodes, edges }: { nodes: GraphNode[]; edges: Gra
 
     sim.current?.stop();
     const s = forceSimulation<SimNode, SimLink>(list)
-      .force("link", forceLink<SimNode, SimLink>(links).id((d) => d.id).distance(120).strength(0.5))
-      .force("charge", forceManyBody().strength(-520))
+      .force("link", forceLink<SimNode, SimLink>(links).id((d) => d.id).distance((l) => ((l.source as SimNode).w + (l.target as SimNode).w) / 2 + 40).strength(0.35))
+      .force("charge", forceManyBody().strength(-380))
       .force("x", forceX(width / 2).strength(0.04))
-      .force("y", forceY(HEIGHT / 2).strength(0.09))
-      .force("collide", forceCollide<SimNode>().radius((d) => d.w / 2 + 6).strength(0.9))
+      .force("y", forceY(HEIGHT / 2).strength(0.05))
+      .force("collide", forceCollide<SimNode>().radius((d) => d.w / 2.4 + 10).strength(1).iterations(3))
       .alpha(0.7)
       .alphaDecay(0.035)
       .on("tick", () => {
@@ -146,7 +146,7 @@ export function EvidenceGraph({ nodes, edges }: { nodes: GraphNode[]; edges: Gra
             <div
               key={n.id}
               className={`animate-pop absolute -translate-x-1/2 -translate-y-1/2 rounded border-[1.5px] px-3 py-2 font-mono text-[12.5px] whitespace-nowrap ${cls}`}
-              style={{ left: n.x, top: n.y, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", fontStretch: n.kind === "exhibit" ? "80%" : undefined }}
+              style={{ left: n.x, top: n.y, maxWidth: 210, zIndex: n.kind === "exhibit" ? 3 : n.kind === "brand" ? 2 : 1, overflow: "hidden", textOverflow: "ellipsis", fontStretch: n.kind === "exhibit" ? "80%" : undefined }}
               title={safeLabel(n.label)}
             >
               {n.kind === "exhibit" ? "Exhibit A" : safeLabel(n.label)}

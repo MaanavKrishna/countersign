@@ -61,8 +61,8 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit): P
         emit({
           type: "graph",
           delta: {
-            nodes: r.tactics.slice(0, 4).map((t, i) => ({ id: factNodeId("tactic", String(i)), label: `${t.label.toLowerCase()} · "${t.quote.slice(0, 28)}${t.quote.length > 28 ? "…" : ""}"`, kind: "fact" as const, suspicious: true })),
-            edges: r.tactics.slice(0, 4).map((_, i) => ({ source: EXHIBIT_ID, target: factNodeId("tactic", String(i)), label: "tactic" })),
+            nodes: r.tactics.slice(0, 3).map((t, i) => ({ id: factNodeId("tactic", String(i)), label: `${t.label.toLowerCase()} · "${t.quote.slice(0, 28)}${t.quote.length > 28 ? "…" : ""}"`, kind: "fact" as const, suspicious: true })),
+            edges: r.tactics.slice(0, 3).map((_, i) => ({ source: EXHIBIT_ID, target: factNodeId("tactic", String(i)), label: "tactic" })),
           },
         });
       }

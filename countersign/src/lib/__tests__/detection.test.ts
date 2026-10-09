@@ -43,6 +43,9 @@ describe("indicators", () => {
     expect(ind.displayName).toBe("PayPal Service");
     expect(ind.urls).toContain("https://bit.ly/3xK9pQ");
     expect(ind.domains).toEqual(expect.arrayContaining(["paypa1-secure.com", "gmail.com", "bit.ly"]));
+    // Routing headers name infrastructure, not the scammer.
+    expect(ind.domains).not.toContain("google.com");
+    expect(ind.urls.some((u) => u.includes("mx.google.com"))).toBe(false);
     expect(ind.phones[0]).toContain("888");
     expect(ind.money).toContain("$49.99");
     expect(ind.paymentMethods).toContain("gift card");
@@ -83,6 +86,9 @@ describe("lookalike detection", () => {
     expect(classifyDomain("paypal.com.account-check.ru").kind).toBe("subdomain");
     expect(classifyDomain("usps.com-redelivery.top").kind).toBe("subdomain");
     expect(classifyDomain("amazon.verify-account.net").kind).toBe("subdomain");
+  });
+  it("treats a digit-swapped brand inside a domain as a lookalike", () => {
+    expect(classifyDomain("paypa1-secure.com").kind).toBe("lookalike");
   });
   it("catches brand token in unrelated domain", () => {
     const r = classifyDomain("paypal-secure-login.com");
@@ -153,6 +159,10 @@ describe("scoring", () => {
     const one = score([finding("url_shortener", "")]);
     const many = score([finding("url_shortener", "a"), finding("url_shortener", "b"), finding("url_shortener", "c")]);
     expect(many.risk).toBe(one.risk);
+  });
+  it("doesn't let an old domain vouch for an impersonation", () => {
+    const s = score([finding("lookalike_brand_domain", ""), finding("trust_domain_established", "")]);
+    expect(s.risk).toBeCloseTo(0.7, 3);
   });
   it("lets trust evidence pull the score down", () => {
     const s = score([finding("tactic_urgency", ""), finding("tactic_threat", ""), finding("trust_auth_aligned", ""), finding("trust_links_on_brand", "")]);

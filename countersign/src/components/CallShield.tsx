@@ -80,6 +80,12 @@ export function CallShield() {
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const simTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const linesRef = useRef<Line[]>([]);
+  const transcriptBox = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = transcriptBox.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [lines]);
 
   const analyze = useCallback(() => {
     if (debounce.current) clearTimeout(debounce.current);
@@ -348,7 +354,7 @@ export function CallShield() {
               {assessment && assessment.tactics.length > 0 && (
                 <div className="flex flex-wrap gap-2.5">
                   {assessment.claimedIdentity && <span className="rounded-full bg-white px-3.5 py-2 text-sm font-bold text-ink">Claimed: {assessment.claimedIdentity}</span>}
-                  {assessment.tactics.map((t, i) => (
+                  {assessment.tactics.slice(-6).map((t, i) => (
                     <span key={i} className="animate-pop rounded-full px-3.5 py-2 text-sm font-semibold" style={{ background: s.line }}>
                       {t.label} · “{t.quote}”
                     </span>
@@ -366,7 +372,7 @@ export function CallShield() {
                   {paused ? "analysis paused" : analyzing ? "analyzing…" : mode === "sim" ? "simulated call" : "on-device speech"}
                 </span>
               </div>
-              <div className="flex max-h-[460px] flex-col gap-4 overflow-y-auto p-5 text-base leading-normal">
+              <div ref={transcriptBox} className="flex max-h-[460px] flex-col gap-4 overflow-y-auto scroll-smooth p-5 text-base leading-normal">
                 {lines.length === 0 && <p className="m-0 italic" style={{ color: s.muted }}>Waiting for speech…</p>}
                 {lines.map((l, i) => (
                   <p key={i} className="animate-rise m-0" style={{ color: l.final ? (i === lines.length - 1 ? "#fff" : s.text) : s.muted }}>

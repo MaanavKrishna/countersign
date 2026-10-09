@@ -113,7 +113,11 @@ export function classifyDomain(rawHost: string): LookalikeResult {
 
   // 3. Brand token inside an unrelated domain: paypal-secure-login.com
   for (const b of BRANDS) {
-    if (tokenAppears(skel, b.token)) return { brand: b, kind: "token" };
+    if (tokenAppears(skel, b.token)) {
+      // "paypa1-secure": the brand only appears after undoing a character swap.
+      const disguised = !tokenAppears(label.toLowerCase(), b.token);
+      return { brand: b, kind: disguised ? (hasNonAscii ? "homoglyph" : "lookalike") : "token", distance: disguised ? 0 : undefined, unicode: hasNonAscii ? unicodeHost : undefined };
+    }
   }
 
   if (hasNonAscii) return { brand: null, kind: "none", unicode: unicodeHost };
@@ -150,7 +154,7 @@ export function lookalikeCheck(domain: string): ToolOutput {
       break;
     case "lookalike":
       findings.push(finding("lookalike_brand_domain", `"${labelOf(host)}" is ${r.distance === 0 ? "a character-swap" : `${r.distance} edit${r.distance === 1 ? "" : "s"}`} away from ${real}.`));
-      graph.edges.push({ ...edge, label: `lookalike · edit distance ${r.distance}` });
+      graph.edges.push({ ...edge, label: r.distance === 0 ? "lookalike · character swap" : `lookalike · ${r.distance} edit${r.distance === 1 ? "" : "s"}` });
       break;
     case "subdomain":
       findings.push(finding("brand_in_subdomain", `${host} starts with "${real}" but the real owner is ${registrableDomain(host)}.`));

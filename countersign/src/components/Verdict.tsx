@@ -9,7 +9,8 @@ export const BAND_STYLE: Record<Band, { color: string; ink: string; word: string
 export function RiskGauge({ risk, band, size = 132 }: { risk: number; band: Band; size?: number }) {
   const r = (size - 16) / 2;
   const c = 2 * Math.PI * r;
-  const pct = Math.round(risk * 100);
+  // Evidence is never certainty: cap the display at 99.
+  const pct = Math.min(99, Math.round(risk * 100));
   const { color } = BAND_STYLE[band];
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }} role="img" aria-label={`Risk ${pct} percent`}>
