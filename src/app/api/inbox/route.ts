@@ -2,7 +2,7 @@ import { Mailroom, verifyWebhook } from "agentboxd";
 import { after } from "next/server";
 import { toInvestigationInput } from "@/lib/channels/agentboxd";
 import { firstDelivery } from "@/lib/channels/dedupe";
-import { shouldInvestigate } from "@/lib/channels/inboxPolicy";
+import { heldNotice, shouldInvestigate } from "@/lib/channels/inboxPolicy";
 import { collectCase } from "@/lib/report/collect";
 import { renderReportEmail } from "@/lib/report/emailText";
 
@@ -32,15 +32,28 @@ export async function POST(req: Request) {
   if (event.type !== "message.received" || !inboxId || !messageId) return new Response("ignored", { status: 200 });
 
   after(async () => {
-    const mr = new Mailroom();
-    const msg = await mr.messages.get(messageId);
-    if (msg.direction !== "inbound") return;
-    // Dedupe on the signed message id, skip auto-replies, spoofable senders and floods.
-    if (!shouldInvestigate(msg).ok) return;
-    const result = await collectCase(toInvestigationInput(msg));
-    const live = process.env.NEXT_PUBLIC_SITE_URL ?? "https://countersign-maanavkrishnas-projects.vercel.app";
-    const { subject, text } = renderReportEmail(result, live);
-    await mr.messages.reply(inboxId, messageId, { text: `${subject}\n\n${text}`, labels: [`countersign:${result.report.band}`] });
+    try {
+      const mr = new Mailroom();
+      const msg = await mr.messages.get(messageId);
+      if (msg.direction !== "inbound") return;
+      // Dedupe on the signed message id, skip auto-replies, spoofable senders and floods.
+      const policy = shouldInvestigate(msg);
+      console.log(`[inbox] ${messageId} policy=${policy.reason}`);
+      if (!policy.ok) return;
+      const held = heldNotice(msg as Parameters<typeof heldNotice>[0]);
+      if (held) {
+        await mr.messages.reply(inboxId, messageId, { text: `${held.subject}\n\n${held.text}`, labels: ["countersign:forgery"] });
+        console.log(`[inbox] ${messageId} replied held-notice`);
+        return;
+      }
+      const result = await collectCase(toInvestigationInput(msg));
+      const live = process.env.NEXT_PUBLIC_SITE_URL ?? "https://countersign-maanavkrishnas-projects.vercel.app";
+      const { subject, text } = renderReportEmail(result, live);
+      await mr.messages.reply(inboxId, messageId, { text: `${subject}\n\n${text}`, labels: [`countersign:${result.report.band}`] });
+      console.log(`[inbox] ${messageId} replied band=${result.report.band}`);
+    } catch (err) {
+      console.error(`[inbox] ${messageId} failed:`, err);
+    }
   });
   return new Response("accepted", { status: 202 });
 }
