@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { ShieldAssessment, ShieldStage, Tactic } from "@/lib/types";
 import { alertText, smsLink } from "@/lib/countersign/alert";
 import { useFamily } from "@/lib/countersign/store";
@@ -69,6 +69,14 @@ function Highlight({ text, tactics, hot }: { text: string; tactics: Tactic[]; ho
 
 export function CallShield() {
   const { entries } = useVault();
+  const canListen = useSyncExternalStore(
+    () => () => {},
+    () => {
+      const w = window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown };
+      return !!(w.SpeechRecognition ?? w.webkitSpeechRecognition);
+    },
+    () => true,
+  );
   const { pairings, circles, contact } = useFamily();
   const [mode, setMode] = useState<"idle" | "mic" | "sim">("idle");
   const [lines, setLines] = useState<Line[]>([]);
@@ -297,6 +305,16 @@ export function CallShield() {
                 </button>
               </div>
               {micError && <p className="m-0 rounded bg-white/10 px-3 py-2 text-sm">{micError}</p>}
+              {!canListen && (
+                <p className="m-0 rounded bg-white/10 px-3 py-2 text-sm">Live listening needs Chrome, Edge or Safari. The demo calls work everywhere.</p>
+              )}
+              <p className="m-0 max-w-[640px] text-base" style={{ color: s.text }}>
+                You don&apos;t need Call Shield to stay safe. On any phone, open{" "}
+                <Link href="/family?check=1" className="font-bold text-white underline underline-offset-4">
+                  Family → Who&apos;s calling?
+                </Link>{" "}
+                and ask for the countersign.
+              </p>
             </div>
             <aside className="flex min-w-0 flex-[1_1_340px] flex-col gap-3 rounded-md border-[1.5px] p-6" style={{ borderColor: s.line, background: s.panel }}>
               <p className="m-0 font-mono text-xs tracking-[0.12em] uppercase" style={{ color: s.muted }}>
