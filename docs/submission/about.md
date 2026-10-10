@@ -29,7 +29,7 @@ $$
 P(\text{guess}) = 2^{-33} \approx \frac{1}{8.6 \times 10^{9}},
 $$
 
-and the code expires within a minute. Phones accept the neighbouring minute's code for 20 seconds to absorb clock drift. The secret travels only in the URL fragment, which browsers never send to servers. Codes are directional, so a scammer who calls the real grandson at the same time can't relay Grandma's expected words. The protocol is published with test vectors so anyone can build a compatible app.
+and the code expires within a minute. Phones accept the neighbouring minute's code for 20 seconds to absorb clock drift. The secret travels only in the URL fragment, which browsers never send to servers. Every screen says to read your words only when *you* placed the call, and for the closest pairs there's a two-person mode with directional codes, so a scammer who calls the real grandson at the same time can't relay Grandma's expected words. The protocol is published with test vectors so anyone can build a compatible app.
 
 **The verdict.** The AI gathers evidence; code decides. Each finding has a fixed weight, and a noisy-OR combines independent risk signals $w_i$, discounted by trust signals $t_j$:
 
