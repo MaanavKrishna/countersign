@@ -19,6 +19,11 @@ AI removed the tells we taught our families. Phishing has perfect grammar now, a
 - Words in English, Spanish, French, Italian or Portuguese.
 - For the people you talk to most, there's also two-person pairing, which uses directional codes for even stronger relay resistance.
 
+**Built for the habit, not just the tech.**
+- A **Practice call**: a simulated scammer speaks the script and you rehearse asking for the countersign.
+- A **printable card** for the phone table.
+- A **home-screen shortcut** straight to "Who's calling?".
+
 **Call Shield.** Put the call on speaker. Countersign transcribes it on the device, recognizes scam scripts as they unfold (emergency, "don't tell Mom", gift cards), shows the words the real caller must say, and offers a one-tap text to a trusted family member, because scams depend on secrecy.
 
 **Message Investigator.** Paste an email, text or listing, or drop a screenshot (QR codes inside it are decoded too). An AI agent investigates with real lookups: domain registration age, DNS, SPF/DKIM/DMARC, lookalike and homoglyph domains, brand-in-subdomain tricks, and redirect chains followed without opening the page. You watch an evidence graph build live. A transparent scoring model, not the AI, sets the verdict. A defense agent argues the message is genuine before a judge stamps it FORGERY, UNVERIFIED or COUNTERSIGNED, in the message's own language. You also get the organization's official help link and "what to do if you already clicked".
