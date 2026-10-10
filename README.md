@@ -193,6 +193,7 @@ We'd rather you hear these from us.
 | `/family/card` | Printable phone-table card |
 | `/check` | Message Investigator (paste, screenshot, QR) |
 | `/shield` | Call Shield (live listening or demo calls) |
+| `/vault` | Memory Vault: personal questions Call Shield can ask a caller, stored only on this phone |
 | `/evidence` | Published evaluation, including losses |
 | `/share` | Android share-sheet target |
 | `/api/investigate`, `/api/shield`, `/api/inbox` | Streaming investigation, live-call assessment, forward-to-check webhook |
