@@ -2,28 +2,45 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { EVAL_CASES } from "@/lib/eval/cases";
 import { ADVERSARIAL_CASES } from "@/lib/eval/adversarialCases";
+import { MENTION_CASES, QR_CASES } from "@/lib/eval/freshCases";
 import { HARD_CASES } from "@/lib/eval/hardCases";
+import { qrPicture } from "@/lib/eval/qrImage";
+import { decodeQrFromImageData, qrNote } from "@/lib/investigator/qr";
 import { llmOnlyBand } from "@/lib/eval/baseline";
 import { summarize, type ArmMetrics, type EvalRow } from "@/lib/eval/metrics";
 import { collectCase } from "@/lib/investigator/report/collect";
 
 // Opt-in: calls the model API and the network. EVAL=1 npx vitest run eval
-type Row = EvalRow & { set: "easy" | "hard" | "adversarial" };
+type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention";
+type Row = EvalRow & { set: SetId };
 type ArmId = "llm-only" | "evidence-only" | "countersign-v1" | "countersign";
 type EvalResults = {
   generatedAt: string;
   hardSetCommit: string;
   adversarialSetCommit: string;
-  arms: { id: ArmId; label: string; metrics: { all: ArmMetrics; easy: ArmMetrics; hard: ArmMetrics; adversarial: ArmMetrics }; rows: Row[] }[];
+  freshSetCommit: string;
+  arms: { id: ArmId; label: string; metrics: Record<"all" | SetId, ArmMetrics>; rows: Row[] }[];
 };
 
 const CASES = [
   ...EVAL_CASES.map((c) => ({ ...c, set: "easy" as const })),
   ...HARD_CASES.map((c) => ({ ...c, set: "hard" as const })),
   ...ADVERSARIAL_CASES.map((c) => ({ ...c, set: "adversarial" as const })),
+  ...QR_CASES.map((c) => ({ ...c, set: "qr" as const })),
+  ...MENTION_CASES.map((c) => ({ ...c, set: "mention" as const })),
 ];
 
-async function runArm(fn: (text: string) => Promise<{ band: EvalRow["band"]; risk: number }>, concurrency = 3): Promise<Row[]> {
+type Prepared = { text: string; llmText: string; image: { mediaType: "image/png"; base64: string } | null };
+
+/** What each system receives. For a QR case, both get the picture; Countersign also decodes it,
+ *  exactly as the browser does before sending a screenshot. */
+async function prepare(c: { text: string; qr?: string }): Promise<Prepared> {
+  if (!c.qr) return { text: c.text, llmText: c.text, image: null };
+  const pic = await qrPicture(c.qr);
+  return { text: (c.text + qrNote(decodeQrFromImageData(pic.pixels))).trim(), llmText: c.text, image: pic.png };
+}
+
+async function runArm(fn: (p: Prepared) => Promise<{ band: EvalRow["band"]; risk: number }>, concurrency = 3): Promise<Row[]> {
   const rows: Row[] = new Array(CASES.length);
   let next = 0;
   await Promise.all(
@@ -33,7 +50,7 @@ async function runArm(fn: (text: string) => Promise<{ band: EvalRow["band"]; ris
         const c = CASES[i];
         const t0 = Date.now();
         try {
-          const { band, risk } = await fn(c.text);
+          const { band, risk } = await fn(await prepare(c));
           rows[i] = { id: c.id, label: c.label, set: c.set, band, risk, ms: Date.now() - t0 };
         } catch {
           rows[i] = { id: c.id, label: c.label, set: c.set, band: "error", risk: -1, ms: Date.now() - t0 };
@@ -49,18 +66,20 @@ const metrics = (rows: Row[]) => ({
   easy: summarize(rows.filter((r) => r.set === "easy")),
   hard: summarize(rows.filter((r) => r.set === "hard")),
   adversarial: summarize(rows.filter((r) => r.set === "adversarial")),
+  qr: summarize(rows.filter((r) => r.set === "qr")),
+  mention: summarize(rows.filter((r) => r.set === "mention")),
 });
 
-const full = (v: "v1" | "final") => async (t: string) => {
-  const r = await collectCase({ text: t, image: null }, v === "v1" ? { ai: true, combination: false, judgment: false } : { ai: true });
+const full = (v: "v1" | "final") => async (p: Prepared) => {
+  const r = await collectCase({ text: p.text, image: p.image }, v === "v1" ? { ai: true, combination: false, judgment: false } : { ai: true });
   return { band: r.report.band, risk: r.report.risk };
 };
 
 describe.skipIf(!process.env.EVAL)("ablation eval", () => {
   it("runs four arms over the easy and hard sets and writes eval/results.json", async () => {
-    const llm = await runArm(async (t) => ({ band: await llmOnlyBand(t), risk: -1 }));
-    const det = await runArm(async (t) => {
-      const r = await collectCase({ text: t, image: null }, { ai: false });
+    const llm = await runArm(async (p) => ({ band: await llmOnlyBand(p.llmText, p.image), risk: -1 }));
+    const det = await runArm(async (p) => {
+      const r = await collectCase({ text: p.text, image: p.image }, { ai: false });
       return { band: r.report.band, risk: r.report.risk };
     });
     const v1 = await runArm(full("v1"));
@@ -68,7 +87,8 @@ describe.skipIf(!process.env.EVAL)("ablation eval", () => {
     const results: EvalResults = {
       generatedAt: new Date().toISOString(),
       hardSetCommit: "34e3ba0",
-      adversarialSetCommit: process.env.ADVERSARIAL_COMMIT ?? "",
+      adversarialSetCommit: "0744fe0",
+      freshSetCommit: process.env.FRESH_COMMIT ?? "",
       arms: [
         { id: "llm-only", label: "Single LLM prompt (typical entry)", metrics: metrics(llm), rows: llm },
         { id: "evidence-only", label: "Deterministic checks only (no AI)", metrics: metrics(det), rows: det },
