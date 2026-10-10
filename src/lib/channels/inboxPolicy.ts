@@ -56,7 +56,7 @@ export function heldNotice(msg: Incoming): { subject: string; text: string } | n
       "  2. If it claims to be from a company you use, go to that company's app or website yourself.",
       "  3. Report it at reportfraud.ftc.gov (US) or your country's fraud line, then delete it.",
       "",
-      "For a full evidence report, paste the message at https://countersign-maanavkrishnas-projects.vercel.app",
+      "For a full evidence report, paste the message at https://countersign-self.vercel.app",
     ].join("\n"),
   };
 }

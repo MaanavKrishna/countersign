@@ -241,7 +241,7 @@ await scene("evidence", [ev], async () => {
 const end = tts("Countersign. Free, open source, with an open protocol. AI can fake a voice. It can't fake our secret.");
 await scene("end", [end], async () => {
   await caption("");
-  await stage("card", `<div class="eyebrow">Countersign</div><p class="big">AI can fake a voice.<br/><span class="hl">It can&rsquo;t fake our secret.</span></p><p class="sub">countersign-maanavkrishnas-projects.vercel.app<br/>github.com/MaanavKrishna/countersign</p>`);
+  await stage("card", `<div class="eyebrow">Countersign</div><p class="big">AI can fake a voice.<br/><span class="hl">It can&rsquo;t fake our secret.</span></p><p class="sub">countersign-self.vercel.app<br/>github.com/MaanavKrishna/countersign</p>`);
 }, { minExtra: 2 });
 
 await cdp.send("Page.stopScreencast");

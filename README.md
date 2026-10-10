@@ -124,7 +124,7 @@ Bands: ≥ 0.70 **FORGERY** · 0.35–0.70 **UNVERIFIED** · < 0.35 **COUNTERSIG
 
 ## Results
 
-Every number is reproducible with `npm run eval` and published, with 95% confidence intervals, at **[/evidence](https://countersign-maanavkrishnas-projects.vercel.app/evidence)**. Earlier runs are kept unchanged in [`eval/history/`](eval/history). We compare four systems: a single AI prompt (what most scam checkers are), our deterministic checks alone, Countersign v1, and Countersign.
+Every number is reproducible with `npm run eval` and published, with 95% confidence intervals, at **[/evidence](https://countersign-self.vercel.app/evidence)**. Earlier runs are kept unchanged in [`eval/history/`](eval/history). We compare four systems: a single AI prompt (what most scam checkers are), our deterministic checks alone, Countersign v1, and Countersign.
 
 **The clean test: a hold-out written and committed before any system saw it** ([commit 61f3639](https://github.com/MaanavKrishna/countersign/commit/61f3639)). Twelve QR-code messages (six pairs with identical wording, one code pointing to a lookalike site and one to the real site) plus six quoting-versus-attacking cases:
 
@@ -149,6 +149,8 @@ All sets, run 6 (exact verdicts). Only the hold-out is clean: the other sets sha
 3. We pre-registered an adversarial set ([0744fe0](https://github.com/MaanavKrishna/countersign/commit/0744fe0)) and **lost it 10/12 to 12/12**: two genuine messages that quote injection text were rated UNVERIFIED.
 4. We fixed that, then pre-registered QR and quoting sets ([50a4fe9](https://github.com/MaanavKrishna/countersign/commit/50a4fe9)). The single prompt scored 3/12 on QR codes.
 5. Four more fixes, then the hold-out above.
+
+These numbers come from run 6. On the evening of the deadline, a final code review tightened four scoring rules (callback scams, brand names inside unrelated domains, quoted injection text, and when link trust applies). We haven't re-run the evaluation since, so treat the tables as describing the code at run 6 ([eval/results.json](eval/results.json)).
 
 Our one hold-out miss, a security-awareness email listing example attacks that we stamped FORGERY, was a bug in a new rule. It's fixed, and the recorded result stays.
 

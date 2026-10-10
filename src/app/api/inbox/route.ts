@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         return;
       }
       const result = await collectCase(toInvestigationInput(msg));
-      const live = process.env.NEXT_PUBLIC_SITE_URL ?? "https://countersign-maanavkrishnas-projects.vercel.app";
+      const live = process.env.NEXT_PUBLIC_SITE_URL ?? "https://countersign-self.vercel.app";
       const { subject, text } = renderReportEmail(result, live);
       await mr.messages.reply(inboxId, messageId, { text: `${subject}\n\n${text}`, labels: [`countersign:${result.report.band}`] });
       console.log(`[inbox] ${messageId} replied band=${result.report.band}`);
