@@ -1,7 +1,7 @@
 "use client";
 
 import QRCode from "qrcode";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, type Circle } from "@/lib/countersign/circle";
 import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
@@ -13,13 +13,28 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
   const [who, setWho] = useState<string | null>(null);
   const [verdict, setVerdict] = useState<"match" | "nomatch" | null>(null);
   const others = circle.members.filter((m) => normalizeName(m) !== normalizeName(circle.me));
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+  // Focus Close once on open; Escape closes.
+  useEffect(() => {
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCloseRef.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
-    <section aria-label="Who's calling?" className="fixed inset-0 z-50 overflow-y-auto bg-night text-white">
+    <section role="dialog" aria-modal="true" aria-label="Who's calling?" className="fixed inset-0 z-50 overflow-y-auto bg-night text-white">
       <div className="mx-auto flex min-h-full max-w-[900px] flex-col gap-8 px-5 py-8">
         <div className="flex items-center justify-between gap-4">
           <p className="m-0 font-mono text-sm tracking-[0.12em] text-[#AEB6C2] uppercase">{circle.name}</p>
-          <button type="button" onClick={onClose} className="min-h-12 rounded-full border-2 border-white px-5 text-lg font-bold">
+          <button ref={closeRef} type="button" onClick={onClose} className="min-h-12 rounded-full border-2 border-white px-5 text-lg font-bold">
             Close
           </button>
         </div>
@@ -87,7 +102,7 @@ export function FamilyCircles() {
   const [invite, setInvite] = useState<{ circle: Pick<Circle, "name">; qr: string; link: string } | null>(null);
   const [checking, setChecking] = useState<Circle | null>(null);
   // Opened from the home-screen shortcut (/family?check=1): go straight to the check.
-  const wantsCheck = useSyncExternalStore(() => () => {}, () => window.location.search.includes("check=1"), () => false);
+  const wantsCheck = useSyncExternalStore(() => () => {}, () => new URLSearchParams(window.location.search).get("check") === "1", () => false);
   const [shortcutDismissed, setShortcutDismissed] = useState(false);
   const active = checking ?? (wantsCheck && !shortcutDismissed && circles.length > 0 ? circles[0] : null);
   const [copied, setCopied] = useState(false);
@@ -115,6 +130,7 @@ export function FamilyCircles() {
           onClose={() => {
             setChecking(null);
             setShortcutDismissed(true);
+            if (wantsCheck) history.replaceState(null, "", "/family");
           }}
         />
       )}

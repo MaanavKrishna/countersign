@@ -1,23 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState, useSyncExternalStore } from "react";
 import { normalizeName, memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
+import { LANGS } from "@/lib/countersign/languages";
 import { useFamily } from "@/lib/countersign/store";
 import { SCENARIOS, practiceStep, start, type ScenarioId } from "@/lib/practice";
 
 const EXAMPLE_WORDS = ["copper", "lantern", "river"];
 
-function say(text: string, onEnd?: () => void) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    onEnd?.();
-    return;
-  }
-  window.speechSynthesis.cancel();
+const noop = () => () => {};
+const hasSpeech = () => typeof window !== "undefined" && "speechSynthesis" in window;
+
+/** Speak one line. The returned stop() detaches the callbacks before cancelling, so a
+ *  cancelled line can never fire its "finished" callback (Safari fires `end` on cancel). */
+function say(text: string, lang: string, onEnd?: () => void, onError?: () => void): () => void {
+  if (!hasSpeech()) return () => {};
   const u = new SpeechSynthesisUtterance(text);
   u.rate = 0.95;
-  if (onEnd) u.onend = () => onEnd();
+  u.lang = lang;
+  u.onend = () => onEnd?.();
+  u.onerror = (e) => {
+    if (e.error !== "interrupted" && e.error !== "canceled") onError?.();
+  };
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
+  return () => {
+    u.onend = null;
+    u.onerror = null;
+    window.speechSynthesis.cancel();
+  };
 }
 
 const LESSON = {
@@ -30,39 +42,42 @@ export default function PracticePage() {
   const { circles, pairings } = useFamily();
   const [state, dispatch] = useReducer(practiceStep, start("jail"));
   const [words, setWords] = useState<string[]>(EXAMPLE_WORDS);
+  const [muted, setMuted] = useState(false);
+  const speech = useSyncExternalStore(noop, hasSpeech, () => true);
 
-  // Personalise: the first family member who isn't me.
+  // Personalise: the first family member who isn't me. Real words only for a real circle member.
   const circle: Circle | undefined = circles[0];
-  const familyName =
-    circle?.members.find((m) => normalizeName(m) !== normalizeName(circle.me)) ?? pairings[0]?.them ?? "Ethan";
+  const member = circle?.members.find((m) => normalizeName(m) !== normalizeName(circle.me));
+  const familyName = member ?? pairings[0]?.them ?? "Ethan";
+  const realWords = Boolean(circle && member);
+  const wordsLang = LANGS[realWords && circle ? circle.lang : "en"].speech;
   const sc = SCENARIOS[state.scenario];
   const fill = useCallback((t: string) => t.replaceAll("{name}", familyName), [familyName]);
 
   // The genuine caller reads your circle's real current words.
   useEffect(() => {
-    if (!circle) return;
+    if (!circle || !member) return;
     let alive = true;
-    void memberCodesForDisplay(circle, familyName, Date.now()).then((c) => alive && setWords(c.words));
+    memberCodesForDisplay(circle, member, Date.now())
+      .then((c) => alive && setWords(c.words))
+      .catch(() => {}); // keep the example words if the word list can't load offline
     return () => {
       alive = false;
     };
-  }, [circle, familyName, state.phase]);
+  }, [circle, member, state.phase]);
 
-  // Speak each line, then advance.
+  // Speak each step. Cleanup stops the line, so changing step, scenario or page never doubles up.
+  // With no voice available, the "Next line" button drives the call instead.
   useEffect(() => {
-    if (state.phase === "talking") say(fill(sc.lines[state.line]), () => dispatch({ type: "next" }));
-    if (state.phase === "reply" && state.reply) say(state.reply === "WORDS" ? words.join(", ") : fill(state.reply));
+    const failed = () => setMuted(true);
+    if (state.phase === "talking") return say(fill(sc.lines[state.line]), "en-US", () => dispatch({ type: "next" }), failed);
+    if (state.phase === "reply" && state.reply) {
+      return state.reply === "WORDS" ? say(words.join(", "), wordsLang, undefined, failed) : say(fill(state.reply), "en-US", undefined, failed);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- speak once per step, not when the words tick over
   }, [state.phase, state.line, state.reply, sc, fill]);
 
-  useEffect(() => () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-  }, []);
-
-  const pick = (id: ScenarioId) => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
-    dispatch({ type: "select", scenario: id });
-  };
+  const pick = (id: ScenarioId) => dispatch({ type: "select", scenario: id });
 
   const caller = fill(sc.caller);
   const btn = "min-h-16 rounded-md px-5 text-left text-xl font-black uppercase";
@@ -72,13 +87,12 @@ export default function PracticePage() {
       <div className="mx-auto flex max-w-[860px] flex-col gap-8 px-4 py-8 sm:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/family" className="font-bold text-white underline-offset-4 hover:underline">← Family</Link>
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Practice scenario">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Practice scenario">
             {(Object.keys(SCENARIOS) as ScenarioId[]).map((id) => (
               <button
                 key={id}
                 type="button"
-                role="tab"
-                aria-selected={state.scenario === id}
+                aria-pressed={state.scenario === id}
                 onClick={() => pick(id)}
                 className={`min-h-11 rounded-full px-4 text-sm font-bold ${state.scenario === id ? "bg-white text-ink" : "border border-white/40 text-white"}`}
               >
@@ -97,7 +111,9 @@ export default function PracticePage() {
 
         {state.phase === "ringing" && (
           <div className="flex flex-col gap-6">
-            <p className="m-0 text-xl text-[#D5DAE1]">Unknown number. It sounds like {caller}. Turn your sound on, then answer.</p>
+            <p className="m-0 text-xl text-[#D5DAE1]">
+              Unknown number. It sounds like {caller}. {speech ? "Turn your sound on, then answer." : "This browser can't speak, so read each line and tap Next."}
+            </p>
             <button type="button" onClick={() => dispatch({ type: "answer" })} className="min-h-20 rounded-full bg-[#1F9D55] text-2xl font-black uppercase">
               Answer
             </button>
@@ -109,6 +125,7 @@ export default function PracticePage() {
             <p className="m-0 rounded-md bg-white/10 p-5 text-2xl leading-snug" aria-live="polite">
               &ldquo;{fill(sc.lines[state.line])}&rdquo;
             </p>
+            {muted && <p className="m-0 text-base text-[#AEB6C2]">No sound available. Read the line, then tap Next.</p>}
             <button type="button" onClick={() => dispatch({ type: "next" })} className="self-start text-lg font-bold underline underline-offset-4">
               Next line →
             </button>
@@ -122,7 +139,7 @@ export default function PracticePage() {
                 {state.reply === "WORDS" ? (
                   <>
                     &ldquo;Sure, it&apos;s <b className="uppercase">{words.join(" · ")}</b>.&rdquo;
-                    <span className="mt-2 block text-base text-[#AEB6C2]">{circle ? "These are your circle's real words right now. Check them on the Family page." : "Example words. Set up a Family Circle to practise with your real ones."}</span>
+                    <span className="mt-2 block text-base text-[#AEB6C2]">{realWords ? "These are your circle's real words right now. Check them on the Family page." : "Example words. Set up a Family Circle to practise with your real ones."}</span>
                   </>
                 ) : (
                   <>&ldquo;{fill(state.reply ?? "")}&rdquo;</>
