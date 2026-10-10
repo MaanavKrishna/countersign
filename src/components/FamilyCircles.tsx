@@ -1,7 +1,7 @@
 "use client";
 
 import QRCode from "qrcode";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, type Circle } from "@/lib/countersign/circle";
 import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
@@ -86,6 +86,10 @@ export function FamilyCircles() {
   const [lang, setLang] = useState<Lang>("en");
   const [invite, setInvite] = useState<{ circle: Pick<Circle, "name">; qr: string; link: string } | null>(null);
   const [checking, setChecking] = useState<Circle | null>(null);
+  // Opened from the home-screen shortcut (/family?check=1): go straight to the check.
+  const wantsCheck = useSyncExternalStore(() => () => {}, () => window.location.search.includes("check=1"), () => false);
+  const [shortcutDismissed, setShortcutDismissed] = useState(false);
+  const active = checking ?? (wantsCheck && !shortcutDismissed && circles.length > 0 ? circles[0] : null);
   const [copied, setCopied] = useState(false);
 
   const showInvite = async (c: Pick<Circle, "secret" | "name" | "members" | "lang">) => {
@@ -105,7 +109,15 @@ export function FamilyCircles() {
 
   return (
     <section className="flex flex-col gap-6" aria-labelledby="circles-h">
-      {checking && <WhoIsCalling circle={checking} onClose={() => setChecking(null)} />}
+      {active && (
+        <WhoIsCalling
+          circle={active}
+          onClose={() => {
+            setChecking(null);
+            setShortcutDismissed(true);
+          }}
+        />
+      )}
       <div className="flex flex-col gap-2">
         <h2 id="circles-h" className="condensed m-0 text-[34px] font-black uppercase">Family Circle</h2>
         <p className="m-0 max-w-[760px] text-body">One QR code for the whole family. Everyone scans it once, picks their name, and gets their own three words. Anyone in the circle can then check anyone else.</p>

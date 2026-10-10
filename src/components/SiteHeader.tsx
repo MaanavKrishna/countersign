@@ -54,7 +54,7 @@ export function SiteHeader() {
   // Call Shield draws its own full-bleed header so it can change colour with the threat level.
   if (path.startsWith("/shield") || path.startsWith("/family/practice")) return null;
   return (
-    <header className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-8">
+    <header className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-8 print:hidden">
       <Logo />
       <Nav />
     </header>

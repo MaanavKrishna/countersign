@@ -1,7 +1,7 @@
 // Countersign service worker: the Family Countersign and Call Shield screens
 // must open with no signal, because that's when a scam call can come in.
-const VERSION = "countersign-v4";
-const PAGES = ["/", "/family", "/shield", "/check", "/vault"];
+const VERSION = "countersign-v5";
+const PAGES = ["/", "/family", "/family/practice", "/family/card", "/shield", "/check", "/vault"];
 const EXTRA = ["/manifest.webmanifest", "/icon"];
 
 // Cache each offline-critical page AND the scripts/styles it references, so the

@@ -66,6 +66,11 @@ export default function FamilyPage() {
         </p>
       </header>
 
+      <div className="flex flex-wrap gap-3">
+        <a href="/family/practice" className="flex min-h-12 items-center rounded border-2 border-ink px-4 font-bold text-ink no-underline">Practice a scam call →</a>
+        <a href="/family/card" className="flex min-h-12 items-center rounded border-2 border-ink px-4 font-bold text-ink no-underline">Print a card for the phone table →</a>
+      </div>
+
       <FamilyCircles />
 
       <div className="flex flex-col gap-2 border-t border-line pt-8">
