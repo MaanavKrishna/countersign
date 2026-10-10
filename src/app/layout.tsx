@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { RegisterSW } from "@/components/RegisterSW";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-screen">
         <SiteHeader />
         {children}
+        <RegisterSW />
       </body>
     </html>
   );
