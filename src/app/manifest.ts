@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Countersign — prove it's really them",
     short_name: "Countersign",
     description: "Check any suspicious message before you act on it.",
-    start_url: "/",
+    start_url: "/family",
     display: "standalone",
     background_color: "#E9EBEE",
     theme_color: "#111418",

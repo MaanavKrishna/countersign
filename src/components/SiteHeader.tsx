@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
-  { href: "/", label: "Investigate" },
-  { href: "/shield", label: "Call Shield" },
   { href: "/family", label: "Family" },
-  { href: "/vault", label: "Memory Vault" },
+  { href: "/check", label: "Check a message" },
+  { href: "/shield", label: "Call Shield" },
   { href: "/evidence", label: "Evidence" },
 ] as const;
 
@@ -32,7 +31,7 @@ export function Nav({ tone = "light" }: { tone?: "light" | "dark" }) {
   return (
     <nav aria-label="Primary" className="flex flex-wrap gap-1 text-[15px] font-semibold">
       {NAV.map((n) => {
-        const active = n.href === "/" ? path === "/" : path.startsWith(n.href);
+        const active = path.startsWith(n.href);
         const cls = active
           ? tone === "light"
             ? "bg-ink text-white"
@@ -53,7 +52,7 @@ export function Nav({ tone = "light" }: { tone?: "light" | "dark" }) {
 export function SiteHeader() {
   const path = usePathname();
   // Call Shield draws its own full-bleed header so it can change colour with the threat level.
-  if (path.startsWith("/shield")) return null;
+  if (path.startsWith("/shield") || path.startsWith("/family/practice")) return null;
   return (
     <header className="mx-auto flex max-w-[1360px] flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-8">
       <Logo />
