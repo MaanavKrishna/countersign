@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GRACE_SECONDS, STEP_SECONDS } from "../countersign/protocol";
-import { circleJoinLink, memberCode, memberCodesForDisplay, normalizeName, parseJoinFragment, type Circle } from "../countersign/circle";
+import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanName, memberCode, memberCodesForDisplay, normalizeName, parseJoinFragment, type Circle } from "../countersign/circle";
 import { addCircle, joinStatus } from "../countersign/store";
 import { WORDS } from "../countersign/wordlist";
 
@@ -43,6 +43,28 @@ describe("Family Circle protocol", () => {
     expect(parseJoinFragment("#v=2&s=short&c=x&m=a")).toBeNull();
     expect(parseJoinFragment(`#v=2&s=${SECRET}&c=&m=a`)).toBeNull();
     expect(parseJoinFragment("")).toBeNull();
+  });
+});
+
+describe("member names survive the join link intact", () => {
+  it("strips commas so one name never splits into two", () => {
+    expect(cleanName("Smith, John")).toBe("Smith John");
+    const c: Circle = { ...circle, members: ["Grandma", cleanName("Smith, John")] };
+    expect(parseJoinFragment(new URL(circleJoinLink("https://x.example", c)).hash)?.members).toEqual(["Grandma", "Smith John"]);
+  });
+  it("applies the same length limit on both phones", async () => {
+    const long = "A".repeat(MAX_NAME + 20);
+    expect(cleanName(long)).toHaveLength(MAX_NAME);
+    const c: Circle = { ...circle, members: ["Grandma", cleanName(long)] };
+    const parsed = parseJoinFragment(new URL(circleJoinLink("https://x.example", c)).hash)!;
+    expect(await memberCode(SECRET, parsed.members[1], 7)).toEqual(await memberCode(SECRET, c.members[1], 7));
+  });
+  it("drops duplicate names that differ only in case or spacing", () => {
+    expect(parseJoinFragment(`#v=2&s=${SECRET}&c=F&m=Ethan,ethan ,Priya`)?.members).toEqual(["Ethan", "Priya"]);
+  });
+  it("rejects a link with more members than any phone would accept", () => {
+    const many = Array.from({ length: MAX_MEMBERS + 1 }, (_, i) => `M${i}`).join(",");
+    expect(parseJoinFragment(`#v=2&s=${SECRET}&c=F&m=${many}`)).toBeNull();
   });
 });
 

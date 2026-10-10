@@ -1,12 +1,28 @@
 // Countersign service worker: the Family Countersign and Call Shield screens
 // must open with no signal, because that's when a scam call can come in.
-const VERSION = "countersign-v2";
-const PRECACHE = ["/", "/family", "/shield", "/vault", "/manifest.webmanifest", "/icon"];
+const VERSION = "countersign-v3";
+const PAGES = ["/", "/family", "/shield", "/vault"];
+const EXTRA = ["/manifest.webmanifest", "/icon"];
+
+// Cache each offline-critical page AND the scripts/styles it references, so the
+// pages hydrate offline even if the person never visited them before.
+async function precache() {
+  const cache = await caches.open(VERSION);
+  const assets = new Set();
+  await Promise.allSettled(
+    PAGES.map(async (path) => {
+      const res = await fetch(new Request(path, { cache: "reload" }));
+      if (!res.ok) return;
+      await cache.put(path, res.clone());
+      const html = await res.text();
+      for (const m of html.matchAll(/\/_next\/static\/[^"'\s)\\]+/g)) assets.add(m[0]);
+    }),
+  );
+  await Promise.allSettled([...EXTRA, ...assets].map((u) => cache.add(new Request(u, { cache: "reload" }))));
+}
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(VERSION).then((c) => Promise.allSettled(PRECACHE.map((u) => c.add(new Request(u, { cache: "reload" }))))),
-  );
+  event.waitUntil(precache());
   self.skipWaiting();
 });
 
@@ -45,7 +61,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(req)
       .then((res) => {
-        if (res.ok && (req.mode === "navigate" || url.pathname === "/icon" || url.pathname.endsWith(".webmanifest"))) {
+        if (res.ok && !res.redirected && (req.mode === "navigate" || url.pathname === "/icon" || url.pathname.endsWith(".webmanifest"))) {
           const copy = res.clone();
           caches.open(VERSION).then((c) => c.put(url.pathname, copy));
         }

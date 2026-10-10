@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import type { Circle } from "./circle";
+import { cleanName, normalizeName, type Circle } from "./circle";
 import type { Pairing } from "./protocol";
 
 // Pairings and the trusted contact live only in this browser's localStorage.
@@ -81,12 +81,15 @@ export function useFamily() {
     addCircle: (c: Omit<Circle, "id" | "createdAt">) =>
       write({ ...read(), circles: addCircle(read().circles, { ...c, id: crypto.randomUUID(), createdAt: Date.now() }) }),
     removeCircle: (id: string) => write({ ...read(), circles: read().circles.filter((x) => x.id !== id) }),
-    addMember: (id: string, name: string) =>
+    addMember: (id: string, raw: string) => {
+      const name = cleanName(raw);
+      if (!name) return;
       write({
         ...read(),
         circles: read().circles.map((x) =>
-          x.id === id && !x.members.some((m) => m.trim().toLowerCase() === name.trim().toLowerCase()) ? { ...x, members: [...x.members, name.trim()] } : x,
+          x.id === id && !x.members.some((m) => normalizeName(m) === normalizeName(name)) ? { ...x, members: [...x.members, name] } : x,
         ),
-      }),
+      });
+    },
   };
 }

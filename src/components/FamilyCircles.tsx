@@ -2,7 +2,7 @@
 
 import QRCode from "qrcode";
 import { useState } from "react";
-import { circleJoinLink, normalizeName, type Circle } from "@/lib/countersign/circle";
+import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, type Circle } from "@/lib/countersign/circle";
 import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
 import { useFamily } from "@/lib/countersign/store";
@@ -78,7 +78,8 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
 }
 
 export function FamilyCircles() {
-  const { circles, addCircle, removeCircle } = useFamily();
+  const { circles, addCircle, removeCircle, addMember } = useFamily();
+  const [newName, setNewName] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [me, setMe] = useState("");
   const [others, setOthers] = useState("");
@@ -94,9 +95,10 @@ export function FamilyCircles() {
   };
 
   const create = async () => {
-    const members = [me.trim(), ...others.split(",").map((s) => s.trim()).filter(Boolean)];
-    if (!name.trim() || !me.trim() || members.length < 2) return;
-    const c = { name: name.trim(), secret: newSecret(), members, me: me.trim(), lang };
+    const meClean = cleanName(me);
+    const members = cleanMembers([meClean, ...others.split(",")]).slice(0, MAX_MEMBERS);
+    if (!name.trim() || !meClean || members.length < 2) return;
+    const c = { name: name.trim().slice(0, 80), secret: newSecret(), members, me: meClean, lang };
     addCircle(c);
     await showInvite(c);
   };
@@ -128,6 +130,27 @@ export function FamilyCircles() {
           <button type="button" onClick={() => setChecking(c)} className="flex min-h-20 items-center justify-center rounded-md bg-ink text-[28px] font-black text-white uppercase" style={{ fontStretch: "75%" }}>
             Who&apos;s calling? Check now →
           </button>
+          <form
+            className="flex flex-wrap items-end gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              addMember(c.id, newName[c.id] ?? "");
+              setNewName((n) => ({ ...n, [c.id]: "" }));
+            }}
+          >
+            <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-bold">
+              Someone joined who isn&apos;t listed here? Add their name
+              <input
+                value={newName[c.id] ?? ""}
+                maxLength={MAX_NAME}
+                onChange={(e) => setNewName((n) => ({ ...n, [c.id]: e.target.value }))}
+                className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal"
+              />
+            </label>
+            <button type="submit" disabled={!cleanName(newName[c.id] ?? "")} className="min-h-11 rounded border-[1.5px] border-ink px-4 font-bold disabled:opacity-50">
+              Add
+            </button>
+          </form>
           <div className="flex flex-col gap-1 rounded bg-paper p-4">
             <p className="eyebrow m-0">Your words, only when you call family</p>
             <MemberCode circle={c} member={c.me} />
@@ -147,11 +170,11 @@ export function FamilyCircles() {
           <h3 className="condensed m-0 text-2xl font-black uppercase">Start a family circle</h3>
           <label className="flex flex-col gap-1.5 text-sm font-bold">
             Circle name
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="The Krishna family" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />
+            <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="The Krishna family" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-bold">
             Your name (what family calls you)
-            <input value={me} onChange={(e) => setMe(e.target.value)} placeholder="Grandma" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />
+            <input value={me} maxLength={MAX_NAME} onChange={(e) => setMe(e.target.value)} placeholder="Grandma" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-bold">
             Everyone else, separated by commas

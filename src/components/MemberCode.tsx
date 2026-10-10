@@ -19,9 +19,13 @@ function speak(words: string[], lang: string) {
 /** A circle member's rolling words, refreshed every second. */
 export function MemberCode({ circle, member, size = "md", readAloud = false }: { circle: Circle; member: string; size?: "md" | "lg" | "xl"; readAloud?: boolean }) {
   const [codes, setCodes] = useState<Codes | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     let alive = true;
-    const tick = () => memberCodesForDisplay(circle, member, Date.now()).then((c) => alive && setCodes(c));
+    const tick = () =>
+      memberCodesForDisplay(circle, member, Date.now())
+        .then((c) => alive && setCodes(c))
+        .catch(() => alive && setFailed(true));
     tick();
     const t = setInterval(tick, 1000);
     return () => {
@@ -30,6 +34,7 @@ export function MemberCode({ circle, member, size = "md", readAloud = false }: {
     };
   }, [circle, member]);
 
+  if (!codes && failed) return <p className="m-0 font-semibold">Words unavailable offline. Open this page once with a signal to download this language.</p>;
   if (!codes) return <div className="h-14 animate-pulse rounded bg-black/5" aria-hidden="true" />;
   const text = size === "xl" ? "text-[44px] sm:text-[80px]" : size === "lg" ? "text-[40px] sm:text-[56px]" : "text-[28px]";
   return (

@@ -7,6 +7,29 @@ import { GRACE_SECONDS, STEP_SECONDS, stepAt, wordsFor } from "./protocol";
 export type WordLang = Lang;
 export type Circle = { id: string; name: string; secret: string; members: string[]; me: string; lang: WordLang; createdAt: number };
 
+export const MAX_NAME = 60;
+export const MAX_MEMBERS = 30;
+
+/** The one rule every phone applies to a name before storing or sharing it.
+ *  Commas are the link's member separator, so they can never be part of a name. */
+export function cleanName(name: string): string {
+  return name.replace(/,/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_NAME).trim();
+}
+
+/** Unique, cleaned member list (case/spacing duplicates removed, first spelling kept). */
+export function cleanMembers(names: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of names) {
+    const n = cleanName(raw);
+    if (n && !seen.has(normalizeName(n))) {
+      seen.add(normalizeName(n));
+      out.push(n);
+    }
+  }
+  return out;
+}
+
 export function normalizeName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -36,8 +59,8 @@ export function parseJoinFragment(hash: string): { secret: string; name: string;
   const f = new URLSearchParams(hash.replace(/^#/, ""));
   const secret = f.get("s") ?? "";
   const name = (f.get("c") ?? "").trim().slice(0, 80);
-  const members = (f.get("m") ?? "").split(",").map((m) => m.trim().slice(0, 60)).filter(Boolean).slice(0, 30);
-  if (f.get("v") !== "2" || !/^[A-Za-z0-9_-]{43}$/.test(secret) || !name || members.length === 0) return null;
+  const members = cleanMembers((f.get("m") ?? "").split(","));
+  if (f.get("v") !== "2" || !/^[A-Za-z0-9_-]{43}$/.test(secret) || !name || members.length === 0 || members.length > MAX_MEMBERS) return null;
   const l = f.get("l");
   return { secret, name, members, lang: isLang(l) ? l : "en" };
 }
