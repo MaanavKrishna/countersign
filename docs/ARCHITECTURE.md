@@ -68,21 +68,23 @@ On top of that, server modules (`ai/client`, the pipeline, the tool registry, th
  Analytics / crash reports ──────┴──► path only, no query or fragment, no error messages
 ```
 
-- **The secret travels only in URL fragments** (`#…`), which browsers never send to servers, and is removed from the address bar on arrival.
+- **The secret travels only in URL fragments** (`#…`), which browsers never send to servers, and is removed from the address bar on arrival. A screenshot containing a family QR code is refused on the phone, so neither the picture nor the link is uploaded.
 - **Message content is untrusted data.** It's wrapped as such for every model call, and every tool is a read-only lookup. Text written to steer an AI is detected deterministically and counted as evidence.
 - **Links are never opened.** Tracing uses HEAD requests behind an SSRF guard. Rendering, if enabled, happens remotely.
 
 ## How a verdict is made
 
 1. **Indicators**: URLs, domains, sender, reply-to, headers, phones, money and payment terms, claimed brands.
-2. **Deterministic signals**: AI-directed text (quoting an example doesn't count), provider scores.
+2. **Deterministic signals**: AI-directed text, and provider scores. Quoting an attack as an example ("such as …") counts as weak evidence (0.15) rather than an attack (0.55).
 3. **In parallel**: the tactics agent quotes manipulation tactics verbatim (unverifiable quotes are dropped) and gives one overall read; the investigator agent chooses lookups.
-4. **Safety-net sweep**: any standard lookup the agent skipped runs anyway.
-5. **Combination signal**: a claimed identity plus a request for money, codes or access.
-6. **Score**: `risk = (1 − Π(1 − wᵢ)) × Π(1 − tⱼ)` over fixed weights in `core/scoring.ts`. Trust is ignored when there's impersonation evidence. Bands: ≥ 0.70 FORGERY, ≥ 0.35 UNVERIFIED, else COUNTERSIGNED.
+4. **Safety-net sweep**: any standard lookup the agent skipped runs anyway. Then, once the model's findings are in (so the order is deterministic), **link trust**: every link and the sender are on one brand's own domains. User-content hosts (S3, Google Sites and Docs, GitHub Pages) never count as the brand's own.
+5. **Combination signals**:
+   - The message claims a brand and links to a domain whose name contains that brand as a whole word but isn't the brand's (`amazon-returns-dropoff.com`).
+   - A claimed identity plus a request for money, codes or access. This is suppressed only when the claim is corroborated: the brand authenticated the mail, or the brand's own links are the only way to respond, with no phone number and no reply address elsewhere.
+6. **Score**: `risk = (1 − Π(1 − wᵢ)) × Π(1 − tⱼ)` over fixed weights in `core/scoring.ts`. When there's impersonation evidence, the trust signals that can't vouch for an impersonator (an old domain, links on the brand, the model's "genuine") are ignored. Bands: ≥ 0.70 FORGERY, ≥ 0.35 UNVERIFIED, else COUNTERSIGNED.
 7. **Debate**: a defense agent argues it's genuine, a judge writes the explanation in the message's language. **Neither can change the band.**
 
-If the model is unavailable, steps 1, 2, 4, 5 and 6 still run and still produce a verdict, marked as degraded.
+If the model is unavailable, steps 1, 2, 4 and 6 and the first combination signal still run and produce a verdict, marked as degraded. The identity-plus-request signal needs the model's tactic findings, so it only runs with the model.
 
 ## Testing
 

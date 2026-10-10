@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { defang } from "@/lib/core/domain";
-import { decodeQrFromImage, qrNote } from "@/lib/investigator/qr";
+import { decodeQrFromImage, isFamilySecretLink, qrNote } from "@/lib/investigator/qr";
 import { SAMPLES } from "@/lib/investigator/samples";
 import { useInvestigation, type ImageInput } from "@/lib/investigator/useInvestigation";
 import { AnnotatedMessage, Debate, ResponseKit } from "./CaseParts";
@@ -36,6 +36,7 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
   const { state, run, reset } = useInvestigation();
   const [text, setText] = useState(initialText);
   const [image, setImage] = useState<ImageInput>(null);
+  const [blocked, setBlocked] = useState(false);
   const [submitted, setSubmitted] = useState<{ text: string; image: ImageInput } | null>(
     autorun && initialText.trim() ? { text: initialText, image: null } : null,
   );
@@ -59,7 +60,12 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
 
   const onFiles = async (files: FileList | null) => {
     const f = files?.[0];
-    if (f && f.type.startsWith("image/")) setImage(await toImageInput(f));
+    if (!f || !f.type.startsWith("image/")) return;
+    const img = await toImageInput(f);
+    // A family QR code carries the family secret: never upload it, not even the picture.
+    const family = isFamilySecretLink(img?.qr ?? null);
+    setBlocked(family);
+    setImage(family ? null : img);
   };
 
   if (state.status === "idle" || !submitted) {
@@ -118,6 +124,11 @@ export function Investigator({ initialText = "", autorun = false }: { initialTex
                 </div>
                 {image.qr && <p className="m-0 font-mono text-xs font-semibold break-all text-alert-ink">QR code found: {defang(image.qr)}. It will be investigated too.</p>}
               </div>
+            )}
+            {blocked && (
+              <p role="alert" className="m-0 border-t border-dashed border-dash bg-alert-soft px-4.5 py-3.5 font-semibold text-alert-deep">
+                That screenshot contains a family QR code. It carries your family&apos;s secret, so it wasn&apos;t sent anywhere. Never share it.
+              </p>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-dash px-4.5 py-3.5">
               <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="sr-only" id="shot" onChange={(e) => void onFiles(e.target.files)} />

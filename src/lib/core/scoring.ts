@@ -59,7 +59,7 @@ export const SIGNALS: Record<string, Signal> = {
   trust_domain_established: { weight: 0.25, label: "Long-established domain", kind: "trust" },
   model_judgment_legit: { weight: 0.35, label: "The AI's overall read: genuine", kind: "trust" },
   // Neutral
-  ai_text_quoted: { weight: 0, label: "Quotes AI-instruction text as an example", kind: "neutral" },
+  ai_text_quoted: { weight: 0.15, label: "Quotes AI-instruction text as an example", kind: "risk" },
   neutral: { weight: 0, label: "Checked", kind: "neutral" },
   inconclusive: { weight: 0, label: "Lookup inconclusive", kind: "neutral" },
 };
@@ -71,7 +71,7 @@ const IMPERSONATION = new Set([
 ]);
 
 // Trust evidence that an impersonation or an injection attempt can fake or sway.
-const UNTRUSTWORTHY_UNDER_ATTACK = new Set(["trust_domain_established", "model_judgment_legit"]);
+const UNTRUSTWORTHY_UNDER_ATTACK = new Set(["trust_domain_established", "model_judgment_legit", "trust_links_on_brand"]);
 
 export const TACTIC_SIGNALS = Object.keys(SIGNALS).filter((k) => k.startsWith("tactic_"));
 

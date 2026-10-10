@@ -30,9 +30,15 @@ describe("impersonation + ask", () => {
     expect(score(base).band).toBe("unverified");
     expect(score([...base, ...impersonationAsk(base, [])]).band).toBe("forgery");
   });
-  it("doesn't fire when every link is on the claimed brand's own domains: the infrastructure corroborates the claim", () => {
-    const f = impersonationAsk([finding("tactic_authority", "Microsoft"), finding("tactic_credentials", "re-register"), finding("trust_links_on_brand", "all on microsoft.com")], ["Microsoft"]);
+  it("doesn't fire when links on the brand's domains are the ONLY way to respond: the infrastructure corroborates the claim", () => {
+    const f = impersonationAsk([finding("tactic_authority", "Microsoft"), finding("tactic_credentials", "re-register"), finding("trust_links_on_brand", "all on microsoft.com")], ["Microsoft"], { phones: 0, replyElsewhere: false });
     expect(f).toEqual([]);
+  });
+  it("still fires when the message also gives a phone number or a reply address elsewhere (callback scams)", () => {
+    const base = [finding("tactic_authority", "Chase fraud"), finding("tactic_credentials", "read us the code"), finding("trust_links_on_brand", "chase.com")];
+    expect(impersonationAsk(base, ["Chase"], { phones: 1, replyElsewhere: false }).map((x) => x.signalId)).toEqual(["impersonation_with_ask"]);
+    expect(impersonationAsk(base, ["Chase"], { phones: 0, replyElsewhere: true }).map((x) => x.signalId)).toEqual(["impersonation_with_ask"]);
+    expect(impersonationAsk(base, ["Chase"]).map((x) => x.signalId)).toEqual(["impersonation_with_ask"]);
   });
 });
 
@@ -45,5 +51,20 @@ describe("claimed brand, foreign link", () => {
   it("leaves the brand's real domains and unclaimed brands alone", () => {
     expect(claimedBrandForeignLink(["https://www.amazon.com/spr/returns"], ["Amazon"])).toEqual([]);
     expect(claimedBrandForeignLink(["https://amazon-returns-dropoff.com/x"], ["PayPal"])).toEqual([]);
+  });
+  it.each([
+    ["https://groups.io/g/x", "UPS"],
+    ["https://www.firstbank.com/x", "IRS"],
+    ["https://www.citizensbank.com/x", "Citi"],
+    ["https://purchase-portal.com/x", "Chase"],
+    ["https://www.steamboatresort.com/x", "Steam"],
+    ["https://www.amazon.fr/x", "Amazon"],
+    ["https://www.paypalobjects.com/x", "PayPal"],
+  ])("doesn't flag %s for %s: the brand name must be a whole word, and brand.<country> is the brand", (url, brand) => {
+    expect(claimedBrandForeignLink([url], [brand])).toEqual([]);
+  });
+  it("still flags brand-word lookalikes", () => {
+    expect(claimedBrandForeignLink(["https://ups-redelivery.top/x"], ["UPS"])).toHaveLength(1);
+    expect(claimedBrandForeignLink(["https://secure-chase-alerts.com/x"], ["Chase"])).toHaveLength(1);
   });
 });

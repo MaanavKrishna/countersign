@@ -35,3 +35,20 @@ test("a screenshot that jsQR alone can't read at full size still works", async (
   await page.getByRole("button", { name: "Investigate" }).click();
   await expect.poll(() => sent?.text ?? "").toContain("https://usps-redelivery-schedule.top/notice/9400");
 });
+
+test("a screenshot of a family QR code is never uploaded", async ({ page }) => {
+  const secretLink = "https://countersign.example/family/join#v=2&s=AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8&c=Fam&m=A,B&l=en";
+  const qr = await QRCode.toDataURL(secretLink, { margin: 4, width: 400 });
+  const png = Buffer.from(qr.split(",")[1], "base64");
+  let requests = 0;
+  await page.route("**/api/investigate", async (route) => {
+    requests++;
+    await route.abort();
+  });
+  await page.goto("/check");
+  await page.locator('input[type="file"]').setInputFiles({ name: "family.png", mimeType: "image/png", buffer: png });
+  await expect(page.getByRole("alert").filter({ hasText: /family QR code/i })).toBeVisible();
+  // Nothing to send: the picture was dropped, so Investigate stays disabled.
+  await expect(page.getByRole("button", { name: "Investigate" })).toBeDisabled();
+  expect(requests).toBe(0);
+});

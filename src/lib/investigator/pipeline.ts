@@ -120,11 +120,14 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit, op
   // Safety net: run the deterministic checks the agent skipped, so the score
   // never depends on the model remembering to look.
   await sweep(ind, checked, emit, onTool);
+  // Wait for the model's findings first, so link trust sees all the evidence and the
+  // verdict doesn't depend on which step happened to finish first.
+  const tacticsResult = await tacticsPromise;
   linkTrust(ind, all);
 
-  const tacticsResult = await tacticsPromise;
   if (opts.combination !== false) {
-    const combo = [...claimedBrandForeignLink(ind.urls, ind.claimedBrands), ...impersonationAsk(all, ind.claimedBrands)];
+    const channels = { phones: ind.phones.length, replyElsewhere: !!ind.replyToDomain && ind.replyToDomain !== ind.senderDomain };
+    const combo = [...claimedBrandForeignLink(ind.urls, ind.claimedBrands), ...impersonationAsk(all, ind.claimedBrands, channels)];
     if (combo.length) {
       all.push(...combo);
       emit({ type: "tool_start", id: "combination", name: "impersonation_check", args: {} });
@@ -205,9 +208,13 @@ async function sweep(
 }
 
 /** Trust evidence: every link and the sender stay on one brand's own domains. */
+// Hosts on a brand's domain where anyone can publish: a phishing page on S3 or Google Sites
+// is not "the brand's own site".
+const USER_CONTENT = /(^|\.)(amazonaws\.com|githubusercontent\.com|googleusercontent\.com|sites\.google\.com|docs\.google\.com|drive\.google\.com|forms\.google\.com|github\.io)$/;
+
 function linkTrust(ind: ReturnType<typeof extractIndicators>, all: Finding[]) {
   const hosts = ind.urls.map(hostFromUrl).filter((h): h is string => !!h);
-  if (hosts.length === 0) return;
+  if (hosts.length === 0 || hosts.some((h) => USER_CONTENT.test(h))) return;
   const brands = hosts.map((h) => brandForDomain(h)?.name ?? null);
   const first = brands[0];
   if (!first || brands.some((b) => b !== first)) return;

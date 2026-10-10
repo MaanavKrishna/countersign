@@ -33,7 +33,10 @@ describe("qr", () => {
   });
   it("never forwards a Family Countersign pairing link to the investigator", () => {
     expect(qrNote("https://countersign.example/family/pair#v=1&s=SECRET&a=Grandma&b=Ethan")).toBe(
-      "\n\n[QR code in the screenshot is a Family Countersign pairing code. It was not sent.]",
+      "\n\n[QR code in the screenshot is a Family Countersign code. It was not sent.]",
     );
+  });
+  it("treats circle join links as family secrets too", () => {
+    expect(qrNote("https://x.app/family/join#v=2&s=SECRET")).not.toContain("SECRET");
   });
 });

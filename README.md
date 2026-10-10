@@ -206,6 +206,7 @@ We'd rather you hear these from us.
 - **The secret lives in the browser.** Clearing site data loses it, and there's no encrypted backup yet; start fresh is the recovery. The optional word lock stops someone casually reading the words, but it's a gate, not encryption: someone with developer tools on an unlocked phone could still read storage.
 - **Live listening depends on the browser.** It needs Chrome, Edge or Safari, it only hears the other side on speaker, and Chrome's speech engine is cloud-based.
 - **On plain text, the message checker only ties a strong single prompt.** It pulls ahead where a prompt is blind (QR codes, real lookups, model outages). The test sets are small, our fixes were shaped by the earlier sets, and only the hold-out is a clean test; see the confidence intervals on /evidence.
+- **Quoting is a soft spot.** Text written to steer an AI counts as strong evidence (0.55), but the same text introduced as an example ("phrases such as …") counts as weak evidence (0.15), so security newsletters aren't flagged. A scammer can use that framing to weaken the signal; the other checks (domains, tactics, the model's read) still apply.
 - **Hosted pieces cost money.** The investigator needs model credit and the email channel needs an inbox provider. Rate limits are per server instance, not global. The family features need neither.
 
 ## Site map

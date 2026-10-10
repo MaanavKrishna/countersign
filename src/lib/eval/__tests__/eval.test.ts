@@ -93,7 +93,7 @@ describe.skipIf(!process.env.EVAL)("ablation eval", () => {
       hardSetCommit: "34e3ba0",
       adversarialSetCommit: "0744fe0",
       freshSetCommit: "50a4fe9",
-      holdoutSetCommit: process.env.HOLDOUT_COMMIT ?? "",
+      holdoutSetCommit: "61f3639",
       arms: [
         { id: "llm-only", label: "Single LLM prompt (typical entry)", metrics: metrics(llm), rows: llm },
         { id: "evidence-only", label: "Deterministic checks only (no AI)", metrics: metrics(det), rows: det },

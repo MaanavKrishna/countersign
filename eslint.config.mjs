@@ -8,7 +8,7 @@ function boundary(files, banned, why) {
     files: [files],
     ignores: ["**/__tests__/**"],
     rules: {
-      "no-restricted-imports": ["error", { patterns: [{ group: banned.flatMap((m) => [`@/lib/${m}`, `@/lib/${m}/*`]), message: why }] }],
+      "no-restricted-imports": ["error", { patterns: [{ group: banned.flatMap((m) => [`@/lib/${m}`, `@/lib/${m}/*`, `**/lib/${m}`, `**/lib/${m}/*`, `../${m}`, `../${m}/*`]), message: why }] }],
     },
   }];
 }
@@ -28,11 +28,11 @@ const eslintConfig = defineConfig([
   ...boundary("src/lib/telemetry/**", ["family", "investigator", "shield", "ai", "server", "channels", "eval"],
     "Telemetry only scrubs and reports; it must never see app data."),
   {
-    files: ["src/components/**", "src/app/**/page.tsx", "src/app/**/error.tsx", "src/app/layout.tsx"],
+    files: ["src/components/**", "src/app/**/*.tsx"],
     rules: {
       "no-restricted-imports": ["error", {
         patterns: [{
-          group: ["@/lib/ai/*", "@/lib/server/*", "@/lib/channels/*", "@/lib/investigator/pipeline", "@/lib/investigator/agents/*", "@/lib/investigator/tools/*", "@/lib/investigator/report/*", "@/lib/shield/ai"],
+          group: ["ai/*", "server/*", "channels/*", "investigator/pipeline", "investigator/agents/*", "investigator/tools/*", "investigator/report/*", "shield/ai"].flatMap((m) => [`@/lib/${m}`, `**/lib/${m}`]),
           message: "Server-only module: UI code talks to it through an /api route.",
         }],
       }],

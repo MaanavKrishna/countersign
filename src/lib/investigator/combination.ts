@@ -18,10 +18,16 @@ const ASK_WORDS: Record<string, string> = {
   tactic_remote_access: "access to your device",
 };
 
-export function impersonationAsk(findings: Finding[], claimedBrands: string[]): Finding[] {
-  // A claim the infrastructure corroborates (authenticated by the brand, or every link on the
-  // brand's own domains) isn't impersonation.
-  if (findings.some((f) => f.signalId === "trust_auth_aligned" || f.signalId === "trust_links_on_brand")) return [];
+/** Other ways the message lets you respond: a phone number, or replies that go elsewhere. */
+export type OtherChannels = { phones: number; replyElsewhere: boolean };
+
+export function impersonationAsk(findings: Finding[], claimedBrands: string[], channels?: OtherChannels): Finding[] {
+  // A claim the infrastructure corroborates isn't impersonation: the brand authenticated the
+  // mail, or the brand's own site is the ONLY way to respond. A phone number or a reply address
+  // elsewhere reopens it (callback scams link to the real site and ask you to call).
+  if (findings.some((f) => f.signalId === "trust_auth_aligned")) return [];
+  const onlyBrandLinks = findings.some((f) => f.signalId === "trust_links_on_brand") && channels && channels.phones === 0 && !channels.replyElsewhere;
+  if (onlyBrandLinks) return [];
   const claim = findings.find((f) => CLAIMS.has(f.signalId)) ?? null;
   const ask = findings.find((f) => ASKS.has(f.signalId));
   if (!ask || (!claim && claimedBrands.length === 0)) return [];
@@ -39,7 +45,11 @@ export function claimedBrandForeignLink(urls: string[], claimedBrands: string[])
       const host = hostFromUrl(url);
       if (!host || brandForDomain(host)) continue;
       const reg = registrableDomain(host);
-      if (reg.replace(/[^a-z0-9]/g, "").includes(brand.token)) {
+      const label = reg.split(".")[0];
+      // The brand name must be a whole hyphen-separated word ("amazon-returns", not "citizensbank"),
+      // and "<brand>.<any country domain>" is the brand's own (amazon.fr).
+      if (label === brand.token) continue;
+      if (label.split("-").includes(brand.token)) {
         return [finding("claimed_brand_foreign_link", `It says it's from ${brand.name}, but the link goes to ${reg}, which ${brand.name} doesn't own.`)];
       }
     }

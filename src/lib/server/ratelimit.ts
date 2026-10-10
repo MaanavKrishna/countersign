@@ -1,3 +1,4 @@
+import "server-only";
 // Per-instance sliding-window limiter. Serverless instances don't share memory, so this
 // bounds abuse per warm instance rather than globally; a shared store (or a platform
 // firewall rule) is the production upgrade.

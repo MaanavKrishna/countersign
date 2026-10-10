@@ -37,8 +37,13 @@ export async function decodeQrFromImage(img: HTMLImageElement | HTMLCanvasElemen
   return null;
 }
 
+/** Family pairing and circle QR codes carry the family secret in their #fragment. */
+export function isFamilySecretLink(data: string | null): boolean {
+  return !!data && /\/family\/(pair|join)#/.test(data);
+}
+
 export function qrNote(data: string | null): string {
-  // A Family Countersign pairing code carries a secret; it must never leave the device.
-  if (data && /\/family\/pair#/.test(data)) return "\n\n[QR code in the screenshot is a Family Countersign pairing code. It was not sent.]";
+  // Defence in depth: the UI refuses these screenshots before anything is sent.
+  if (isFamilySecretLink(data)) return "\n\n[QR code in the screenshot is a Family Countersign code. It was not sent.]";
   return data ? `\n\n[QR code in the screenshot points to: ${data.slice(0, 2000)}]` : "";
 }

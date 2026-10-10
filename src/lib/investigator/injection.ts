@@ -68,5 +68,6 @@ export function detectAiDirectedText(text: string): Finding[] {
       return [finding("ai_directed_instructions", `The message contains text written to manipulate AI scanners: "${quote}"`)];
     }
   }
-  return mention ? [finding("ai_text_quoted", `Quotes AI-instruction text as an example ("${mention}"), so it isn't counted as an attack.`)] : [];
+  // Weaker evidence, not none: wrapping an attack in "such as" must not erase it.
+  return mention ? [finding("ai_text_quoted", `Quotes AI-instruction text as an example ("${mention}"), so it counts as weak evidence rather than an attack.`)] : [];
 }
