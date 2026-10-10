@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { ShieldAssessment, ShieldStage, Tactic } from "@/lib/types";
-import { alertText, smsLink } from "@/lib/countersign/alert";
-import { useFamily } from "@/lib/countersign/store";
-import { matchesPerson } from "@/lib/people";
-import { assessLocally } from "@/lib/shieldLocal";
-import { questionsFor, useVault } from "@/lib/vault";
+import type { ShieldAssessment, ShieldStage } from "@/lib/shield/types";
+import type { Tactic } from "@/lib/core/types";
+import { alertText, smsLink } from "@/lib/shield/alert";
+import { useFamily } from "@/lib/family/store";
+import { matchesPerson } from "@/lib/shield/people";
+import { assessLocally } from "@/lib/shield/rules";
+import { questionsFor, useVault } from "@/lib/shield/vault";
 import { MemberCode } from "./MemberCode";
 import { RollingCode } from "./RollingCode";
-import { normalizeName } from "@/lib/countersign/circle";
+import { normalizeName } from "@/lib/family/circle";
 import { Logo, Nav } from "./SiteHeader";
 
 // Minimal typing for the Web Speech API (Chrome / Edge / Safari).

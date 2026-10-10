@@ -7,7 +7,7 @@ for (const [code, file] of Object.entries(LANGS)) {
   const words = (await res.text()).trim().split("\n").map((w) => w.trim().normalize("NFC"));
   if (words.length !== 2048) throw new Error(`${file}: expected 2048 words, got ${words.length}`);
   writeFileSync(
-    `src/lib/countersign/words/${code}.ts`,
+    `src/lib/family/words/${code}.ts`,
     `// BIP-39 ${file} wordlist (MIT License, https://github.com/bitcoin/bips).\nexport const WORDS: readonly string[] = ${JSON.stringify(words)};\n`,
   );
   console.log("wrote", code, words.length);

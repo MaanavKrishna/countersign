@@ -1,6 +1,6 @@
-import { runInvestigation, type InvestigationInput } from "@/lib/pipeline";
-import { clientIp, investigateLimiter } from "@/lib/ratelimit";
-import type { InvestigationEvent } from "@/lib/types";
+import { runInvestigation, type InvestigationInput } from "@/lib/investigator/pipeline";
+import { clientIp, investigateLimiter } from "@/lib/server/ratelimit";
+import type { InvestigationEvent } from "@/lib/investigator/types";
 
 export const maxDuration = 120;
 

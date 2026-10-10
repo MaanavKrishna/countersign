@@ -2,12 +2,12 @@
 
 import QRCode from "qrcode";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, secretTag, type Circle } from "@/lib/countersign/circle";
-import { LANGS, type Lang } from "@/lib/countersign/languages";
-import { newSecret } from "@/lib/countersign/protocol";
-import { useFamily } from "@/lib/countersign/store";
-import { UI } from "@/lib/countersign/ui";
-import { ensureOpen, useWordsOpen } from "@/lib/countersign/lock";
+import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, secretTag, type Circle } from "@/lib/family/circle";
+import { LANGS, type Lang } from "@/lib/family/languages";
+import { newSecret } from "@/lib/family/protocol";
+import { useFamily } from "@/lib/family/store";
+import { UI } from "@/lib/family/ui";
+import { ensureOpen, useWordsOpen } from "@/lib/family/lock";
 import { MemberCode } from "./MemberCode";
 
 /** Full-screen check for the person receiving the call. Built for grandparents: huge type, one decision. */

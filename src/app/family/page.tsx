@@ -6,9 +6,9 @@ import { DrillButton } from "@/components/DrillButton";
 import { FamilyCircles } from "@/components/FamilyCircles";
 import { LockSetting } from "@/components/LockSetting";
 import { RollingCode } from "@/components/RollingCode";
-import { newSecret, pairingLink } from "@/lib/countersign/protocol";
-import { ensureOpen, useWordsOpen } from "@/lib/countersign/lock";
-import { useFamily, type TrustedContact } from "@/lib/countersign/store";
+import { newSecret, pairingLink } from "@/lib/family/protocol";
+import { ensureOpen, useWordsOpen } from "@/lib/family/lock";
+import { useFamily, type TrustedContact } from "@/lib/family/store";
 
 function ContactForm({ contact, onSave }: { contact: TrustedContact | null; onSave: (c: TrustedContact | null) => void }) {
   const [name, setName] = useState(contact?.name ?? "");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useVault } from "@/lib/vault";
+import { useVault } from "@/lib/shield/vault";
 
 const EXAMPLES = [
   { person: "Ethan (grandson)", question: "What did we name the dog we got the summer you broke your arm?", hint: "Biscuit" },

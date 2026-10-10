@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Investigator } from "@/components/Investigator";
-import { composeSharedText } from "@/lib/share";
+import { composeSharedText } from "@/lib/investigator/share";
 
 async function SharedInvestigation({ searchParams }: { searchParams: PageProps<"/share">["searchParams"] }) {
   const p = await searchParams;

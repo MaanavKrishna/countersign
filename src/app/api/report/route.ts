@@ -1,5 +1,5 @@
-import { scrubPath } from "@/lib/privacy";
-import { clientIp, createLimiter } from "@/lib/ratelimit";
+import { scrubPath } from "@/lib/telemetry/privacy";
+import { clientIp, createLimiter } from "@/lib/server/ratelimit";
 
 // Client-side crash reports from the error pages: error type, digest and path only.
 const limiter = createLimiter({ limit: 20, windowMs: 10 * 60_000 });

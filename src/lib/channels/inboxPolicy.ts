@@ -1,5 +1,5 @@
 import type { Message } from "agentboxd";
-import { createLimiter } from "../ratelimit";
+import { createLimiter } from "@/lib/server/ratelimit";
 import { extractForwarded } from "./forwarded";
 
 // Decides whether an inbound email gets investigated and answered. Keys on the

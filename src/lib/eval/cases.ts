@@ -1,4 +1,4 @@
-import { SAMPLES } from "../samples";
+import { SAMPLES } from "@/lib/investigator/samples";
 
 export type EvalCase = { id: string; label: "scam" | "legit"; group: "core" | "injection" | "multilingual"; text: string };
 

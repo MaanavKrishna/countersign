@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { LANGS, type Lang } from "@/lib/countersign/languages";
-import { useFamily } from "@/lib/countersign/store";
-import { UI } from "@/lib/countersign/ui";
+import { LANGS, type Lang } from "@/lib/family/languages";
+import { useFamily } from "@/lib/family/store";
+import { UI } from "@/lib/family/ui";
 import { PrintButton } from "./PrintButton";
 
 /** The printable phone-table card, in the family's language. It never contains the words. */

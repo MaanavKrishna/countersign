@@ -1,6 +1,6 @@
 "use client";
 
-import { drillCalendar, nextDrillTime } from "@/lib/drill";
+import { drillCalendar, nextDrillTime } from "@/lib/family/drill";
 
 /** Downloads a weekly calendar reminder: two minutes to practise the countersign. */
 export function DrillButton({ className = "" }: { className?: string }) {

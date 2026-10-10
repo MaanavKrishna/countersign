@@ -1,5 +1,5 @@
 import type { Instrumentation } from "next";
-import { scrubPath } from "@/lib/privacy";
+import { scrubPath } from "@/lib/telemetry/privacy";
 
 // Server errors as one structured log line each (visible in the Vercel logs): error type, digest
 // and route only. No query strings, and no message, which can echo the text being investigated.

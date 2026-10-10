@@ -2,7 +2,7 @@
 
 import { forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY, type Simulation, type SimulationNodeDatum } from "d3-force";
 import { useEffect, useRef, useState } from "react";
-import type { GraphEdge, GraphNode } from "@/lib/types";
+import type { GraphEdge, GraphNode } from "@/lib/investigator/types";
 
 type SimNode = SimulationNodeDatum & GraphNode & { w: number; h: number };
 type SimLink = { source: SimNode | string; target: SimNode | string; edge: GraphEdge };

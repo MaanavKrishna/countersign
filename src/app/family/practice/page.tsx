@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useReducer, useState, useSyncExternalStore } from "react";
-import { normalizeName, memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
+import { normalizeName, memberCodesForDisplay, type Circle } from "@/lib/family/circle";
 import { DrillButton } from "@/components/DrillButton";
-import { LANGS } from "@/lib/countersign/languages";
-import { useWordsOpen } from "@/lib/countersign/lock";
-import { useFamily } from "@/lib/countersign/store";
-import { SCENARIOS, practiceStep, start, type ScenarioId } from "@/lib/practice";
+import { LANGS } from "@/lib/family/languages";
+import { useWordsOpen } from "@/lib/family/lock";
+import { useFamily } from "@/lib/family/store";
+import { SCENARIOS, practiceStep, start, type ScenarioId } from "@/lib/family/practice";
 
 const EXAMPLE_WORDS = ["copper", "lantern", "river"];
 

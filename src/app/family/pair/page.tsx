@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { parsePairingFragment } from "@/lib/countersign/protocol";
-import { canAccept, useFamily } from "@/lib/countersign/store";
+import { parsePairingFragment } from "@/lib/family/protocol";
+import { canAccept, useFamily } from "@/lib/family/store";
 
 const subscribeHash = (cb: () => void) => {
   window.addEventListener("hashchange", cb);

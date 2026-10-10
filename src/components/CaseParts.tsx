@@ -1,6 +1,7 @@
-import { defang } from "@/lib/domain";
-import { parseHeaders } from "@/lib/indicators";
-import type { Report, Tactic } from "@/lib/types";
+import { defang } from "@/lib/core/domain";
+import { parseHeaders } from "@/lib/investigator/indicators";
+import type { Report } from "@/lib/investigator/types";
+import type { Tactic } from "@/lib/core/types";
 
 type Range = { start: number; end: number; tactic: Tactic };
 

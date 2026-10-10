@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
-import { LANGS } from "@/lib/countersign/languages";
-import { STEP_SECONDS } from "@/lib/countersign/protocol";
-import { UI } from "@/lib/countersign/ui";
+import { memberCodesForDisplay, type Circle } from "@/lib/family/circle";
+import { LANGS } from "@/lib/family/languages";
+import { STEP_SECONDS } from "@/lib/family/protocol";
+import { UI } from "@/lib/family/ui";
 import { WordsGate } from "./WordsGate";
 
 type Codes = Awaited<ReturnType<typeof memberCodesForDisplay>>;

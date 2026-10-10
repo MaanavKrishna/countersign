@@ -1,4 +1,4 @@
-import type { Band } from "@/lib/types";
+import type { Band } from "@/lib/core/types";
 
 export const BAND_STYLE: Record<Band, { color: string; ink: string; word: string; wash: string }> = {
   forgery: { color: "#E5381B", ink: "#C42A10", word: "FORGERY", wash: "#FFE0D8" },

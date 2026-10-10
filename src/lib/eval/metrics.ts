@@ -1,4 +1,4 @@
-import type { Band } from "../types";
+import type { Band } from "@/lib/core/types";
 
 export type EvalRow = { id: string; label: "scam" | "legit"; band: Band | "error"; risk: number; ms: number };
 export type ArmMetrics = {

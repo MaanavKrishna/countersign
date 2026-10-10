@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { MAX_NAME, cleanName, normalizeName, parseJoinFragment, secretTag } from "@/lib/countersign/circle";
-import { joinStatus, useFamily } from "@/lib/countersign/store";
+import { MAX_NAME, cleanName, normalizeName, parseJoinFragment, secretTag } from "@/lib/family/circle";
+import { joinStatus, useFamily } from "@/lib/family/store";
 
 const subscribeHash = (cb: () => void) => {
   window.addEventListener("hashchange", cb);

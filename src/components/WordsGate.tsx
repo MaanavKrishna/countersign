@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { unlock, useWordsOpen } from "@/lib/countersign/lock";
-import { useFamily } from "@/lib/countersign/store";
+import { unlock, useWordsOpen } from "@/lib/family/lock";
+import { useFamily } from "@/lib/family/store";
 
 /** Shows family words only when the optional screen-lock gate is open. */
 export function WordsGate({ children, label = "Unlock to see the words" }: { children: ReactNode; label?: string }) {

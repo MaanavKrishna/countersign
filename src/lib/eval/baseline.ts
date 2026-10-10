@@ -1,7 +1,7 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
-import { MODEL, anthropic, untrusted } from "../agent/client";
-import type { Band } from "../types";
+import { MODEL, anthropic, untrusted } from "@/lib/ai/client";
+import type { Band } from "@/lib/core/types";
 
 // What a typical hackathon entry does: one prompt, the model's own verdict.
 const Verdict = z.object({ verdict: z.enum(["scam", "suspicious", "legitimate"]) });

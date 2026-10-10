@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createLock, ensureOpen, lockSupported, relock } from "@/lib/countersign/lock";
-import { useFamily } from "@/lib/countersign/store";
+import { createLock, ensureOpen, lockSupported, relock } from "@/lib/family/lock";
+import { useFamily } from "@/lib/family/store";
 
 /** Optional: require Face ID, fingerprint or the phone's PIN before family words are shown. */
 export function LockSetting() {

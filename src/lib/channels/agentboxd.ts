@@ -1,7 +1,8 @@
+import "server-only";
 import type { Message } from "agentboxd";
-import type { InvestigationInput } from "../pipeline";
-import { finding } from "../scoring";
-import type { Finding } from "../types";
+import type { InvestigationInput } from "@/lib/investigator/pipeline";
+import { finding } from "@/lib/core/scoring";
+import type { Finding } from "@/lib/core/types";
 import { extractForwarded } from "./forwarded";
 
 type Incoming = Pick<Message, "from" | "reply_to" | "subject" | "text" | "labels" | "ai">;

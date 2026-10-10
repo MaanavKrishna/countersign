@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { reportError } from "@/lib/reportError";
+import { reportError } from "@/lib/telemetry/reportError";
 
 // Replaces the root layout when it fails, so it carries its own document and inline styles.
 export default function GlobalError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {

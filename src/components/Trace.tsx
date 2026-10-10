@@ -1,4 +1,4 @@
-import type { TimelineItem } from "@/lib/useInvestigation";
+import type { TimelineItem } from "@/lib/investigator/useInvestigation";
 
 const TOOL_NAMES: Record<string, string> = {
   rdap_lookup: "Domain registry",

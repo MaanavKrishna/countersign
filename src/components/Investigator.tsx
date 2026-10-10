@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { defang } from "@/lib/domain";
-import { decodeQrFromImageData, qrNote } from "@/lib/qr";
-import { SAMPLES } from "@/lib/samples";
-import { useInvestigation, type ImageInput } from "@/lib/useInvestigation";
+import { defang } from "@/lib/core/domain";
+import { decodeQrFromImageData, qrNote } from "@/lib/investigator/qr";
+import { SAMPLES } from "@/lib/investigator/samples";
+import { useInvestigation, type ImageInput } from "@/lib/investigator/useInvestigation";
 import { AnnotatedMessage, Debate, ResponseKit } from "./CaseParts";
 import { EvidenceGraph } from "./EvidenceGraph";
 import { Trace } from "./Trace";

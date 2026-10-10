@@ -3,8 +3,8 @@ import { after } from "next/server";
 import { toInvestigationInput } from "@/lib/channels/agentboxd";
 import { firstDelivery } from "@/lib/channels/dedupe";
 import { heldNotice, shouldInvestigate } from "@/lib/channels/inboxPolicy";
-import { collectCase } from "@/lib/report/collect";
-import { renderReportEmail } from "@/lib/report/emailText";
+import { collectCase } from "@/lib/investigator/report/collect";
+import { renderReportEmail } from "@/lib/investigator/report/emailText";
 
 export const maxDuration = 120;
 

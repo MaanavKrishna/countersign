@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { STEP_SECONDS, codesForDisplay, type Pairing } from "@/lib/countersign/protocol";
+import { STEP_SECONDS, codesForDisplay, type Pairing } from "@/lib/family/protocol";
 import { WordsGate } from "./WordsGate";
 
 type Codes = Awaited<ReturnType<typeof codesForDisplay>>;

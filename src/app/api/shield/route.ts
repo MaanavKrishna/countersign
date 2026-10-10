@@ -1,6 +1,6 @@
-import { assessCall } from "@/lib/agent/shield";
-import { assessLocally } from "@/lib/shieldLocal";
-import { clientIp, shieldLimiter } from "@/lib/ratelimit";
+import { assessCall } from "@/lib/shield/ai";
+import { assessLocally } from "@/lib/shield/rules";
+import { clientIp, shieldLimiter } from "@/lib/server/ratelimit";
 
 export const maxDuration = 30;
 
