@@ -2,10 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { STEP_SECONDS, codesForDisplay, type Pairing } from "@/lib/countersign/protocol";
+import { WordsGate } from "./WordsGate";
 
 type Codes = Awaited<ReturnType<typeof codesForDisplay>>;
 
-export function RollingCode({ pairing, which, size = "md" }: { pairing: Pairing; which: "mine" | "theirs"; size?: "md" | "lg" }) {
+type Props = { pairing: Pairing; which: "mine" | "theirs"; size?: "md" | "lg" };
+
+export function RollingCode(props: Props) {
+  return (
+    <WordsGate>
+      <PairWords {...props} />
+    </WordsGate>
+  );
+}
+
+function PairWords({ pairing, which, size = "md" }: Props) {
   const [codes, setCodes] = useState<Codes | null>(null);
   useEffect(() => {
     let alive = true;

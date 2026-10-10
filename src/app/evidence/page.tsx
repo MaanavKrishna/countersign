@@ -1,11 +1,23 @@
 import results from "../../../eval/results.json";
+import { wilson } from "@/lib/eval/metrics";
 
 type Metrics = { n: number; recall: number; falsePositiveRate: number; strictAccuracy: number; dangerousMisses: number; tp: number; fp: number; tn: number; fn: number };
-type Row = { id: string; label: "scam" | "legit"; set: "easy" | "hard"; band: string };
-type Arm = { id: string; label: string; metrics: { all: Metrics; easy: Metrics; hard: Metrics }; rows: Row[] };
-const data = results as unknown as { generatedAt: string; hardSetCommit?: string; arms: Arm[] };
+type SetId = "easy" | "hard" | "adversarial";
+type Row = { id: string; label: "scam" | "legit"; set: SetId; band: string };
+type Arm = { id: string; label: string; metrics: { all: Metrics } & Partial<Record<SetId, Metrics>>; rows: Row[] };
+const data = results as unknown as { generatedAt: string; hardSetCommit?: string; adversarialSetCommit?: string; arms: Arm[] };
 const arms = data.arms ?? [];
 const pct = (x: number) => `${Math.round(x * 100)}%`;
+/** Rate with its 95% Wilson interval, so small samples don't look more certain than they are. */
+function Rate({ k, n }: { k: number; n: number }) {
+  if (n === 0) return <>—</>;
+  const [lo, hi] = wilson(k, n);
+  return (
+    <>
+      {pct(k / n)} <span className="text-xs text-muted">({pct(lo)}–{pct(hi)})</span>
+    </>
+  );
+}
 const REPO = "https://github.com/MaanavKrishna/countersign";
 
 export const metadata = { title: "Evidence — Countersign" };
@@ -17,8 +29,9 @@ const BAND_CHIP: Record<string, string> = {
   error: "bg-paper text-muted",
 };
 
-function ResultsTable({ set, title, blurb }: { set: "easy" | "hard"; title: string; blurb: string }) {
+function ResultsTable({ set, title, blurb }: { set: SetId; title: string; blurb: string }) {
   const m0 = arms[0]?.metrics[set];
+  if (!m0) return null;
   return (
     <section className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
@@ -40,13 +53,15 @@ function ResultsTable({ set, title, blurb }: { set: "easy" | "hard"; title: stri
           </thead>
           <tbody>
             {arms.map((a) => {
-              const m = a.metrics[set];
+              const m = a.metrics[set]!;
+              const scams = m.tp + m.fn;
+              const legit = m.tn + m.fp;
               return (
                 <tr key={a.id} className={`border-b border-line last:border-0 ${a.id === "countersign" ? "bg-trust-wash" : ""}`}>
                   <td className="p-4 font-bold">{a.label}</td>
-                  <td className="p-4 font-mono">{pct(m.recall)}</td>
-                  <td className="p-4 font-mono">{pct(m.falsePositiveRate)}</td>
-                  <td className="p-4 font-mono">{pct(m.strictAccuracy)}</td>
+                  <td className="p-4 font-mono"><Rate k={m.tp} n={scams} /></td>
+                  <td className="p-4 font-mono"><Rate k={m.fp} n={legit} /></td>
+                  <td className="p-4 font-mono"><Rate k={Math.round(m.strictAccuracy * m.n)} n={m.n} /></td>
                   <td className={`p-4 font-mono font-bold ${m.dangerousMisses ? "text-alert-ink" : "text-trust-ink"}`}>{m.dangerousMisses}</td>
                 </tr>
               );
@@ -84,6 +99,21 @@ export default function EvidencePage() {
             title="Hard set: polished fakes and scary-but-real alerts"
             blurb="Scams with calm, professional wording, where the giveaway is only in the infrastructure (lookalike or disguised domains, mismatched reply addresses), and genuine alerts that look alarming."
           />
+          <ResultsTable
+            set="adversarial"
+            title="Adversarial set: scams written to fool AI screeners"
+            blurb="Scams carrying fake security-scan reports, fake assistant transcripts, 'training example' framing, and instructions in another language or spaced out, plus genuine messages that talk about AI."
+          />
+          <p className="m-0 text-sm text-muted">Percentages in brackets are 95% confidence intervals (Wilson). With sets this small, a difference of one or two cases is not significant, and we don&apos;t treat it as one.</p>
+          {data.adversarialSetCommit && (
+            <p className="m-0 text-sm text-muted">
+              The adversarial set was also committed before any system was run on it:{" "}
+              <a className="font-semibold text-trust" href={`${REPO}/commit/${data.adversarialSetCommit}`}>
+                commit {data.adversarialSetCommit}
+              </a>
+              .
+            </p>
+          )}
           {data.hardSetCommit && (
             <p className="m-0 text-sm text-muted">
               The hard set was committed before any system was run on it:{" "}

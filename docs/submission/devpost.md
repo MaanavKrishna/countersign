@@ -17,6 +17,7 @@ AI removed the tells we taught our families. Phishing has perfect grammar now, a
 - Works fully offline (installable app with a service worker).
 - No account, and the secret never leaves the family's phones.
 - Words, and the screens Grandma uses, in English, Spanish, French, Italian or Portuguese.
+- Optional **word lock** with the phone's Face ID, fingerprint or PIN.
 - Real life is handled: a new phone just re-scans; a lost phone or someone leaving means **start fresh**, which re-keys the circle so the old words stop working.
 - For the people you talk to most, there's also two-person pairing, which uses directional codes for even stronger relay resistance.
 
@@ -55,7 +56,7 @@ A strong model is very hard to beat at classifying scam text, so the real gap is
 ## Limitations (we'd rather you hear them from us)
 - It only protects families who set it up, in person, once. That's the price of a secret nobody else can learn.
 - It relies on someone remembering to ask; the practice call, drill and card are there to build the habit, but we haven't measured it with real grandparents yet.
-- The secret lives in the browser: no app lock or encrypted backup yet. Start fresh is the recovery.
+- The secret lives in the browser. An optional Face ID / fingerprint lock gates the words, but it is a gate, not encryption, and there is no encrypted backup yet. Start fresh is the recovery.
 - Live listening needs Chrome, Edge or Safari, and the call on speaker.
 - The message checker ties a strong single prompt on verdicts; its edge is evidence, code-controlled verdicts and robustness. The test sets are small, and /evidence shows confidence intervals.
 

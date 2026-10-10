@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { useState } from "react";
 import { DrillButton } from "@/components/DrillButton";
 import { FamilyCircles } from "@/components/FamilyCircles";
+import { LockSetting } from "@/components/LockSetting";
 import { RollingCode } from "@/components/RollingCode";
 import { newSecret, pairingLink } from "@/lib/countersign/protocol";
 import { useFamily, type TrustedContact } from "@/lib/countersign/store";
@@ -74,6 +75,7 @@ export default function FamilyPage() {
       </div>
 
       <FamilyCircles />
+      <LockSetting />
 
       <div className="flex flex-col gap-2 border-t border-line pt-8">
         <h2 className="condensed m-0 text-[30px] font-black uppercase">Two-person pairing (strongest)</h2>

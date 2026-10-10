@@ -51,6 +51,7 @@ storage:   localStorage only; nothing leaves the device
 | Code overheard or replayed later | Valid only for the current minute plus 20 s of grace |
 | **Relay attack:** scammer calls the real Ethan pretending to be Grandma and asks for "the code" | Codes are **directional**, a different code per direction, and Ethan's screen says "say this only when *you* called", so Grandma's expected code is never shown on Ethan's phone |
 | Pairing secret intercepted | Pairing happens in person by QR, and the secret travels only in the URL fragment, which browsers never send to servers. It's removed from the address bar after pairing |
+| Someone picks up an unlocked phone | Optional **Lock the words**: Face ID, fingerprint or the phone's PIN (WebAuthn user verification) before any words show; unlocked for 5 minutes, and a reload locks again |
 | Lost phone, or someone leaves the circle | Phone lock protects it in the meantime; **Start fresh** re-keys the circle so the old secret's words stop working everywhere. Removing a name without re-keying does not revoke anyone, and the app says so |
 | No internet during the call | Fully offline: Web Crypto + local storage |
 | Family Circle trade-off | A circle shares one secret, and each member's words come from HMAC(secret, name, minute). That means any member's phone can show any member's words, which is convenient but weaker against relay than a two-person pairing. Every screen says "never read words to someone who called you", and two-person pairing remains available for the people who matter most |
@@ -176,7 +177,7 @@ We'd rather you hear these from us.
 - **It only protects families who set it up.** Everyone has to scan the QR code in person once. That's the price of a secret no one else can learn, and it's the hardest part of adoption.
 - **It relies on someone remembering to ask.** The practice call, weekly drill and phone-table card exist to build that habit, but we haven't yet measured whether it sticks with real grandparents.
 - **"My phone died" still works on people who bend the rule.** The rule has to be: no words, no money, call back on the number you know. The app teaches it, but it can't enforce it.
-- **The secret lives in the browser.** Clearing site data, or a thief with an unlocked phone, defeats it. There's no app lock or encrypted backup yet. Start fresh is the recovery.
+- **The secret lives in the browser.** Clearing site data loses it, and there's no encrypted backup yet; start fresh is the recovery. The optional word lock stops someone casually reading the words, but it's a gate, not encryption: someone with developer tools on an unlocked phone could still read storage.
 - **Live listening depends on the browser.** It needs Chrome, Edge or Safari, it only hears the other side on speaker, and Chrome's speech engine is cloud-based.
 - **The message checker ties a strong single prompt on verdicts.** Its advantages are evidence for every verdict, a verdict that code (not the model) controls, and working without the model. The test sets are small; see the confidence intervals on /evidence.
 - **Hosted pieces cost money.** The investigator needs model credit and the email channel needs an inbox provider. Rate limits are per server instance, not global. The family features need neither.

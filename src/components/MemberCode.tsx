@@ -5,6 +5,7 @@ import { memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
 import { LANGS } from "@/lib/countersign/languages";
 import { STEP_SECONDS } from "@/lib/countersign/protocol";
 import { UI } from "@/lib/countersign/ui";
+import { WordsGate } from "./WordsGate";
 
 type Codes = Awaited<ReturnType<typeof memberCodesForDisplay>>;
 
@@ -17,8 +18,18 @@ function speak(words: string[], lang: string) {
   window.speechSynthesis.speak(u);
 }
 
-/** A circle member's rolling words, refreshed every second. */
-export function MemberCode({ circle, member, size = "md", readAloud = false }: { circle: Circle; member: string; size?: "md" | "lg" | "xl"; readAloud?: boolean }) {
+type Props = { circle: Circle; member: string; size?: "md" | "lg" | "xl"; readAloud?: boolean };
+
+/** A circle member's rolling words, refreshed every second, behind the optional lock. */
+export function MemberCode(props: Props) {
+  return (
+    <WordsGate>
+      <MemberWords {...props} />
+    </WordsGate>
+  );
+}
+
+function MemberWords({ circle, member, size = "md", readAloud = false }: { circle: Circle; member: string; size?: "md" | "lg" | "xl"; readAloud?: boolean }) {
   const [codes, setCodes] = useState<Codes | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useReducer, useState, useSyncExternalStore } fr
 import { normalizeName, memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
 import { DrillButton } from "@/components/DrillButton";
 import { LANGS } from "@/lib/countersign/languages";
+import { useWordsOpen } from "@/lib/countersign/lock";
 import { useFamily } from "@/lib/countersign/store";
 import { SCENARIOS, practiceStep, start, type ScenarioId } from "@/lib/practice";
 
@@ -40,9 +41,10 @@ const LESSON = {
 };
 
 export default function PracticePage() {
-  const { circles, pairings } = useFamily();
+  const { circles, pairings, lock } = useFamily();
+  const wordsOpen = useWordsOpen(lock);
   const [state, dispatch] = useReducer(practiceStep, start("jail"));
-  const [words, setWords] = useState<string[]>(EXAMPLE_WORDS);
+  const [loadedWords, setWords] = useState<string[]>(EXAMPLE_WORDS);
   const [muted, setMuted] = useState(false);
   const speech = useSyncExternalStore(noop, hasSpeech, () => true);
 
@@ -50,14 +52,16 @@ export default function PracticePage() {
   const circle: Circle | undefined = circles[0];
   const member = circle?.members.find((m) => normalizeName(m) !== normalizeName(circle.me));
   const familyName = member ?? pairings[0]?.them ?? "Ethan";
-  const realWords = Boolean(circle && member);
+  // A locked phone practises with example words rather than revealing real ones.
+  const realWords = Boolean(circle && member && wordsOpen);
+  const words = realWords ? loadedWords : EXAMPLE_WORDS;
   const wordsLang = LANGS[realWords && circle ? circle.lang : "en"].speech;
   const sc = SCENARIOS[state.scenario];
   const fill = useCallback((t: string) => t.replaceAll("{name}", familyName), [familyName]);
 
   // The genuine caller reads your circle's real current words.
   useEffect(() => {
-    if (!circle || !member) return;
+    if (!circle || !member || !wordsOpen) return;
     let alive = true;
     memberCodesForDisplay(circle, member, Date.now())
       .then((c) => alive && setWords(c.words))
@@ -65,7 +69,7 @@ export default function PracticePage() {
     return () => {
       alive = false;
     };
-  }, [circle, member, state.phase]);
+  }, [circle, member, wordsOpen, state.phase]);
 
   // Speak each step. Cleanup stops the line, so changing step, scenario or page never doubles up.
   // With no voice available, the "Next line" button drives the call instead.

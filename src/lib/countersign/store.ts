@@ -2,15 +2,16 @@
 
 import { useSyncExternalStore } from "react";
 import { cleanName, normalizeName, type Circle } from "./circle";
+import type { WordLock } from "./lock";
 import type { Pairing } from "./protocol";
 
 // Pairings and the trusted contact live only in this browser's localStorage.
 
 export type TrustedContact = { name: string; phone: string };
-type State = { pairings: Pairing[]; circles: Circle[]; contact: TrustedContact | null };
+type State = { pairings: Pairing[]; circles: Circle[]; contact: TrustedContact | null; lock: WordLock | null };
 
 const KEY = "countersign.family.v1";
-const EMPTY: State = { pairings: [], circles: [], contact: null };
+const EMPTY: State = { pairings: [], circles: [], contact: null, lock: null };
 const listeners = new Set<() => void>();
 let cache: State | null = null;
 
@@ -84,6 +85,8 @@ export function useFamily() {
     pairings: state.pairings,
     circles: state.circles,
     contact: state.contact,
+    lock: state.lock,
+    setLock: (lock: WordLock | null) => write({ ...read(), lock }),
     add: (p: Omit<Pairing, "id" | "createdAt">) => write({ ...read(), pairings: addPairing(read().pairings, p) }),
     remove: (id: string) => write({ ...read(), pairings: read().pairings.filter((x) => x.id !== id) }),
     setContact: (c: TrustedContact | null) => write({ ...read(), contact: c }),
