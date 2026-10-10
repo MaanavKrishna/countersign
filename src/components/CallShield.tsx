@@ -495,7 +495,7 @@ export function CallShield() {
                   Live transcript
                 </h2>
                 <span className="font-mono text-xs" style={{ color: s.muted }}>
-                  {analyzing ? "analyzing…" : assessment?.source === "device" ? "checked on this phone" : mode === "sim" ? "simulated call" : "live speech"}
+                  {analyzing ? "analyzing…" : assessment?.source === "device" ? "checked on this phone" : assessment?.source === "rules" ? "built-in rules" : mode === "sim" ? "simulated call" : "live speech"}
                 </span>
               </div>
               <div ref={transcriptBox} className="flex max-h-[460px] flex-col gap-4 overflow-y-auto scroll-smooth p-5 text-base leading-normal">

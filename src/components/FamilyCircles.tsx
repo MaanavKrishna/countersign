@@ -7,6 +7,7 @@ import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
 import { useFamily } from "@/lib/countersign/store";
 import { UI } from "@/lib/countersign/ui";
+import { ensureOpen, useWordsOpen } from "@/lib/countersign/lock";
 import { MemberCode } from "./MemberCode";
 
 /** Full-screen check for the person receiving the call. Built for grandparents: huge type, one decision. */
@@ -91,8 +92,10 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
 }
 
 export function FamilyCircles() {
-  const { circles, addCircle, removeCircle, addMember, rekeyCircle } = useFamily();
+  const { circles, addCircle, removeCircle, addMember, rekeyCircle, lock } = useFamily();
   const [freshDrop, setFreshDrop] = useState<Record<string, string>>({});
+  // A QR code carries the secret: hide it the moment the phone locks.
+  const wordsOpen = useWordsOpen(lock);
   const [newName, setNewName] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [me, setMe] = useState("");
@@ -114,6 +117,7 @@ export function FamilyCircles() {
 
   // New secret: everyone's old words stop working, so a removed member or a lost phone can't be used.
   const startFresh = async (c: Circle) => {
+    if (!(await ensureOpen(lock))) return;
     const drop = freshDrop[c.id] || null;
     const who = drop ? `${drop} will be removed and ` : "";
     if (!window.confirm(`${who}everyone's words will change. Each family member must scan the new QR code. Continue?`)) return;
@@ -158,10 +162,14 @@ export function FamilyCircles() {
               <p className="m-0 text-sm text-muted">You are {c.me} · {c.members.length} members · words in {LANGS[c.lang].label}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => void showInvite(c)} className="min-h-11 rounded border-[1.5px] border-ink px-3 text-sm font-bold">
+              <button type="button" onClick={async () => {
+                  if (await ensureOpen(lock)) await showInvite(c);
+                }} className="min-h-11 rounded border-[1.5px] border-ink px-3 text-sm font-bold">
                 Add someone
               </button>
-              <button type="button" onClick={() => removeCircle(c.id)} className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink">
+              <button type="button" onClick={async () => {
+                  if ((await ensureOpen(lock)) && window.confirm(`Leave ${c.name}? Your words for this circle will be deleted from this phone.`)) removeCircle(c.id);
+                }} className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink">
                 Leave
               </button>
             </div>
@@ -267,7 +275,7 @@ export function FamilyCircles() {
           </button>
         </form>
 
-        {invite && (
+        {invite && wordsOpen && (
           <div className="animate-pop flex min-w-0 flex-[1_1_380px] flex-col items-start gap-3 rounded-md border-2 border-ink bg-card p-6 shadow-block">
             <p className="eyebrow m-0">Each family member scans this with their phone camera</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}

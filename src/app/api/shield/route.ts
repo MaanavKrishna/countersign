@@ -20,6 +20,6 @@ export async function POST(req: Request) {
   } catch (err) {
     // AI unavailable (outage, quota): degrade to the on-device rules rather than going silent mid-call.
     console.error("shield: AI assessment failed, using rules", (err as Error).message);
-    return Response.json(assessLocally(transcript));
+    return Response.json({ ...assessLocally(transcript), source: "rules" });
   }
 }

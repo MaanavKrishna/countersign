@@ -2,10 +2,13 @@
 // It carries no names or secrets: only a reminder and a link to the practice call.
 
 const stamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const pad = (n: number) => String(n).padStart(2, "0");
+/** Floating local time (no Z): the drill stays at the same wall-clock time across daylight saving. */
+const local = (d: Date) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
 
 /** Escape a TEXT value and fold it at 75 octets (RFC 5545 §3.1, §3.3.11). */
 function line(name: string, value: string): string {
-  const text = `${name}:${value.replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\n/g, "\\n")}`;
+  const text = `${name}:${value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n")}`;
   const out: string[] = [];
   let cur = "";
   for (const ch of text) {
@@ -30,13 +33,13 @@ export function drillCalendar(origin: string, start: Date): string {
     "BEGIN:VEVENT",
     `UID:drill-${start.getTime()}@countersign`,
     `DTSTAMP:${stamp(new Date())}`,
-    `DTSTART:${stamp(start)}`,
+    `DTSTART:${local(start)}`,
     "DURATION:PT5M",
     "RRULE:FREQ=WEEKLY",
     line("SUMMARY", "Countersign family drill (2 minutes)"),
     line(
       "DESCRIPTION",
-      `Call one family member and ask: "What's our countersign?" They read their three words from the Family page. Then try a practice scam call: ${practice}`,
+      `Call one family member and ask: "What's our countersign?" They read their three words from the Family page; you check them. Then, if you have a minute, try a practice scam call: ${practice}`,
     ),
     line("URL", practice),
     "BEGIN:VALARM",

@@ -18,10 +18,11 @@ const RULES: Record<Category, RegExp> = {
   authority: /\b(this is (?:the )?[^.?!,\n]{0,40}?(?:department|team|office|agency|bank|support|irs|police|court)|lawyer|attorney|officer|irs|fbi|social security administration)\b/i,
   secrecy: new RegExp(`\\b(don${A}t tell|do not tell|keep (?:this|it) (?:between us|secret|quiet)|between you and me|don${A}t mention)`, "i"),
   reward: new RegExp(`\\b(you${A}ve won|you have won|prize|lottery|sweepstakes|guaranteed returns?|double your money)`, "i"),
-  payment: /\b(gift cards?|apple cards?|google play cards?|bitcoin|crypto(?:currency)?|wire (?:the )?(?:money|transfer)|western union|moneygram|zelle|cash app|venmo|bail|send (?:me )?(?:the )?money|\$\s?\d[\d,]*|(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) (?:hundred|thousand) dollars)/i,
+  payment: /(?:\$\s?\d[\d,]*|\b(?:gift cards?|apple cards?|google play cards?|bitcoin|crypto(?:currency)?|wire (?:the )?(?:money|transfer)|western union|moneygram|zelle|cash app|venmo|bail|send (?:me )?(?:the )?money|(?:one|two|three|four|five|six|seven|eight|nine|ten|\d+) (?:hundred|thousand) dollars))/i,
   credentials: /\b((?:six|6|four|4)[- ]digit code|verification code|one[- ]time (?:code|password|passcode)|read (?:it|the code|them|the numbers) back|your (?:password|pin|social security number|account number|card number))/i,
-  remote_access: /\b(anydesk|teamviewer|remote(?:ly)? (?:access|control|in)|fix it remotely|download (?:an? |the )?\w+|install (?:an? |the )?\w+|share your screen|screen ?share)/i,
-  relationship: new RegExp(`\\b(it${A}s me\\b|don${A}t you recogni[sz]e (?:my voice|me))`, "i"),
+  remote_access: /\b(anydesk|teamviewer|remote(?:ly)? (?:access|control|in)|fix it remotely|(?:download|install) (?:an? |the |our )?(?:\w+ )?(?:helper|support (?:app|tool)|remote|screen|access) ?\w*|share your screen|screen ?share)/i,
+  // A caller who names themself is not a tactic; pressure to be recognised is.
+  relationship: new RegExp(`\\b(guess who${A}s calling|don${A}t you recogni[sz]e (?:my voice|me)|it${A}s me,? your (?:grandson|granddaughter|son|daughter|nephew|niece|favou?rite))`, "i"),
   emotional: new RegExp(`\\b(i${A}m (?:so )?scared|i${A}m in trouble|freak out|please,? (?:hurry|help me)|i${A}m begging)`, "i"),
 };
 

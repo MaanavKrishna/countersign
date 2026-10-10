@@ -11,7 +11,7 @@ export function FamilyCard() {
   const { circles } = useFamily();
   const [picked, setPicked] = useState<Lang | null>(null);
   const lang: Lang = picked ?? circles[0]?.lang ?? "en";
-  const c = UI[lang].card;
+  const c = (UI[lang] ?? UI.en).card;
 
   return (
     <>

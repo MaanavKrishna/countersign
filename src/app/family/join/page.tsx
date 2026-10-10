@@ -20,7 +20,10 @@ export default function JoinCirclePage() {
   const [joined, setJoined] = useState<{ circle: string; as: string } | null>(null);
   const [other, setOther] = useState("");
   // A "start fresh" link names the old circle it replaces (by tag, never by secret).
+  // Anyone who held the old secret can compute that tag, so replacing is never automatic:
+  // the person ticks a box, and the default keeps the old circle.
   const [replaceId, setReplaceId] = useState<string | null>(null);
+  const [replaceOld, setReplaceOld] = useState(false);
 
   // Read the link once, then remove the secret from the address bar and history straight away.
   if (captured === null && hash !== null) setCaptured(parseJoinFragment(hash) ?? "invalid");
@@ -62,11 +65,16 @@ export default function JoinCirclePage() {
   }
   const parsed = captured;
 
-  const join = (raw: string) => {
+  const join = async (raw: string) => {
     const me = cleanName(raw);
     if (!me) return;
     const members = parsed.members.some((m) => normalizeName(m) === normalizeName(me)) ? parsed.members : [...parsed.members, me];
-    addCircle({ name: parsed.name, secret: parsed.secret, members, me, lang: parsed.lang, replaces: parsed.replaces ?? undefined }, replaceId);
+    // Resolve the old circle now, so a fast tap can't race the background lookup.
+    let replace: string | null = null;
+    if (replaceOld && parsed.replaces) {
+      for (const c of circles) if ((await secretTag(c.secret)) === parsed.replaces) replace = c.id;
+    }
+    addCircle({ name: parsed.name, secret: parsed.secret, members, me, lang: parsed.lang, replaces: parsed.replaces ?? undefined }, replace);
     setJoined({ circle: parsed.name, as: me });
   };
 
@@ -87,14 +95,17 @@ export default function JoinCirclePage() {
         <p className="m-0 mt-1">Did someone send you this link in a message or ask you to tap it on a call? Stop. That&apos;s how a scammer would set up fake &ldquo;family words&rdquo;.</p>
       </div>
       {replaceId && (
-        <p className="m-0 rounded-md bg-trust-wash p-4 text-lg">
-          {parsed.name} has started fresh with new words. Joining replaces your old {parsed.name} words on this phone.
-        </p>
+        <label className="flex cursor-pointer items-start gap-3 rounded-md bg-trust-wash p-4 text-lg">
+          <input type="checkbox" checked={replaceOld} onChange={(e) => setReplaceOld(e.target.checked)} className="mt-1.5 h-5 w-5 flex-none" />
+          <span>
+            This code says {parsed.name} has <b>started fresh</b>. Remove my old {parsed.name} words from this phone. <span className="text-base text-body">Only tick this if the person who started fresh is showing you this code right now. Otherwise leave it, and remove the old circle later with Leave.</span>
+          </span>
+        </label>
       )}
       <h1 className="condensed m-0 text-[44px] leading-[0.95] font-black uppercase">Which one are you?</h1>
       <div className="flex flex-col gap-3">
         {parsed.members.map((m) => (
-          <button key={normalizeName(m)} type="button" onClick={() => join(m)} className="min-h-16 rounded-md border-2 border-ink bg-card px-5 text-left text-2xl font-black uppercase" style={{ fontStretch: "75%" }}>
+          <button key={normalizeName(m)} type="button" onClick={() => void join(m)} className="min-h-16 rounded-md border-2 border-ink bg-card px-5 text-left text-2xl font-black uppercase" style={{ fontStretch: "75%" }}>
             {m}
           </button>
         ))}
@@ -103,7 +114,7 @@ export default function JoinCirclePage() {
         className="flex flex-wrap items-end gap-3"
         onSubmit={(e) => {
           e.preventDefault();
-          join(other);
+          void join(other);
         }}
       >
         <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-sm font-bold">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LANGS, type Lang } from "../countersign/languages";
+import { LANGS, isLang, type Lang } from "../countersign/languages";
 import { UI, type UiText } from "../countersign/ui";
 
 const flat = (t: UiText): string[] => [
@@ -20,5 +20,10 @@ describe("grandparent screens in every circle language", () => {
       expect(UI[l].noMatchBody("Ana")).toContain("Ana");
       expect(UI[l].reallyThem("Ana")).toContain("Ana");
     }
+  });
+  it("rejects prototype keys as languages", () => {
+    expect(isLang("constructor")).toBe(false);
+    expect(isLang("__proto__")).toBe(false);
+    expect(isLang("es")).toBe(true);
   });
 });

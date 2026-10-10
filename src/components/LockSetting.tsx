@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createLock, lockSupported, relock } from "@/lib/countersign/lock";
+import { createLock, ensureOpen, lockSupported, relock } from "@/lib/countersign/lock";
 import { useFamily } from "@/lib/countersign/store";
 
 /** Optional: require Face ID, fingerprint or the phone's PIN before family words are shown. */
@@ -18,7 +18,7 @@ export function LockSetting() {
     <section className="flex min-w-0 flex-col gap-3 rounded-md border-[1.5px] border-line bg-card p-6" aria-labelledby="lock-h">
       <h2 id="lock-h" className="condensed m-0 text-2xl font-black uppercase">Lock the words</h2>
       <p className="m-0 text-[15px] text-body">
-        Ask for this phone&apos;s Face ID, fingerprint or PIN before showing any family words, so someone who picks up the phone can&apos;t read them. Stays unlocked for five minutes.
+        Ask for this phone&apos;s Face ID, fingerprint or PIN before showing any family words or QR codes, or changing a circle, so someone who picks up the phone can&apos;t read or change them. Stays unlocked for five minutes. Locked out? Clearing this site&apos;s data removes the lock and the circles; then a family member shows you the QR code again.
       </p>
       {lock ? (
         <div className="flex flex-wrap items-center gap-3">
@@ -26,7 +26,13 @@ export function LockSetting() {
           <button type="button" onClick={relock} className="min-h-11 rounded border-[1.5px] border-ink px-4 font-bold">
             Lock now
           </button>
-          <button type="button" onClick={() => setLock(null)} className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink">
+          <button
+            type="button"
+            onClick={async () => {
+              if (await ensureOpen(lock)) setLock(null);
+            }}
+            className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink"
+          >
             Turn off
           </button>
         </div>

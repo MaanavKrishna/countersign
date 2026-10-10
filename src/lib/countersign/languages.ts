@@ -11,7 +11,7 @@ export const LANGS = {
 export type Lang = keyof typeof LANGS;
 
 export function isLang(x: string | null | undefined): x is Lang {
-  return !!x && x in LANGS;
+  return !!x && Object.hasOwn(LANGS, x);
 }
 
 export async function loadWords(lang: Lang): Promise<readonly string[]> {

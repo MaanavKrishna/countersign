@@ -100,8 +100,8 @@ export type ShieldAssessment = {
   advice: string;
   challengeNow: boolean;
   challengeTopic: string | null;
-  /** "device": assessed by on-device rules; nothing was sent to a server. */
-  source?: "ai" | "device";
+  /** "device": on-device rules, nothing sent. "rules": the server's fallback to the same rules. */
+  source?: "ai" | "device" | "rules";
 };
 
 export type RunOptions = { ai: boolean; combination?: boolean; judgment?: boolean };

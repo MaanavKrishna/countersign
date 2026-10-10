@@ -81,6 +81,19 @@ export function relock() {
   notify();
 }
 
+/** For actions that reveal or change the secret (show the QR code, start fresh, leave, turn the lock off). */
+export async function ensureOpen(lock: WordLock | null): Promise<boolean> {
+  if (!lock || unlockedAt > 0) return true;
+  return unlock(lock);
+}
+
+// Timers can fire late in a sleeping tab, so re-check expiry whenever the app comes back.
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (unlockedAt > 0 && Date.now() - unlockedAt >= UNLOCK_MS) relock();
+  });
+}
+
 function subscribe(l: () => void) {
   listeners.add(l);
   return () => listeners.delete(l);

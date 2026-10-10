@@ -7,6 +7,7 @@ import { FamilyCircles } from "@/components/FamilyCircles";
 import { LockSetting } from "@/components/LockSetting";
 import { RollingCode } from "@/components/RollingCode";
 import { newSecret, pairingLink } from "@/lib/countersign/protocol";
+import { ensureOpen, useWordsOpen } from "@/lib/countersign/lock";
 import { useFamily, type TrustedContact } from "@/lib/countersign/store";
 
 function ContactForm({ contact, onSave }: { contact: TrustedContact | null; onSave: (c: TrustedContact | null) => void }) {
@@ -43,7 +44,8 @@ function ContactForm({ contact, onSave }: { contact: TrustedContact | null; onSa
 }
 
 export default function FamilyPage() {
-  const { pairings, contact, add, remove, setContact } = useFamily();
+  const { pairings, contact, add, remove, setContact, lock } = useFamily();
+  const wordsOpen = useWordsOpen(lock);
   const [me, setMe] = useState("");
   const [them, setThem] = useState("");
   const [invite, setInvite] = useState<{ link: string; qr: string; them: string } | null>(null);
@@ -88,7 +90,9 @@ export default function FamilyPage() {
             <article key={p.id} className="flex flex-col gap-5 rounded-md border-2 border-ink bg-card p-6 shadow-block">
               <div className="flex items-start justify-between gap-3">
                 <h2 className="condensed m-0 text-[30px] font-black uppercase">{p.them}</h2>
-                <button type="button" onClick={() => remove(p.id)} className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink">
+                <button type="button" onClick={async () => {
+                  if (await ensureOpen(lock)) remove(p.id);
+                }} className="min-h-11 rounded px-3 text-sm font-semibold text-muted hover:text-alert-ink">
                   Unpair
                 </button>
               </div>
@@ -128,7 +132,7 @@ export default function FamilyPage() {
           </button>
         </form>
 
-        {invite && (
+        {invite && wordsOpen && (
           <div className="animate-pop flex min-w-0 flex-[1_1_380px] flex-col items-start gap-3 rounded-md border-2 border-ink bg-card p-6 shadow-block">
             <p className="eyebrow m-0">Have {invite.them} scan this with their phone camera</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}

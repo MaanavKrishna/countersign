@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { drillCalendar, nextDrillTime } from "../drill";
 
 describe("weekly drill calendar", () => {
-  const ics = drillCalendar("https://example.app", new Date("2026-10-11T17:00:00Z"));
+  const ics = drillCalendar("https://example.app", new Date(2026, 9, 11, 18, 0));
   const lines = ics.split("\r\n");
 
   it("is a valid single-event iCalendar file with CRLF line endings", () => {
@@ -14,7 +14,8 @@ describe("weekly drill calendar", () => {
   });
 
   it("repeats weekly from the chosen time, with a reminder", () => {
-    expect(lines).toContain("DTSTART:20261011T170000Z");
+    // Floating local time, so the drill stays at 18:00 across daylight-saving changes.
+    expect(lines).toContain("DTSTART:20261011T180000");
     expect(lines).toContain("RRULE:FREQ=WEEKLY");
     expect(lines).toContain("BEGIN:VALARM");
   });
@@ -22,6 +23,11 @@ describe("weekly drill calendar", () => {
   it("links to the practice call and keeps every line within 75 octets", () => {
     expect(ics).toContain("https://example.app/family/practice");
     for (const l of lines) expect(new TextEncoder().encode(l).length).toBeLessThanOrEqual(75);
+  });
+
+  it("escapes TEXT values", () => {
+    expect(ics).toContain("\\,");
+    expect(ics).not.toMatch(/[^\\];/);
   });
 
   it("contains no family secrets or names", () => {

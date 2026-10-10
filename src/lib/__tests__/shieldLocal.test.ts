@@ -58,4 +58,17 @@ describe("on-device Call Shield", () => {
     expect(a.stage).toBe("calm");
     expect(a.challengeNow).toBe(false);
   });
+  it("catches dollar amounts", () => {
+    expect(assessLocally("Please send $500 to my friend").tactics.map((t) => t.label)).toContain("Untraceable payment");
+  });
+
+  it("a genuine caller who names themself, mentions today and installing an update stays calm", () => {
+    const a = assessLocally("Hey Grandma, it's me, Ethan! I'll install the update on your tablet today when I visit.");
+    expect(a.stage).toBe("calm");
+    expect(a.challengeNow).toBe(false);
+  });
+
+  it("still flags an anonymous 'it's me' with don't-you-recognize pressure", () => {
+    expect(assessLocally("Grandma, it's me! Don't you recognize my voice?").tactics.map((t) => t.label)).toContain("Relationship claim");
+  });
 });

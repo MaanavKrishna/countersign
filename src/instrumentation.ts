@@ -1,13 +1,14 @@
 import type { Instrumentation } from "next";
 import { scrubPath } from "@/lib/privacy";
 
-// Server errors as one structured log line each (visible in the Vercel logs), without query strings.
+// Server errors as one structured log line each (visible in the Vercel logs): error type, digest
+// and route only. No query strings, and no message, which can echo the text being investigated.
 export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
   console.error(
     JSON.stringify({
       level: "error",
       source: "server",
-      message: (err instanceof Error ? err.message : String(err)).slice(0, 300),
+      name: err instanceof Error ? err.name : typeof err,
       digest: typeof err === "object" && err && "digest" in err ? String(err.digest) : undefined,
       method: request.method,
       path: scrubPath(request.path),

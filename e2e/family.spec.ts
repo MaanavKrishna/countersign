@@ -81,7 +81,7 @@ test("starting fresh replaces the old circle on a member's phone", async ({ brow
 
   await ethan.goto("/family"); // a scanned QR code opens a fresh page, not a hash change
   await ethan.goto(joinLink(after));
-  await expect(ethan.getByText(/has started fresh with new words/)).toBeVisible();
+  await ethan.getByLabel(/started fresh/).check();
   await ethan.getByRole("button", { name: "Ethan", exact: true }).click();
   await expect(ethan.getByRole("heading", { name: /You joined/ })).toBeVisible();
   const mine = await circles(ethan);
@@ -123,4 +123,27 @@ test("a Spanish circle shows Grandma's check and the card in Spanish", async ({ 
   await expect(dialog.getByText("Pregunta: «Lucía, ¿cuál es nuestra contraseña?»")).toBeVisible();
   await grandma.goto("/family/card");
   await expect(grandma.getByRole("heading", { name: /¿Una llamada pide dinero\?/ })).toBeVisible();
+});
+
+test("a start-fresh link keeps the old circle unless the person opts in", async ({ browser }) => {
+  const grandma = await phone(browser);
+  await createCircle(grandma);
+  const [before] = await circles(grandma);
+  const ethan = await phone(browser);
+  await ethan.goto(joinLink(before));
+  await ethan.getByRole("button", { name: "Ethan", exact: true }).click();
+  await expect(ethan.getByRole("heading", { name: /You joined/ })).toBeVisible();
+
+  grandma.on("dialog", (d) => void d.accept());
+  await grandma.getByText("New phone, lost phone, or someone left?").click();
+  await grandma.getByRole("button", { name: "Start fresh with new words" }).click();
+  await expect(grandma.getByAltText(/Join QR code/)).toBeVisible();
+  const [after] = await circles(grandma);
+
+  await ethan.goto("/family");
+  await ethan.goto(joinLink(after));
+  await expect(ethan.getByLabel(/started fresh/)).not.toBeChecked();
+  await ethan.getByRole("button", { name: "Ethan", exact: true }).click();
+  await expect(ethan.getByRole("heading", { name: /You joined/ })).toBeVisible();
+  expect(await circles(ethan)).toHaveLength(2);
 });
