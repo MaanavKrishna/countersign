@@ -52,3 +52,6 @@ AGENTS.md
 # end-to-end test output
 /test-results/
 /playwright-report/
+
+# demo video output
+/video-out/

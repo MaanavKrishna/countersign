@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { defang } from "@/lib/core/domain";
-import { decodeQrFromImageData, qrNote } from "@/lib/investigator/qr";
+import { decodeQrFromImage, qrNote } from "@/lib/investigator/qr";
 import { SAMPLES } from "@/lib/investigator/samples";
 import { useInvestigation, type ImageInput } from "@/lib/investigator/useInvestigation";
 import { AnnotatedMessage, Debate, ResponseKit } from "./CaseParts";
@@ -27,7 +27,7 @@ async function toImageInput(file: File): Promise<ImageInput> {
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   // "Quishing": a QR code in the screenshot hides a link the text never shows.
-  const qr = decodeQrFromImageData(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  const qr = await decodeQrFromImage(img);
   const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
   return { mediaType: "image/jpeg", base64: dataUrl.split(",")[1], previewUrl: url, qr };
 }

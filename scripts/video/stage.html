@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Countersign demo stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink: #111418; --paper: #e9ebee; --alert: #e5381b; --trust: #1e4fd8; --hl: #eaff5c; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); color: #fff; font-family: Archivo, system-ui, sans-serif; }
+  .scene { position: absolute; inset: 0; display: none; }
+  .scene.on { display: block; }
+  /* Title cards */
+  .card { display: none; position: absolute; inset: 0; flex-direction: column; align-items: center; justify-content: center; gap: 28px; text-align: center; padding: 0 160px; }
+  .card.on { display: flex; }
+  .eyebrow { font-family: "IBM Plex Mono", monospace; letter-spacing: .16em; text-transform: uppercase; color: #aeb6c2; font-size: 26px; }
+  .big { font-stretch: 70%; font-weight: 900; text-transform: uppercase; line-height: .9; font-size: 132px; margin: 0; }
+  .big .red { color: var(--alert); }
+  .big .hl { color: var(--hl); }
+  .sub { font-size: 38px; color: #d5dae1; max-width: 1300px; line-height: 1.35; margin: 0; }
+  .callid { font-family: "IBM Plex Mono", monospace; font-size: 30px; color: #aeb6c2; }
+  .ring { width: 160px; height: 160px; border-radius: 50%; background: #1f9d55; display: grid; place-items: center; animation: pulse 1s infinite; }
+  .ring svg { width: 72px; height: 72px; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(31,157,85,.6); } 50% { box-shadow: 0 0 0 36px rgba(31,157,85,0); } }
+  /* Devices */
+  .phones { position: absolute; inset: 0 0 150px 0; display: flex; align-items: center; justify-content: center; gap: 140px; }
+  .device { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .label { font-family: "IBM Plex Mono", monospace; font-size: 24px; letter-spacing: .14em; text-transform: uppercase; color: #aeb6c2; }
+  .bezel { width: 414px; height: 868px; border-radius: 56px; background: #000; padding: 12px; box-shadow: 0 0 0 2px #2b313a, 0 30px 80px rgba(0,0,0,.6); }
+  .bezel iframe { width: 390px; height: 844px; border: 0; border-radius: 44px; background: #e9ebee; display: block; }
+  .desktop { position: absolute; left: 80px; right: 80px; top: 50px; bottom: 170px; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 2px #2b313a, 0 30px 80px rgba(0,0,0,.6); background: #e9ebee; }
+  .desktop .bar { height: 44px; background: #1e242c; display: flex; align-items: center; gap: 10px; padding: 0 18px; }
+  .desktop .bar i { width: 14px; height: 14px; border-radius: 50%; background: #3a414b; display: block; }
+  .desktop .bar span { margin-left: 18px; font-family: "IBM Plex Mono", monospace; font-size: 18px; color: #aeb6c2; }
+  .desktop iframe { width: 1760px; height: 816px; border: 0; display: block; }
+  /* Captions */
+  #caption { position: absolute; left: 0; right: 0; bottom: 44px; text-align: center; padding: 0 140px; font-size: 40px; font-weight: 700; line-height: 1.25; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  #caption b { color: var(--hl); }
+  #brand { position: absolute; left: 44px; bottom: 54px; font-stretch: 70%; font-weight: 900; text-transform: uppercase; font-size: 30px; letter-spacing: .02em; opacity: .7; }
+</style>
+</head>
+<body>
+  <div id="card" class="card"></div>
+  <div id="phones" class="scene">
+    <div class="phones">
+      <div class="device" id="dev-a"><div class="label" id="label-a">Grandma's phone</div><div class="bezel"><iframe id="phone-a" title="Phone A"></iframe></div></div>
+      <div class="device" id="dev-b"><div class="label" id="label-b">Ethan's phone</div><div class="bezel"><iframe id="phone-b" title="Phone B"></iframe></div></div>
+    </div>
+  </div>
+  <div id="desktop" class="scene">
+    <div class="desktop"><div class="bar"><i></i><i></i><i></i><span id="url"></span></div><iframe id="screen" title="Desktop"></iframe></div>
+  </div>
+  <div id="brand">Countersign</div>
+  <div id="caption"></div>
+<script>
+  // Driven by scripts/video/record.mjs through window.stage.
+  window.stage = {
+    card(html) {
+      for (const s of document.querySelectorAll(".scene")) s.classList.remove("on");
+      const c = document.getElementById("card");
+      c.innerHTML = html; c.classList.add("on");
+      document.getElementById("brand").style.display = "none";
+    },
+    phones(a, b, labels) {
+      document.getElementById("card").classList.remove("on");
+      document.getElementById("desktop").classList.remove("on");
+      document.getElementById("phones").classList.add("on");
+      document.getElementById("brand").style.display = "";
+      document.getElementById("dev-b").style.display = b ? "" : "none";
+      if (a) document.getElementById("phone-a").src = a;
+      if (b) document.getElementById("phone-b").src = b;
+      if (labels) { document.getElementById("label-a").textContent = labels[0]; document.getElementById("label-b").textContent = labels[1] ?? ""; }
+    },
+    desktop(src, shownUrl) {
+      document.getElementById("card").classList.remove("on");
+      document.getElementById("phones").classList.remove("on");
+      document.getElementById("desktop").classList.add("on");
+      document.getElementById("brand").style.display = "none";
+      document.getElementById("screen").src = src;
+      document.getElementById("url").textContent = shownUrl ?? src;
+    },
+    caption(html) { document.getElementById("caption").innerHTML = html ?? ""; },
+  };
+</script>
+</body>
+</html>
