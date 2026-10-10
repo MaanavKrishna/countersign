@@ -2,7 +2,7 @@
 
 import QRCode from "qrcode";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, type Circle } from "@/lib/countersign/circle";
+import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normalizeName, secretTag, type Circle } from "@/lib/countersign/circle";
 import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
 import { useFamily } from "@/lib/countersign/store";
@@ -93,7 +93,8 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
 }
 
 export function FamilyCircles() {
-  const { circles, addCircle, removeCircle, addMember } = useFamily();
+  const { circles, addCircle, removeCircle, addMember, rekeyCircle } = useFamily();
+  const [freshDrop, setFreshDrop] = useState<Record<string, string>>({});
   const [newName, setNewName] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [me, setMe] = useState("");
@@ -107,10 +108,22 @@ export function FamilyCircles() {
   const active = checking ?? (wantsCheck && !shortcutDismissed && circles.length > 0 ? circles[0] : null);
   const [copied, setCopied] = useState(false);
 
-  const showInvite = async (c: Pick<Circle, "secret" | "name" | "members" | "lang">) => {
+  const showInvite = async (c: Pick<Circle, "secret" | "name" | "members" | "lang" | "replaces">) => {
     const link = circleJoinLink(window.location.origin, c);
     setCopied(false);
     setInvite({ circle: c, link, qr: await QRCode.toDataURL(link, { margin: 1, width: 320, errorCorrectionLevel: "M" }) });
+  };
+
+  // New secret: everyone's old words stop working, so a removed member or a lost phone can't be used.
+  const startFresh = async (c: Circle) => {
+    const drop = freshDrop[c.id] || null;
+    const who = drop ? `${drop} will be removed and ` : "";
+    if (!window.confirm(`${who}everyone's words will change. Each family member must scan the new QR code. Continue?`)) return;
+    const secret = newSecret();
+    const replaces = await secretTag(c.secret);
+    rekeyCircle(c.id, secret, replaces, drop);
+    const members = drop ? c.members.filter((m) => normalizeName(m) !== normalizeName(drop)) : c.members;
+    await showInvite({ ...c, secret, replaces, members });
   };
 
   const create = async () => {
@@ -184,6 +197,39 @@ export function FamilyCircles() {
             <MemberCode circle={c} member={c.me} />
             <p className="m-0 text-sm text-muted">Never read words to someone who called you. Family only ever asks for them.</p>
           </div>
+          <details className="rounded border-[1.5px] border-line p-4">
+            <summary className="cursor-pointer font-bold">New phone, lost phone, or someone left?</summary>
+            <div className="mt-3 flex flex-col gap-3 text-body">
+              <p className="m-0">
+                <b>New phone:</b> tap <b>Add someone</b> and let them scan the QR code again.
+              </p>
+              <p className="m-0">
+                <b>Lost phone, or someone should no longer be in the circle:</b> start fresh. Everyone gets new words, the old ones stop working, and each person scans the new code.
+              </p>
+              <div className="flex flex-wrap items-end gap-2">
+                <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-bold">
+                  Remove someone (optional)
+                  <select
+                    value={freshDrop[c.id] ?? ""}
+                    onChange={(e) => setFreshDrop((d) => ({ ...d, [c.id]: e.target.value }))}
+                    className="min-h-11 rounded border-[1.5px] border-faint bg-card px-3 text-base font-normal"
+                  >
+                    <option value="">Nobody, just new words</option>
+                    {c.members
+                      .filter((m) => normalizeName(m) !== normalizeName(c.me))
+                      .map((m) => (
+                        <option key={normalizeName(m)} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <button type="button" onClick={() => void startFresh(c)} className="min-h-11 rounded border-2 border-alert-ink px-4 font-bold text-alert-ink">
+                  Start fresh with new words
+                </button>
+              </div>
+            </div>
+          </details>
         </article>
       ))}
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { MAX_NAME, cleanName, normalizeName, parseJoinFragment } from "@/lib/countersign/circle";
+import { MAX_NAME, cleanName, normalizeName, parseJoinFragment, secretTag } from "@/lib/countersign/circle";
 import { joinStatus, useFamily } from "@/lib/countersign/store";
 
 const subscribeHash = (cb: () => void) => {
@@ -19,12 +19,25 @@ export default function JoinCirclePage() {
   const [captured, setCaptured] = useState<Parsed | "invalid" | null>(null);
   const [joined, setJoined] = useState<{ circle: string; as: string } | null>(null);
   const [other, setOther] = useState("");
+  // A "start fresh" link names the old circle it replaces (by tag, never by secret).
+  const [replaceId, setReplaceId] = useState<string | null>(null);
 
   // Read the link once, then remove the secret from the address bar and history straight away.
   if (captured === null && hash !== null) setCaptured(parseJoinFragment(hash) ?? "invalid");
   useEffect(() => {
     if (captured !== null && window.location.hash) history.replaceState(null, "", "/family/join");
   }, [captured]);
+  useEffect(() => {
+    const tag = captured && captured !== "invalid" ? captured.replaces : null;
+    if (!tag) return;
+    let alive = true;
+    void Promise.all(circles.map(async (c) => ((await secretTag(c.secret)) === tag ? c.id : null))).then(
+      (ids) => alive && setReplaceId(ids.find(Boolean) ?? null),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [captured, circles]);
 
   if (joined) {
     return (
@@ -53,7 +66,7 @@ export default function JoinCirclePage() {
     const me = cleanName(raw);
     if (!me) return;
     const members = parsed.members.some((m) => normalizeName(m) === normalizeName(me)) ? parsed.members : [...parsed.members, me];
-    addCircle({ name: parsed.name, secret: parsed.secret, members, me, lang: parsed.lang });
+    addCircle({ name: parsed.name, secret: parsed.secret, members, me, lang: parsed.lang, replaces: parsed.replaces ?? undefined }, replaceId);
     setJoined({ circle: parsed.name, as: me });
   };
 
@@ -73,6 +86,11 @@ export default function JoinCirclePage() {
         <p className="m-0 text-lg font-bold">Only join if a family member is showing you this code in person.</p>
         <p className="m-0 mt-1">Did someone send you this link in a message or ask you to tap it on a call? Stop. That&apos;s how a scammer would set up fake &ldquo;family words&rdquo;.</p>
       </div>
+      {replaceId && (
+        <p className="m-0 rounded-md bg-trust-wash p-4 text-lg">
+          {parsed.name} has started fresh with new words. Joining replaces your old {parsed.name} words on this phone.
+        </p>
+      )}
       <h1 className="condensed m-0 text-[44px] leading-[0.95] font-black uppercase">Which one are you?</h1>
       <div className="flex flex-col gap-3">
         {parsed.members.map((m) => (

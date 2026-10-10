@@ -39,4 +39,12 @@ describe("practice call", () => {
   it("can restart", () => {
     expect(practiceStep(run("jail", [{ type: "answer" }]), { type: "restart" })).toEqual(start("jail"));
   });
+  it("'my phone died' is still a scam: no words means hang up and call their usual number", () => {
+    const sc = SCENARIOS.borrowed;
+    expect(sc.genuine).toBe(false);
+    const asked = run("borrowed", [{ type: "answer" }, ...sc.lines.map(() => ({ type: "next" as const })), { type: "choose", choice: "ask" }]);
+    expect(asked.reply).toBe(sc.dodge);
+    expect(practiceStep(asked, { type: "choose", choice: "hangup" }).outcome).toBe("pass");
+    expect(practiceStep(asked, { type: "choose", choice: "send" }).outcome).toBe("fail");
+  });
 });

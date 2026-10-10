@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useReducer, useState, useSyncExternalStore } from "react";
 import { normalizeName, memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
+import { DrillButton } from "@/components/DrillButton";
 import { LANGS } from "@/lib/countersign/languages";
 import { useFamily } from "@/lib/countersign/store";
 import { SCENARIOS, practiceStep, start, type ScenarioId } from "@/lib/practice";
@@ -178,6 +179,7 @@ export default function PracticePage() {
               <Link href="/family" className="flex min-h-14 items-center rounded border-2 border-white px-6 font-bold text-white no-underline">
                 Back to Family
               </Link>
+              <DrillButton className="min-h-14 rounded border-2 border-white/60 px-6 font-bold text-white" />
             </div>
           </div>
         )}

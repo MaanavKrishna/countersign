@@ -2,6 +2,7 @@
 
 import QRCode from "qrcode";
 import { useState } from "react";
+import { DrillButton } from "@/components/DrillButton";
 import { FamilyCircles } from "@/components/FamilyCircles";
 import { RollingCode } from "@/components/RollingCode";
 import { newSecret, pairingLink } from "@/lib/countersign/protocol";
@@ -69,6 +70,7 @@ export default function FamilyPage() {
       <div className="flex flex-wrap gap-3">
         <a href="/family/practice" className="flex min-h-12 items-center rounded border-2 border-ink px-4 font-bold text-ink no-underline">Practice a scam call →</a>
         <a href="/family/card" className="flex min-h-12 items-center rounded border-2 border-ink px-4 font-bold text-ink no-underline">Print a card for the phone table →</a>
+        <DrillButton className="min-h-12 rounded border-2 border-ink px-4 font-bold text-ink" />
       </div>
 
       <FamilyCircles />

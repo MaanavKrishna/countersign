@@ -5,7 +5,17 @@ import { isLang, loadWords, type Lang } from "./languages";
 import { GRACE_SECONDS, STEP_SECONDS, stepAt, wordsFor } from "./protocol";
 
 export type WordLang = Lang;
-export type Circle = { id: string; name: string; secret: string; members: string[]; me: string; lang: WordLang; createdAt: number };
+export type Circle = {
+  id: string;
+  name: string;
+  secret: string;
+  members: string[];
+  me: string;
+  lang: WordLang;
+  createdAt: number;
+  /** After "start fresh": the tag of the old secret, so joining phones replace their old circle. */
+  replaces?: string;
+};
 
 export const MAX_NAME = 60;
 export const MAX_MEMBERS = 30;
@@ -51,17 +61,25 @@ export async function memberCodesForDisplay(c: Circle, member: string, ms: numbe
   return { words, alt, secondsLeft: Math.ceil(STEP_SECONDS - into) };
 }
 
-export function circleJoinLink(origin: string, c: Pick<Circle, "secret" | "name" | "members" | "lang">): string {
+/** Public fingerprint of a secret: lets a new link say which old circle it replaces without revealing it. */
+export async function secretTag(secret: string): Promise<string> {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`countersign/v2|tag|${secret}`));
+  return [...new Uint8Array(d).slice(0, 8)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function circleJoinLink(origin: string, c: Pick<Circle, "secret" | "name" | "members" | "lang" | "replaces">): string {
   const f = new URLSearchParams({ v: "2", s: c.secret, c: c.name, m: c.members.join(","), l: c.lang });
+  if (c.replaces) f.set("r", c.replaces);
   return `${origin}/family/join#${f.toString()}`;
 }
 
-export function parseJoinFragment(hash: string): { secret: string; name: string; members: string[]; lang: WordLang } | null {
+export function parseJoinFragment(hash: string): { secret: string; name: string; members: string[]; lang: WordLang; replaces: string | null } | null {
   const f = new URLSearchParams(hash.replace(/^#/, ""));
   const secret = f.get("s") ?? "";
   const name = (f.get("c") ?? "").trim().slice(0, 80);
   const members = cleanMembers((f.get("m") ?? "").split(","));
   if (f.get("v") !== "2" || !/^[A-Za-z0-9_-]{43}$/.test(secret) || !name || members.length === 0 || members.length > MAX_MEMBERS) return null;
   const l = f.get("l");
-  return { secret, name, members, lang: isLang(l) ? l : "en" };
+  const r = f.get("r");
+  return { secret, name, members, lang: isLang(l) ? l : "en", replaces: r && /^[0-9a-f]{16}$/.test(r) ? r : null };
 }

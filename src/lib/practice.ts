@@ -36,6 +36,16 @@ export const SCENARIOS = {
     ],
     dodge: "Ma'am, I'm with the bank. I don't know any family words. I just need that code before the charge goes through.",
   },
+  borrowed: {
+    title: "“My phone died”",
+    caller: "{name}",
+    genuine: false,
+    lines: [
+      "Grandma, it's {name}! I'm calling from a friend's phone. Mine got smashed.",
+      "I'm stuck at the bus station and my wallet was stolen. Can you send five hundred dollars to my friend's account so I can get home tonight?",
+    ],
+    dodge: "I can't check the words, my phone is broken! That's why I'm on my friend's phone. Please, Grandma, I just need to get home.",
+  },
   genuine: {
     title: "A genuine call",
     caller: "{name}",

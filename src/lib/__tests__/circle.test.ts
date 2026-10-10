@@ -43,7 +43,7 @@ describe("Family Circle protocol", () => {
     const u = new URL(circleJoinLink("https://cs.example", circle));
     expect(u.pathname).toBe("/family/join");
     expect(u.search).toBe("");
-    expect(parseJoinFragment(u.hash)).toEqual({ secret: SECRET, name: "Krishna family", members: ["Grandma", "Ethan", "Priya"], lang: "en" });
+    expect(parseJoinFragment(u.hash)).toEqual({ secret: SECRET, name: "Krishna family", members: ["Grandma", "Ethan", "Priya"], lang: "en", replaces: null });
   });
   it("rejects malformed join links", () => {
     expect(parseJoinFragment("#v=2&s=short&c=x&m=a")).toBeNull();

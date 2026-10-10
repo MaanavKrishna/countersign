@@ -19,9 +19,18 @@ export function addPairing(list: Pairing[], p: Omit<Pairing, "id" | "createdAt">
   return [...list, { ...p, id: crypto.randomUUID(), createdAt: Date.now() }];
 }
 
-export function addCircle(list: Circle[], c: Circle): Circle[] {
+export function addCircle(list: Circle[], c: Circle, replaceId?: string | null): Circle[] {
   if (list.some((x) => x.secret === c.secret)) return list;
-  return [...list, c];
+  return [...list.filter((x) => x.id !== replaceId), c];
+}
+
+/** Start a circle fresh: new secret (old words stop working), optionally without one member. */
+export function rekeyCircle(list: Circle[], id: string, secret: string, replaces: string, remove: string | null): Circle[] {
+  return list.map((c) => {
+    if (c.id !== id) return c;
+    const drop = remove && normalizeName(remove) !== normalizeName(c.me) ? normalizeName(remove) : null;
+    return { ...c, secret, replaces, members: c.members.filter((m) => normalizeName(m) !== drop) };
+  });
 }
 
 export function joinStatus(list: Circle[], secret: string): "ok" | "member" {
@@ -78,8 +87,10 @@ export function useFamily() {
     add: (p: Omit<Pairing, "id" | "createdAt">) => write({ ...read(), pairings: addPairing(read().pairings, p) }),
     remove: (id: string) => write({ ...read(), pairings: read().pairings.filter((x) => x.id !== id) }),
     setContact: (c: TrustedContact | null) => write({ ...read(), contact: c }),
-    addCircle: (c: Omit<Circle, "id" | "createdAt">) =>
-      write({ ...read(), circles: addCircle(read().circles, { ...c, id: crypto.randomUUID(), createdAt: Date.now() }) }),
+    addCircle: (c: Omit<Circle, "id" | "createdAt">, replaceId?: string | null) =>
+      write({ ...read(), circles: addCircle(read().circles, { ...c, id: crypto.randomUUID(), createdAt: Date.now() }, replaceId) }),
+    rekeyCircle: (id: string, secret: string, replaces: string, remove: string | null) =>
+      write({ ...read(), circles: rekeyCircle(read().circles, id, secret, replaces, remove) }),
     removeCircle: (id: string) => write({ ...read(), circles: read().circles.filter((x) => x.id !== id) }),
     addMember: (id: string, raw: string) => {
       const name = cleanName(raw);

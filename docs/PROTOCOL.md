@@ -34,6 +34,7 @@ This document is complete enough to build a compatible app in any language. The 
 - A member's code is `words(MAC("countersign/v2|member|" + normalize(name) + "|" + step))`, using the circle's word list.
 - Word lists: `en` (English, default), `es`, `fr`, `it`, `pt`. They are the official BIP-39 lists, so indexes are the same in every language and only the displayed words differ.
 - Join link: `https://<site>/family/join#v=2&s=<secret>&c=<circle name>&m=<comma-separated members>&l=<lang>`
+- **Starting fresh (re-keying).** When a phone is lost or someone leaves the circle, generate a new secret. The join link then carries an optional `&r=<tag>`, where `tag` = the first 8 bytes, as lowercase hex, of `SHA-256("countersign/v2|tag|" + old secret)`. A joining phone that holds a circle whose secret has that tag replaces it. The tag reveals nothing about either secret. Removing a member without re-keying does **not** revoke them: they still hold the secret.
 
 ## Rules every implementation must follow
 
