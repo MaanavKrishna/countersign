@@ -22,6 +22,8 @@ Detecting fakes is an arms race the defender loses, because generators keep impr
 
 **Family Circle (v2).** One QR code for a whole family: each member scans it once and picks their name, and each has their own rolling words, `HMAC-SHA256(secret, "countersign/v2|member|" + name + "|" + minute)`. A **"Who's calling?"** screen built for grandparents shows the expected words in huge type, with a read-aloud button and two big buttons: *the words match* or *hang up*.
 
+Full open spec with test vectors: **[docs/PROTOCOL.md](docs/PROTOCOL.md)**. It's complete enough to build a compatible native app.
+
 ### Protocol (v1, two-person pairing)
 
 ```
