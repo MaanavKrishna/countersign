@@ -4,6 +4,7 @@ import { EVAL_CASES } from "@/lib/eval/cases";
 import { ADVERSARIAL_CASES } from "@/lib/eval/adversarialCases";
 import { MENTION_CASES, QR_CASES } from "@/lib/eval/freshCases";
 import { HARD_CASES } from "@/lib/eval/hardCases";
+import { HOLDOUT_MENTION, HOLDOUT_QR } from "@/lib/eval/holdoutCases";
 import { qrPicture } from "@/lib/eval/qrImage";
 import { decodeQrFromImageData, qrNote } from "@/lib/investigator/qr";
 import { llmOnlyBand } from "@/lib/eval/baseline";
@@ -11,7 +12,7 @@ import { summarize, type ArmMetrics, type EvalRow } from "@/lib/eval/metrics";
 import { collectCase } from "@/lib/investigator/report/collect";
 
 // Opt-in: calls the model API and the network. EVAL=1 npx vitest run eval
-type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention";
+type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention" | "holdout";
 type Row = EvalRow & { set: SetId };
 type ArmId = "llm-only" | "evidence-only" | "countersign-v1" | "countersign";
 type EvalResults = {
@@ -19,6 +20,7 @@ type EvalResults = {
   hardSetCommit: string;
   adversarialSetCommit: string;
   freshSetCommit: string;
+  holdoutSetCommit: string;
   arms: { id: ArmId; label: string; metrics: Record<"all" | SetId, ArmMetrics>; rows: Row[] }[];
 };
 
@@ -28,6 +30,7 @@ const CASES = [
   ...ADVERSARIAL_CASES.map((c) => ({ ...c, set: "adversarial" as const })),
   ...QR_CASES.map((c) => ({ ...c, set: "qr" as const })),
   ...MENTION_CASES.map((c) => ({ ...c, set: "mention" as const })),
+  ...[...HOLDOUT_QR, ...HOLDOUT_MENTION].map((c) => ({ ...c, set: "holdout" as const })),
 ];
 
 type Prepared = { text: string; llmText: string; image: { mediaType: "image/png"; base64: string } | null };
@@ -68,6 +71,7 @@ const metrics = (rows: Row[]) => ({
   adversarial: summarize(rows.filter((r) => r.set === "adversarial")),
   qr: summarize(rows.filter((r) => r.set === "qr")),
   mention: summarize(rows.filter((r) => r.set === "mention")),
+  holdout: summarize(rows.filter((r) => r.set === "holdout")),
 });
 
 const full = (v: "v1" | "final") => async (p: Prepared) => {
@@ -88,7 +92,8 @@ describe.skipIf(!process.env.EVAL)("ablation eval", () => {
       generatedAt: new Date().toISOString(),
       hardSetCommit: "34e3ba0",
       adversarialSetCommit: "0744fe0",
-      freshSetCommit: process.env.FRESH_COMMIT ?? "",
+      freshSetCommit: "50a4fe9",
+      holdoutSetCommit: process.env.HOLDOUT_COMMIT ?? "",
       arms: [
         { id: "llm-only", label: "Single LLM prompt (typical entry)", metrics: metrics(llm), rows: llm },
         { id: "evidence-only", label: "Deterministic checks only (no AI)", metrics: metrics(det), rows: det },
