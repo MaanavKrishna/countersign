@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { memberCodesForDisplay, type Circle } from "@/lib/countersign/circle";
+import { LANGS } from "@/lib/countersign/languages";
 import { STEP_SECONDS } from "@/lib/countersign/protocol";
 
 type Codes = Awaited<ReturnType<typeof memberCodesForDisplay>>;
 
-function speak(words: string[]) {
+function speak(words: string[], lang: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(words.join(", "));
   u.rate = 0.8;
+  u.lang = lang;
   window.speechSynthesis.speak(u);
 }
 
@@ -43,7 +45,7 @@ export function MemberCode({ circle, member, size = "md", readAloud = false }: {
       </div>
       {codes.alt && <p className="m-0 font-mono text-xs opacity-70">Their clock may differ slightly. Also accept: {codes.alt.join(" · ")}</p>}
       {readAloud && (
-        <button type="button" onClick={() => speak(codes.words)} className="flex min-h-12 items-center gap-2 self-start rounded border-2 border-current px-4 font-bold">
+        <button type="button" onClick={() => speak(codes.words, LANGS[circle.lang].speech)} className="flex min-h-12 items-center gap-2 self-start rounded border-2 border-current px-4 font-bold">
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />
           </svg>

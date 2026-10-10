@@ -3,6 +3,7 @@
 import QRCode from "qrcode";
 import { useState } from "react";
 import { circleJoinLink, normalizeName, type Circle } from "@/lib/countersign/circle";
+import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
 import { useFamily } from "@/lib/countersign/store";
 import { MemberCode } from "./MemberCode";
@@ -81,6 +82,7 @@ export function FamilyCircles() {
   const [name, setName] = useState("");
   const [me, setMe] = useState("");
   const [others, setOthers] = useState("");
+  const [lang, setLang] = useState<Lang>("en");
   const [invite, setInvite] = useState<{ circle: Pick<Circle, "name">; qr: string; link: string } | null>(null);
   const [checking, setChecking] = useState<Circle | null>(null);
   const [copied, setCopied] = useState(false);
@@ -94,7 +96,7 @@ export function FamilyCircles() {
   const create = async () => {
     const members = [me.trim(), ...others.split(",").map((s) => s.trim()).filter(Boolean)];
     if (!name.trim() || !me.trim() || members.length < 2) return;
-    const c = { name: name.trim(), secret: newSecret(), members, me: me.trim(), lang: "en" as const };
+    const c = { name: name.trim(), secret: newSecret(), members, me: me.trim(), lang };
     addCircle(c);
     await showInvite(c);
   };
@@ -112,7 +114,7 @@ export function FamilyCircles() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h3 className="condensed m-0 text-[30px] font-black uppercase">{c.name}</h3>
-              <p className="m-0 text-sm text-muted">You are {c.me} · {c.members.length} members</p>
+              <p className="m-0 text-sm text-muted">You are {c.me} · {c.members.length} members · words in {LANGS[c.lang].label}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={() => void showInvite(c)} className="min-h-11 rounded border-[1.5px] border-ink px-3 text-sm font-bold">
@@ -154,6 +156,16 @@ export function FamilyCircles() {
           <label className="flex flex-col gap-1.5 text-sm font-bold">
             Everyone else, separated by commas
             <input value={others} onChange={(e) => setOthers(e.target.value)} placeholder="Ethan, Priya, Dad" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm font-bold">
+            Words in
+            <select value={lang} onChange={(e) => setLang(e.target.value as Lang)} className="min-h-11 rounded border-[1.5px] border-faint bg-card px-3 text-base font-normal">
+              {(Object.keys(LANGS) as Lang[]).map((l) => (
+                <option key={l} value={l}>
+                  {LANGS[l].label}
+                </option>
+              ))}
+            </select>
           </label>
           <button type="submit" disabled={!name.trim() || !me.trim() || !others.trim()} className="min-h-12 self-start rounded bg-ink px-5 font-extrabold tracking-[0.06em] text-white uppercase disabled:opacity-50">
             Create circle
