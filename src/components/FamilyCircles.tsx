@@ -6,6 +6,7 @@ import { MAX_MEMBERS, MAX_NAME, circleJoinLink, cleanMembers, cleanName, normali
 import { LANGS, type Lang } from "@/lib/countersign/languages";
 import { newSecret } from "@/lib/countersign/protocol";
 import { useFamily } from "@/lib/countersign/store";
+import { UI } from "@/lib/countersign/ui";
 import { MemberCode } from "./MemberCode";
 
 /** Full-screen check for the person receiving the call. Built for grandparents: huge type, one decision. */
@@ -14,6 +15,7 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
   const [verdict, setVerdict] = useState<"match" | "nomatch" | null>(null);
   const others = circle.members.filter((m) => normalizeName(m) !== normalizeName(circle.me));
   const closeRef = useRef<HTMLButtonElement>(null);
+  const t = UI[circle.lang] ?? UI.en;
 
   const onCloseRef = useRef(onClose);
   useEffect(() => {
@@ -30,18 +32,18 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
   }, []);
 
   return (
-    <section role="dialog" aria-modal="true" aria-label="Who's calling?" className="fixed inset-0 z-50 overflow-y-auto bg-night text-white">
+    <section role="dialog" aria-modal="true" aria-label={t.dialogLabel} lang={circle.lang} className="fixed inset-0 z-50 overflow-y-auto bg-night text-white">
       <div className="mx-auto flex min-h-full max-w-[900px] flex-col gap-8 px-5 py-8">
         <div className="flex items-center justify-between gap-4">
           <p className="m-0 font-mono text-sm tracking-[0.12em] text-[#AEB6C2] uppercase">{circle.name}</p>
           <button ref={closeRef} type="button" onClick={onClose} className="min-h-12 rounded-full border-2 border-white px-5 text-lg font-bold">
-            Close
+            {t.close}
           </button>
         </div>
 
         {!who ? (
           <>
-            <h1 className="condensed m-0 text-[52px] leading-[0.95] font-black uppercase sm:text-[80px]">Who says they&apos;re calling?</h1>
+            <h1 className="condensed m-0 text-[52px] leading-[0.95] font-black uppercase sm:text-[80px]">{t.whoCalling}</h1>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {others.map((m) => (
                 <button key={m} type="button" onClick={() => setWho(m)} className="min-h-24 rounded-md bg-white px-6 text-left text-[36px] font-black text-ink uppercase" style={{ fontStretch: "75%" }}>
@@ -53,38 +55,34 @@ function WhoIsCalling({ circle, onClose }: { circle: Circle; onClose: () => void
         ) : verdict === null ? (
           <>
             <p className="m-0 text-[24px] leading-snug">
-              Ask: <b>&ldquo;{who}, what&apos;s our countersign?&rdquo;</b>
+              <b>{t.ask(who)}</b>
               <br />
-              The real {who} reads it from their phone. They should say:
+              {t.realReads(who)}
             </p>
             <div className="rounded-md bg-white p-6 text-ink sm:p-8">
               <MemberCode circle={circle} member={who} size="xl" readAloud />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <button type="button" onClick={() => setVerdict("match")} className="min-h-20 rounded-md bg-trust text-2xl font-black text-white uppercase">
-                The words match
+                {t.match}
               </button>
               <button type="button" onClick={() => setVerdict("nomatch")} className="min-h-20 rounded-md bg-alert-ink text-2xl font-black text-white uppercase">
-                Wrong, or they won&apos;t say
+                {t.noMatch}
               </button>
             </div>
             <button type="button" onClick={() => setWho(null)} className="self-start text-lg font-bold underline underline-offset-4">
-              ← Someone else
+              {t.someoneElse}
             </button>
           </>
         ) : verdict === "match" ? (
           <div className="flex flex-col gap-5">
-            <h1 className="condensed m-0 text-[56px] leading-[0.95] font-black uppercase sm:text-[84px]">It&apos;s really {who}.</h1>
-            <p className="m-0 text-[22px] leading-normal text-[#D6E2FF]">
-              The words match. If they still ask for gift cards, crypto or a wire transfer, call them back on the number you have saved anyway.
-            </p>
+            <h1 className="condensed m-0 text-[56px] leading-[0.95] font-black uppercase sm:text-[84px]">{t.reallyThem(who)}</h1>
+            <p className="m-0 text-[22px] leading-normal text-[#D6E2FF]">{t.matchBody}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-5">
-            <h1 className="condensed m-0 text-[56px] leading-[0.95] font-black uppercase sm:text-[84px]">Hang up now.</h1>
-            <p className="m-0 text-[22px] leading-normal text-[#FFD9CF]">
-              The real {who} would know the words. This is very likely a scam using a copied voice. Hang up and call {who} on the number you already have. Don&apos;t send money.
-            </p>
+            <h1 className="condensed m-0 text-[56px] leading-[0.95] font-black uppercase sm:text-[84px]">{t.hangUp}</h1>
+            <p className="m-0 text-[22px] leading-normal text-[#FFD9CF]">{t.noMatchBody(who)}</p>
           </div>
         )}
       </div>

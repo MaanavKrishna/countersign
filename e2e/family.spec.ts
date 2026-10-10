@@ -107,3 +107,20 @@ test("an invalid join link is refused", async ({ page }) => {
   await page.goto("/family/join#v=2&s=short&c=x&m=a");
   await expect(page.getByRole("heading", { name: /isn't valid/ })).toBeVisible();
 });
+
+test("a Spanish circle shows Grandma's check and the card in Spanish", async ({ browser }) => {
+  const grandma = await phone(browser);
+  await grandma.goto("/family");
+  await grandma.getByLabel("Circle name").fill("Familia");
+  await grandma.getByLabel("Your name (what family calls you)").fill("Abuela");
+  await grandma.getByLabel(/Everyone else/).fill("Lucía");
+  await grandma.getByLabel("Words in").selectOption("es");
+  await grandma.getByRole("button", { name: "Create circle" }).click();
+  await grandma.getByRole("button", { name: /Who's calling\? Check now/ }).first().click();
+  const dialog = grandma.getByRole("dialog", { name: "¿Quién llama?" });
+  await expect(dialog.getByRole("heading", { name: "¿Quién dice que llama?" })).toBeVisible();
+  await dialog.getByRole("button", { name: "Lucía", exact: true }).click();
+  await expect(dialog.getByText("Pregunta: «Lucía, ¿cuál es nuestra contraseña?»")).toBeVisible();
+  await grandma.goto("/family/card");
+  await expect(grandma.getByRole("heading", { name: /¿Una llamada pide dinero\?/ })).toBeVisible();
+});
