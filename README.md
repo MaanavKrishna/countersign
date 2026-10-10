@@ -9,7 +9,8 @@ A *countersign* is the secret reply a sentry demands to prove a stranger is a fr
 1. **Family Countersign.** Two phones paired once, in person, show the same three words, changing every minute. When "your grandson" calls asking for bail money, ask for the countersign. A voice clone can't produce it. Fully offline, no account, nothing leaves the phone.
 2. **Message Investigator.** Paste a suspicious email, text or listing, or drop a screenshot (QR codes inside it are decoded too). An AI agent investigates it with real lookups (domain registration, DNS, email authentication, lookalike and homoglyph detection, redirect chains) while you watch the evidence graph grow. A transparent scoring model, not the AI, decides the verdict. A defense agent then argues the message is genuine before the judge stamps it **FORGERY**, **UNVERIFIED** or **COUNTERSIGNED**, in the message's own language.
 3. **Call Shield.** Put a call on speaker. Countersign transcribes it in the browser, spots scam scripts as they unfold ("grandson in jail", "bank fraud department", "IRS agent"), shows the countersign the caller must say, and offers a one-tap text to a trusted family member, because scams depend on "don't tell anyone".
-4. **Meets people where scams arrive.** Forward any suspicious email to **countersign@homingbox.net** and get the full case file back by email (built on [Agentboxd](https://agentboxd.com), whose phishing and injection scores feed in as evidence). Or install the app on Android and use **Share → Countersign** straight from your messages app.
+4. **Built for the habit, not just the tech.** A **Practice call** speaks a scammer's script so you can rehearse asking for the countersign. There's a **printable card** for the phone table, and a **home-screen shortcut** straight to "Who's calling?". It works offline and in five languages.
+5. **Meets people where scams arrive.** Forward any suspicious email to **countersign@homingbox.net** and get the full case file back by email (built on [Agentboxd](https://agentboxd.com), whose phishing and injection scores feed in as evidence). Or install the app on Android and use **Share → Countersign** straight from your messages app.
 
 ## Family Countersign: the secret a voice clone can't fake
 
@@ -163,6 +164,21 @@ npm test            # unit tests for the deterministic detection core
 npm run eval        # end-to-end accuracy on labelled cases (uses the model API)
 ```
 
+## Site map
+
+| Route | What it's for |
+|---|---|
+| `/` | The story and the two entry points |
+| `/family` | Family Circle, two-person pairing, and "Who's calling?" (`/family?check=1` opens it directly) |
+| `/family/join`, `/family/pair` | Where a scanned QR code lands; the secret is read from the URL fragment and then removed |
+| `/family/practice` | Practice scam calls (spoken) |
+| `/family/card` | Printable phone-table card |
+| `/check` | Message Investigator (paste, screenshot, QR) |
+| `/shield` | Call Shield (live listening or demo calls) |
+| `/evidence` | Published evaluation, including losses |
+| `/share` | Android share-sheet target |
+| `/api/investigate`, `/api/shield`, `/api/inbox` | Streaming investigation, live-call assessment, forward-to-check webhook |
+
 ## Project layout
 
 ```
@@ -175,6 +191,7 @@ src/lib/tools/              rdap, dns, lookalike, emailAuth, traceUrl, sandbox
 src/lib/agent/              investigator loop, tactic labeller, debate, call shield
 src/lib/pipeline.ts         orchestrates the investigation and streams events
 src/lib/eval/               labelled easy + pre-registered hard sets, baseline, metrics
+src/lib/practice.ts         practice-call state machine
 src/app/api/investigate     SSE endpoint
 src/app/api/shield          live-call assessment endpoint
 src/app/family, /share      pairing + live codes; Android share target
