@@ -1,6 +1,6 @@
 # Countersign — prove it's really them
 
-**ForgeHacks 2026 · AI + Cybersecurity track** · **Live:** https://countersign-maanavkrishnas-projects.vercel.app
+**ForgeHacks 2026 · AI + Cybersecurity track** · **Live:** https://countersign-self.vercel.app
 
 > AI can fake a voice. It can't fake our secret.
 
