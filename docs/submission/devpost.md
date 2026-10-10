@@ -2,6 +2,7 @@
 
 **Project name:** Countersign
 **Tagline:** AI can fake a voice. It can't fake our secret.
+**Elevator pitch (Devpost field, ≤ 200 characters):** A voice clone can sound exactly like your grandson. It can't say your family's secret words, which change every minute. Countersign verifies the caller, not the voice.
 **Track:** AI + Cybersecurity
 **Links**
 - Live: https://countersign-maanavkrishnas-projects.vercel.app
@@ -47,18 +48,18 @@ We test it like a product: unit tests for the protocol vectors and detectors, br
 - **Being honest about accuracy.** Our first evaluation showed a single model prompt beat us on textbook scams. We pre-registered a hard set, fixed real bugs we found, then pre-registered an adversarial set and lost it, and published every run.
 
 ## Accomplishments
-- Three test sets, two of them pre-registered before any system ran: 24 textbook cases, 14 polished fakes and scary-but-real alerts, and 12 adversarial cases written to fool AI screeners. Countersign got 24/24 and 14/14, caught all 8 adversarial scams, and never stamped a genuine message FORGERY or cleared a scam. It lost the adversarial set 10/12 to a single prompt's 12/12, rating two genuine messages that quote injection text as UNVERIFIED. We publish that loss, with confidence intervals, at /evidence.
+- **Six runs, four pre-registered sets, every loss published.** On a hold-out written and committed before any system saw it, Countersign got **17/18 and a single AI prompt 8/18**. Most of those scams hide their link in a QR code, which a prompt can't read and Countersign decodes and checks. On plain text we tie a strong model (24/24, 14/14), and we say so. We lost the adversarial set 10/12 to 12/12 in run 4, published it, fixed the cause, and validated the fix on unseen cases. Everything is at /evidence with confidence intervals.
 - A working, offline, cryptographic identity check for whole families, in five languages, specified openly: the defense against voice clones that doesn't depend on detecting them.
 
 ## What we learned
-A strong model is very hard to beat at classifying scam text, so the real gap is elsewhere: explainability, robustness when the AI is wrong or manipulated, and identity verification that doesn't depend on detection at all.
+A strong model is very hard to beat at reading scam text, so the real gap is what it can't see: QR codes, domain age, email authentication and redirects. Robustness matters when the AI is wrong, manipulated or down. And identity verification shouldn't depend on detection at all. Pre-registering test sets kept us honest; losing one taught us more than winning the others.
 
 ## Limitations (we'd rather you hear them from us)
 - It only protects families who set it up, in person, once. That's the price of a secret nobody else can learn.
 - It relies on someone remembering to ask; the practice call, drill and card are there to build the habit, but we haven't measured it with real grandparents yet.
 - The secret lives in the browser. An optional Face ID / fingerprint lock gates the words, but it is a gate, not encryption, and there is no encrypted backup yet. Start fresh is the recovery.
 - Live listening needs Chrome, Edge or Safari, and the call on speaker.
-- The message checker ties a strong single prompt on verdicts; its edge is evidence, code-controlled verdicts and robustness. The test sets are small, and /evidence shows confidence intervals.
+- On plain text the message checker only ties a strong single prompt; it wins where a prompt is blind (QR codes, real lookups, outages). The test sets are small, and only the hold-out is a clean test; /evidence shows confidence intervals.
 
 ## What's next
 - Native iOS and Android apps built from the open protocol, plus iOS share via Shortcuts.

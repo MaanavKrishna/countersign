@@ -2,10 +2,10 @@ import results from "../../../eval/results.json";
 import { wilson } from "@/lib/eval/metrics";
 
 type Metrics = { n: number; recall: number; falsePositiveRate: number; strictAccuracy: number; dangerousMisses: number; tp: number; fp: number; tn: number; fn: number };
-type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention";
+type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention" | "holdout";
 type Row = { id: string; label: "scam" | "legit"; set: SetId; band: string };
 type Arm = { id: string; label: string; metrics: { all: Metrics } & Partial<Record<SetId, Metrics>>; rows: Row[] };
-const data = results as unknown as { generatedAt: string; hardSetCommit?: string; adversarialSetCommit?: string; freshSetCommit?: string; arms: Arm[] };
+const data = results as unknown as { generatedAt: string; hardSetCommit?: string; adversarialSetCommit?: string; freshSetCommit?: string; holdoutSetCommit?: string; arms: Arm[] };
 const arms = data.arms ?? [];
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 /** Rate with its 95% Wilson interval, so small samples don't look more certain than they are. */
@@ -81,7 +81,7 @@ export default function EvidencePage() {
         <p className="eyebrow m-0 text-[13px]">Does it actually work?</p>
         <h1 className="condensed m-0 text-[48px] leading-[0.95] font-black uppercase sm:text-[64px]">Measured, not claimed.</h1>
         <p className="m-0 max-w-[760px] text-lg leading-relaxed text-body">
-          We ran the same labelled messages through four systems. The first is what most AI scam checkers are: one prompt to a model. We publish every result, including the ones that don&apos;t favour us.
+          We ran the same labelled messages through four systems. The first is what most AI scam checkers are: one prompt to a model. We publish every result, including the ones that don&apos;t favour us. Where it matters most, on a hold-out set written and committed before any system saw it, <b className="text-ink">Countersign got 17 of 18 right and the single prompt 8 of 18</b>, because most of those scams hide their giveaway in a QR code.
         </p>
       </header>
 
@@ -114,6 +114,20 @@ export default function EvidencePage() {
             title="Fresh hold-out: quoting versus attacking"
             blurb="New cases written after run 4's fix: genuine messages that quote injection text as examples, and scams that use it, including one built to slip past the fix."
           />
+          <ResultsTable
+            set="holdout"
+            title="Run-6 hold-out: after the last fixes"
+            blurb="Written and committed after the run-5 fixes and before any system saw it: six new QR pairs with other brands, and six new quoting-versus-attacking cases, including scams built to slip past the new rules."
+          />
+          {data.holdoutSetCommit && (
+            <p className="m-0 text-sm text-muted">
+              Hold-out committed before any system was run on it:{" "}
+              <a className="font-semibold text-trust" href={`${REPO}/commit/${data.holdoutSetCommit}`}>
+                commit {data.holdoutSetCommit}
+              </a>
+              .
+            </p>
+          )}
           {data.freshSetCommit && (
             <p className="m-0 text-sm text-muted">
               Both run-5 sets were committed before any system was run on them:{" "}
@@ -156,10 +170,16 @@ export default function EvidencePage() {
                 <b className="text-ink">Two fixes after run 2</b>, and we say so: a message that <i>gives</i> a code is no longer read as one that <i>asks</i> for it, and the model&apos;s overall read now counts as one weighted signal, which code can still outvote.
               </li>
               <li>
-                <b className="text-ink">Run 4: we pre-registered an adversarial set, and lost it.</b> Twelve new cases: eight scams written to persuade an AI screener (fake security-scan reports, a fake assistant transcript, &ldquo;training example&rdquo; framing, instructions in Spanish or spaced out), and four genuine messages that talk about AI. Neither system was fooled by any of the eight scams. But Countersign rated two genuine messages that <i>quote</i> injection text (a security newsletter and a GitHub pull request) as UNVERIFIED, so the single prompt won 12/12 to 10/12. That&apos;s the cost of treating any text aimed at an AI as suspicious. We publish it unchanged and haven&apos;t tuned anything on these cases. The tables above are run 4, which also re-ran the earlier sets.
+                <b className="text-ink">Run 4: we pre-registered an adversarial set, and lost it.</b> Twelve new cases: eight scams written to persuade an AI screener (fake security-scan reports, a fake assistant transcript, &ldquo;training example&rdquo; framing, instructions in Spanish or spaced out), and four genuine messages that talk about AI. Neither system was fooled by any of the eight scams. But Countersign rated two genuine messages that <i>quote</i> injection text (a security newsletter and a GitHub pull request) as UNVERIFIED, so the single prompt won 12/12 to 10/12. That&apos;s the cost of treating any text aimed at an AI as suspicious. We published it unchanged (it&apos;s kept in <code>eval/history/run-4.json</code>).
               </li>
               <li>
-                <b className="text-ink">What this means.</b> On classification alone, a strong model is hard to beat, and we don&apos;t claim to. Countersign&apos;s job is different: show the evidence behind every verdict, never let the AI set the verdict alone, and, with Family Countersign, prove identity in the one case no detector can: a perfect voice clone.
+                <b className="text-ink">Fix, then run 5 on two new pre-registered sets.</b> We changed the injection detector so that quoting an attack as an example (&ldquo;phrases such as &hellip;&rdquo;) no longer counts as one. Then we tested what a single prompt can&apos;t see: six pairs of identical messages whose only difference is a QR code pointing to a lookalike or the real site. The single prompt scored 3/12 and stamped three genuine messages FORGERY; Countersign scored 7/12. On a fresh quoting-versus-attacking set both scored 5/6.
+              </li>
+              <li>
+                <b className="text-ink">Four more fixes, then run 6 on a hold-out nobody had seen.</b> A brand claim is trusted when every link is on the brand&apos;s own domain; a link to a site carrying the claimed brand&apos;s name that the brand doesn&apos;t own is flagged; a list of quoted examples shares its cue; a fake &ldquo;Assistant:&rdquo; line vouching for a message counts as an attack. Run 6&apos;s hold-out (18 new cases, committed first): <b className="text-ink">Countersign 17/18, single prompt 8/18.</b> Our one miss was a bug in the new &ldquo;Assistant:&rdquo; rule (a quoted example starting with a role label), since fixed; the recorded result stays. The other tables above are run 6 too, but those sets had already shaped our fixes, so only the hold-out is a clean test.
+              </li>
+              <li>
+                <b className="text-ink">What this means.</b> On plain text, a strong model is as good as we are, and we don&apos;t claim otherwise. Countersign wins where a prompt is blind: it reads QR codes, checks domains, email authentication and redirects for real, keeps working without the model, and the AI can&apos;t set the verdict on its own. And Family Countersign proves identity in the one case no detector can: a perfect voice clone.
               </li>
             </ol>
           </section>

@@ -59,7 +59,9 @@ export function detectAiDirectedText(text: string): Finding[] {
     const global = new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g");
     for (const m of text.matchAll(global)) {
       const quote = m[0].length > 90 ? `${m[0].slice(0, 90)}…` : m[0];
-      if (isQuotedMention(text, m.index)) {
+      // Some patterns start at the quote mark itself; judge from the first word inside it.
+      const lead = /^[\s"“‘«]*/.exec(m[0])![0].length;
+      if (isQuotedMention(text, m.index + lead)) {
         mention ??= quote;
         continue;
       }

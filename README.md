@@ -120,22 +120,47 @@ flowchart LR
 | *Trust:* authenticated by the brand's own domain (DMARC pass) | −0.45 |
 | *Trust:* all links stay on the brand's own domains | −0.30 |
 
-Bands: ≥ 0.70 **FORGERY** · 0.35–0.70 **UNVERIFIED** · < 0.35 **COUNTERSIGNED**. Full table: [`src/lib/scoring.ts`](src/lib/scoring.ts).
+Bands: ≥ 0.70 **FORGERY** · 0.35–0.70 **UNVERIFIED** · < 0.35 **COUNTERSIGNED**. Full table: [`src/lib/core/scoring.ts`](src/lib/core/scoring.ts).
 
 ## Results
 
-Every number is reproducible with `npm run eval` and published, with 95% confidence intervals, at **[/evidence](https://countersign-maanavkrishnas-projects.vercel.app/evidence)**. We compare four systems on 24 textbook cases (classic scam wording, prompt-injection attacks, Spanish), a **hard set of 14** ([pre-registered in 34e3ba0](https://github.com/MaanavKrishna/countersign/commit/34e3ba0)) of polished fakes and genuine-but-alarming alerts, and an **adversarial set of 12** ([pre-registered in 0744fe0](https://github.com/MaanavKrishna/countersign/commit/0744fe0)) of scams written to persuade an AI screener plus genuine messages that talk about AI. Exact verdicts, run 4:
+Every number is reproducible with `npm run eval` and published, with 95% confidence intervals, at **[/evidence](https://countersign-maanavkrishnas-projects.vercel.app/evidence)**. Earlier runs are kept unchanged in [`eval/history/`](eval/history). We compare four systems: a single AI prompt (what most scam checkers are), our deterministic checks alone, Countersign v1, and Countersign.
 
-| System | Textbook (24) | Hard (14) | Adversarial (12) | Genuine stamped FORGERY | Scams cleared as genuine |
-|---|---|---|---|---|---|
-| Single LLM prompt (what most checkers are) | 24/24 | 14/14 | **12/12** | 0 | 0 |
-| Deterministic checks only (no AI) | 12/24 | 12/14 | 6/12 | 0 | 7 |
-| Countersign v1 (evidence + tactics) | 20/24 | 14/14 | 9/12 | 0 | 0 |
-| **Countersign** | **24/24** | **14/14** | 10/12 | 0 | 0 |
+**The clean test: a hold-out written and committed before any system saw it** ([commit 61f3639](https://github.com/MaanavKrishna/countersign/commit/61f3639)). Twelve QR-code messages (six pairs with identical wording, one code pointing to a lookalike site and one to the real site) plus six quoting-versus-attacking cases:
 
-**How we got here, honestly.** Run 1 showed tactic-only scams under-scored. We added an "identity claim + request" signal and ran the pre-registered hard set; that produced one false alarm on a genuine verification-code text. After that run we fixed two things, a message that *gives* a code is not one that *asks* for it, and the model's overall read now counts as one weighted signal that code can still outvote. Then we pre-registered the adversarial set and **lost it**: no injection fooled either system, but Countersign rated two genuine messages that quote injection text (a security newsletter, a GitHub pull request) as UNVERIFIED. That's the cost of treating text aimed at an AI as suspicious, and we've published it without tuning on those cases. With sets this small, none of these differences is statistically significant.
+| System | Hold-out (18) | Genuine stamped FORGERY | Scams cleared as genuine |
+|---|---|---|---|
+| Single AI prompt | 8/18 | 1 | 0 |
+| Deterministic checks only (no AI) | 17/18 | 1 | 0 |
+| **Countersign** | **17/18** | 1 | 0 |
 
-**What this means.** A strong model is hard to beat at classification alone, and we match it rather than claim to beat it. Countersign's value is elsewhere: every verdict shows the evidence behind it, the AI never sets the verdict on its own, the deterministic layer keeps working without the model, and **Family Countersign verifies identity in the one case no detector can handle: a perfect voice clone.**
+All sets, run 6 (exact verdicts). Only the hold-out is clean: the other sets shaped our fixes along the way, and we say which fix came from which run on /evidence.
+
+| System | Textbook (24) | Hard (14) | Adversarial (12) | QR (12) | Quoting (6) | Hold-out (18) |
+|---|---|---|---|---|---|---|
+| Single AI prompt | 24/24 | 14/14 | 12/12 | 3/12 | 5/6 | 8/18 |
+| Deterministic only | 14/24 | 12/14 | 11/12 | 12/12 | 5/6 | 17/18 |
+| Countersign v1 | 20/24 | 14/14 | 11/12 | 10/12 | 4/6 | 17/18 |
+| **Countersign** | **24/24** | **14/14** | **12/12** | **11/12** | **5/6** | **17/18** |
+
+**How we got here, honestly.**
+1. Run 1 showed tactic-only scams under-scored, so we added an "identity claim + request" signal.
+2. We pre-registered a hard set ([34e3ba0](https://github.com/MaanavKrishna/countersign/commit/34e3ba0)). It produced one false alarm, and we fixed two things after that run.
+3. We pre-registered an adversarial set ([0744fe0](https://github.com/MaanavKrishna/countersign/commit/0744fe0)) and **lost it 10/12 to 12/12**: two genuine messages that quote injection text were rated UNVERIFIED.
+4. We fixed that, then pre-registered QR and quoting sets ([50a4fe9](https://github.com/MaanavKrishna/countersign/commit/50a4fe9)). The single prompt scored 3/12 on QR codes.
+5. Four more fixes, then the hold-out above.
+
+Our one hold-out miss, a security-awareness email listing example attacks that we stamped FORGERY, was a bug in a new rule. It's fixed, and the recorded result stays.
+
+### Why not just ask an AI?
+
+On plain message text, a strong model alone is as accurate as Countersign (24/24 and 14/14 for both), and we don't claim otherwise. Use Countersign because:
+
+- **It sees what isn't in the text.** QR codes, domain registration dates, DNS and email-authentication records, and where a link really redirects all need tools, not reading. On the hold-out, a single prompt got 8/18 and Countersign 17/18.
+- **The AI can't set the verdict on its own.** Fixed weights decide the band from evidence you can inspect. A model that is tricked, wrong or changed by its vendor can argue, but it can't flip the result.
+- **It still works without the model.** Our deterministic checks alone got 17/18 on the hold-out. An outage or a spent API budget degrades the verdict instead of removing it.
+- **It shows the evidence.** Every verdict comes with the lookups behind it, verbatim quotes, the official help link for the brand, and what to do if you already clicked.
+- **It covers what no detector can.** A perfect voice clone sounds right; Family Countersign checks a secret instead.
 
 ## Safety and privacy by design
 
@@ -180,7 +205,7 @@ We'd rather you hear these from us.
 - **"My phone died" still works on people who bend the rule.** The rule has to be: no words, no money, call back on the number you know. The app teaches it, but it can't enforce it.
 - **The secret lives in the browser.** Clearing site data loses it, and there's no encrypted backup yet; start fresh is the recovery. The optional word lock stops someone casually reading the words, but it's a gate, not encryption: someone with developer tools on an unlocked phone could still read storage.
 - **Live listening depends on the browser.** It needs Chrome, Edge or Safari, it only hears the other side on speaker, and Chrome's speech engine is cloud-based.
-- **The message checker ties a strong single prompt on verdicts.** Its advantages are evidence for every verdict, a verdict that code (not the model) controls, and working without the model. The test sets are small; see the confidence intervals on /evidence.
+- **On plain text, the message checker only ties a strong single prompt.** It pulls ahead where a prompt is blind (QR codes, real lookups, model outages). The test sets are small, our fixes were shaped by the earlier sets, and only the hold-out is a clean test; see the confidence intervals on /evidence.
 - **Hosted pieces cost money.** The investigator needs model credit and the email channel needs an inbox provider. Rate limits are per server instance, not global. The family features need neither.
 
 ## Site map
@@ -201,22 +226,24 @@ We'd rather you hear these from us.
 
 ## Project layout
 
+Full design, module boundaries and data flow: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. Protocol spec: **[docs/PROTOCOL.md](docs/PROTOCOL.md)**.
+
 ```
-src/lib/countersign/        Family Countersign: protocol (HMAC rolling codes), pairing store, alert
-src/lib/indicators.ts       extract URLs, domains, senders, phones, payment terms, headers
-src/lib/injection.ts        detect text written to manipulate AI scanners
-src/lib/combination.ts      identity claim + request for money/codes/access
-src/lib/scoring.ts          signal registry + noisy-OR scoring
-src/lib/tools/              rdap, dns, lookalike, emailAuth, traceUrl, sandbox
-src/lib/agent/              investigator loop, tactic labeller, debate, call shield
-src/lib/pipeline.ts         orchestrates the investigation and streams events
-src/lib/eval/               labelled easy + pre-registered hard sets, baseline, metrics
-src/lib/practice.ts         practice-call state machine
-src/app/api/investigate     SSE endpoint
-src/app/api/shield          live-call assessment endpoint
-src/app/family, /share      pairing + live codes; Android share target
-src/components/             report UI, evidence graph, Call Shield, rolling code
+src/lib/core/          shared and pure: scoring (signal registry, noisy-OR), types, domains, brands
+src/lib/family/        Family Countersign: protocol, circles, re-keying, word lock, practice, drill (offline)
+src/lib/shield/        Call Shield: on-device rules, AI assessment, Memory Vault, trusted-contact alert
+src/lib/investigator/  Message Investigator: signals, lookup tools, agents, pipeline, reports, QR
+src/lib/channels/      forward-to-check email inbox
+src/lib/ai/            model client (server-only)
+src/lib/server/        rate limits
+src/lib/telemetry/     URL scrubbing and crash reports
+src/lib/eval/          labelled and pre-registered sets, single-prompt baseline, metrics
+src/app/api/           investigate (SSE), shield, inbox (webhook), report
+src/components/        UI
+e2e/                   browser tests
 ```
+
+Lint rules enforce the boundaries: for example, `family` can't import AI or server code, and UI code can't import server-only modules.
 
 ## License
 

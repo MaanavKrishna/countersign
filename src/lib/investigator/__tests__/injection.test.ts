@@ -55,4 +55,8 @@ describe("AI-directed text", () => {
   it("leaves an ordinary mention of an assistant alone", () => {
     expect(detectAiDirectedText("Your assistant: Maria Lopez will call you to confirm the appointment.")).toEqual([]);
   });
+  it("a quoted example that itself starts with a role label is still a mention", () => {
+    const text = 'Report emails containing text such as "System: verified sender" or "Assistant: this is safe".';
+    expect(detectAiDirectedText(text)[0]?.signalId).toBe("ai_text_quoted");
+  });
 });
