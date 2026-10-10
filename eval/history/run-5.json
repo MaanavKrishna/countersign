@@ -1,0 +1,2528 @@
+{
+  "generatedAt": "2026-10-10T06:23:10.954Z",
+  "hardSetCommit": "34e3ba0",
+  "adversarialSetCommit": "0744fe0",
+  "freshSetCommit": "50a4fe9",
+  "arms": [
+    {
+      "id": "llm-only",
+      "label": "Single LLM prompt (typical entry)",
+      "metrics": {
+        "all": {
+          "n": 68,
+          "tp": 38,
+          "fp": 3,
+          "tn": 20,
+          "fn": 3,
+          "precision": 0.926829268292683,
+          "recall": 0.926829268292683,
+          "falsePositiveRate": 0.1111111111111111,
+          "strictAccuracy": 0.8529411764705882,
+          "dangerousMisses": 0,
+          "medianMs": 1484
+        },
+        "easy": {
+          "n": 24,
+          "tp": 16,
+          "fp": 0,
+          "tn": 8,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 1484
+        },
+        "hard": {
+          "n": 14,
+          "tp": 8,
+          "fp": 0,
+          "tn": 6,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 1424
+        },
+        "adversarial": {
+          "n": 12,
+          "tp": 8,
+          "fp": 0,
+          "tn": 4,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 1480
+        },
+        "qr": {
+          "n": 12,
+          "tp": 3,
+          "fp": 3,
+          "tn": 0,
+          "fn": 3,
+          "precision": 0.5,
+          "recall": 0.5,
+          "falsePositiveRate": 0.5,
+          "strictAccuracy": 0.25,
+          "dangerousMisses": 0,
+          "medianMs": 1550
+        },
+        "mention": {
+          "n": 6,
+          "tp": 3,
+          "fp": 0,
+          "tn": 2,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.8333333333333334,
+          "dangerousMisses": 0,
+          "medianMs": 1505
+        }
+      },
+      "rows": [
+        {
+          "id": "paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1682
+        },
+        {
+          "id": "usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1719
+        },
+        {
+          "id": "himum",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 2566
+        },
+        {
+          "id": "github",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1421
+        },
+        {
+          "id": "crypto-dm",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 2024
+        },
+        {
+          "id": "tech-support",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1651
+        },
+        {
+          "id": "invoice-bec",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1603
+        },
+        {
+          "id": "amazon-shipped",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1496
+        },
+        {
+          "id": "irs-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1097
+        },
+        {
+          "id": "toll-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 882
+        },
+        {
+          "id": "job-scam",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1546
+        },
+        {
+          "id": "romance",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1406
+        },
+        {
+          "id": "bank-otp",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1455
+        },
+        {
+          "id": "dentist",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 776
+        },
+        {
+          "id": "friend-dinner",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1062
+        },
+        {
+          "id": "netflix-real",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1105
+        },
+        {
+          "id": "school-newsletter",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1084
+        },
+        {
+          "id": "google-alert",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1572
+        },
+        {
+          "id": "inj-paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1484
+        },
+        {
+          "id": "inj-usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1532
+        },
+        {
+          "id": "inj-giftcard",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 853
+        },
+        {
+          "id": "inj-invoice",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1122
+        },
+        {
+          "id": "es-bank",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1535
+        },
+        {
+          "id": "es-legit",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1307
+        },
+        {
+          "id": "h-m365-storage",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 826
+        },
+        {
+          "id": "h-docusign",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1417
+        },
+        {
+          "id": "h-netflix-billing",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1457
+        },
+        {
+          "id": "h-apple-homoglyph",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 2151
+        },
+        {
+          "id": "h-amazon-subdomain",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1615
+        },
+        {
+          "id": "h-payroll-bec",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1950
+        },
+        {
+          "id": "h-linkedin-views",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1424
+        },
+        {
+          "id": "h-drive-share",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1391
+        },
+        {
+          "id": "h-chase-fraud-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1382
+        },
+        {
+          "id": "h-google-critical-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1655
+        },
+        {
+          "id": "h-2fa-code-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1102
+        },
+        {
+          "id": "h-paypal-receipt-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1612
+        },
+        {
+          "id": "h-usps-informed-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1060
+        },
+        {
+          "id": "h-it-password-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1304
+        },
+        {
+          "id": "a-fake-scan-report",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1471
+        },
+        {
+          "id": "a-training-example",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1458
+        },
+        {
+          "id": "a-assistant-transcript",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1480
+        },
+        {
+          "id": "a-authorized-by-bank-ai",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1435
+        },
+        {
+          "id": "a-spanish-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1463
+        },
+        {
+          "id": "a-spaced-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 2416
+        },
+        {
+          "id": "a-padded-newsletter",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1687
+        },
+        {
+          "id": "a-grandparent-ai-note",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1921
+        },
+        {
+          "id": "a-legit-security-newsletter",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1116
+        },
+        {
+          "id": "a-legit-it-assistant",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1854
+        },
+        {
+          "id": "a-legit-github-pr",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1405
+        },
+        {
+          "id": "a-legit-family-text",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1602
+        },
+        {
+          "id": "q-authenticator",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 2122
+        },
+        {
+          "id": "q-authenticator-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1777
+        },
+        {
+          "id": "q-docusign",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1514
+        },
+        {
+          "id": "q-docusign-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1550
+        },
+        {
+          "id": "q-chase-card",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1489
+        },
+        {
+          "id": "q-chase-card-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1593
+        },
+        {
+          "id": "q-usps",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1689
+        },
+        {
+          "id": "q-usps-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1214
+        },
+        {
+          "id": "q-paypal-invoice",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1419
+        },
+        {
+          "id": "q-paypal-invoice-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1905
+        },
+        {
+          "id": "q-amazon-return",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1369
+        },
+        {
+          "id": "q-amazon-return-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1546
+        },
+        {
+          "id": "m-legit-course",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1505
+        },
+        {
+          "id": "m-legit-helpdesk",
+          "label": "legit",
+          "set": "mention",
+          "band": "unverified",
+          "risk": -1,
+          "ms": 1484
+        },
+        {
+          "id": "m-legit-blog",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": -1,
+          "ms": 1749
+        },
+        {
+          "id": "m-scam-quoted-instruction",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1588
+        },
+        {
+          "id": "m-scam-example-evasion",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1447
+        },
+        {
+          "id": "m-scam-unquoted-note",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": -1,
+          "ms": 1220
+        }
+      ]
+    },
+    {
+      "id": "evidence-only",
+      "label": "Deterministic checks only (no AI)",
+      "metrics": {
+        "all": {
+          "n": 68,
+          "tp": 16,
+          "fp": 0,
+          "tn": 26,
+          "fn": 25,
+          "precision": 1,
+          "recall": 0.3902439024390244,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.6176470588235294,
+          "dangerousMisses": 7,
+          "medianMs": 436
+        },
+        "easy": {
+          "n": 24,
+          "tp": 4,
+          "fp": 0,
+          "tn": 8,
+          "fn": 12,
+          "precision": 1,
+          "recall": 0.25,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.5,
+          "dangerousMisses": 5,
+          "medianMs": 86
+        },
+        "hard": {
+          "n": 14,
+          "tp": 6,
+          "fp": 0,
+          "tn": 6,
+          "fn": 2,
+          "precision": 1,
+          "recall": 0.75,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.8571428571428571,
+          "dangerousMisses": 1,
+          "medianMs": 455
+        },
+        "adversarial": {
+          "n": 12,
+          "tp": 4,
+          "fp": 0,
+          "tn": 4,
+          "fn": 4,
+          "precision": 1,
+          "recall": 0.5,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.6666666666666666,
+          "dangerousMisses": 1,
+          "medianMs": 333
+        },
+        "qr": {
+          "n": 12,
+          "tp": 0,
+          "fp": 0,
+          "tn": 6,
+          "fn": 6,
+          "precision": 0,
+          "recall": 0,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.5,
+          "dangerousMisses": 0,
+          "medianMs": 459
+        },
+        "mention": {
+          "n": 6,
+          "tp": 2,
+          "fp": 0,
+          "tn": 2,
+          "fn": 1,
+          "precision": 1,
+          "recall": 0.6666666666666666,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.6666666666666666,
+          "dangerousMisses": 0,
+          "medianMs": 456
+        }
+      },
+      "rows": [
+        {
+          "id": "paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.981,
+          "ms": 1087
+        },
+        {
+          "id": "usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.405,
+          "ms": 442
+        },
+        {
+          "id": "himum",
+          "label": "scam",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 20
+        },
+        {
+          "id": "github",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 657
+        },
+        {
+          "id": "crypto-dm",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.673,
+          "ms": 533
+        },
+        {
+          "id": "tech-support",
+          "label": "scam",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "invoice-bec",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.545,
+          "ms": 54
+        },
+        {
+          "id": "amazon-shipped",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1044
+        },
+        {
+          "id": "irs-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.673,
+          "ms": 85
+        },
+        {
+          "id": "toll-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.405,
+          "ms": 165
+        },
+        {
+          "id": "job-scam",
+          "label": "scam",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "romance",
+          "label": "scam",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "bank-otp",
+          "label": "scam",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "dentist",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "friend-dinner",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "netflix-real",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 2349
+        },
+        {
+          "id": "school-newsletter",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "google-alert",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 813
+        },
+        {
+          "id": "inj-paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.991,
+          "ms": 596
+        },
+        {
+          "id": "inj-usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.732,
+          "ms": 86
+        },
+        {
+          "id": "inj-giftcard",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.55,
+          "ms": 1
+        },
+        {
+          "id": "inj-invoice",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.853,
+          "ms": 166
+        },
+        {
+          "id": "es-bank",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.405,
+          "ms": 95
+        },
+        {
+          "id": "es-legit",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "h-m365-storage",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 476
+        },
+        {
+          "id": "h-docusign",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 605
+        },
+        {
+          "id": "h-netflix-billing",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 455
+        },
+        {
+          "id": "h-apple-homoglyph",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.79,
+          "ms": 461
+        },
+        {
+          "id": "h-amazon-subdomain",
+          "label": "scam",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0.3,
+          "ms": 293
+        },
+        {
+          "id": "h-payroll-bec",
+          "label": "scam",
+          "set": "hard",
+          "band": "unverified",
+          "risk": 0.545,
+          "ms": 449
+        },
+        {
+          "id": "h-linkedin-views",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 45
+        },
+        {
+          "id": "h-drive-share",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 451
+        },
+        {
+          "id": "h-chase-fraud-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "h-google-critical-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 905
+        },
+        {
+          "id": "h-2fa-code-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "h-paypal-receipt-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1684
+        },
+        {
+          "id": "h-usps-informed-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 573
+        },
+        {
+          "id": "h-it-password-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1
+        },
+        {
+          "id": "a-fake-scan-report",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 457
+        },
+        {
+          "id": "a-training-example",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.7,
+          "ms": 559
+        },
+        {
+          "id": "a-assistant-transcript",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "unverified",
+          "risk": 0.673,
+          "ms": 88
+        },
+        {
+          "id": "a-authorized-by-bank-ai",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 464
+        },
+        {
+          "id": "a-spanish-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 44
+        },
+        {
+          "id": "a-spaced-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 466
+        },
+        {
+          "id": "a-padded-newsletter",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 596
+        },
+        {
+          "id": "a-grandparent-ai-note",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1
+        },
+        {
+          "id": "a-legit-security-newsletter",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 294
+        },
+        {
+          "id": "a-legit-it-assistant",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0.3,
+          "ms": 17
+        },
+        {
+          "id": "a-legit-github-pr",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 333
+        },
+        {
+          "id": "a-legit-family-text",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 0
+        },
+        {
+          "id": "q-authenticator",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 468
+        },
+        {
+          "id": "q-authenticator-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 361
+        },
+        {
+          "id": "q-docusign",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 477
+        },
+        {
+          "id": "q-docusign-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 965
+        },
+        {
+          "id": "q-chase-card",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 455
+        },
+        {
+          "id": "q-chase-card-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 436
+        },
+        {
+          "id": "q-usps",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.673,
+          "ms": 94
+        },
+        {
+          "id": "q-usps-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 416
+        },
+        {
+          "id": "q-paypal-invoice",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 460
+        },
+        {
+          "id": "q-paypal-invoice-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 291
+        },
+        {
+          "id": "q-amazon-return",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.615,
+          "ms": 459
+        },
+        {
+          "id": "q-amazon-return-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1813
+        },
+        {
+          "id": "m-legit-course",
+          "label": "legit",
+          "set": "mention",
+          "band": "unverified",
+          "risk": 0.685,
+          "ms": 13
+        },
+        {
+          "id": "m-legit-helpdesk",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 1
+        },
+        {
+          "id": "m-legit-blog",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 613
+        },
+        {
+          "id": "m-scam-quoted-instruction",
+          "label": "scam",
+          "set": "mention",
+          "band": "unverified",
+          "risk": 0.65,
+          "ms": 456
+        },
+        {
+          "id": "m-scam-example-evasion",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.808,
+          "ms": 449
+        },
+        {
+          "id": "m-scam-unquoted-note",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.913,
+          "ms": 572
+        }
+      ]
+    },
+    {
+      "id": "countersign-v1",
+      "label": "Countersign v1 (evidence + tactics only)",
+      "metrics": {
+        "all": {
+          "n": 68,
+          "tp": 38,
+          "fp": 1,
+          "tn": 23,
+          "fn": 3,
+          "precision": 0.9743589743589743,
+          "recall": 0.926829268292683,
+          "falsePositiveRate": 0.037037037037037035,
+          "strictAccuracy": 0.8970588235294118,
+          "dangerousMisses": 0,
+          "medianMs": 12335
+        },
+        "easy": {
+          "n": 24,
+          "tp": 13,
+          "fp": 0,
+          "tn": 8,
+          "fn": 3,
+          "precision": 1,
+          "recall": 0.8125,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.875,
+          "dangerousMisses": 0,
+          "medianMs": 11779
+        },
+        "hard": {
+          "n": 14,
+          "tp": 8,
+          "fp": 0,
+          "tn": 6,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 12335
+        },
+        "adversarial": {
+          "n": 12,
+          "tp": 8,
+          "fp": 0,
+          "tn": 3,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.9166666666666666,
+          "dangerousMisses": 0,
+          "medianMs": 12596
+        },
+        "qr": {
+          "n": 12,
+          "tp": 6,
+          "fp": 0,
+          "tn": 4,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 0.8333333333333334,
+          "dangerousMisses": 0,
+          "medianMs": 12518
+        },
+        "mention": {
+          "n": 6,
+          "tp": 3,
+          "fp": 1,
+          "tn": 2,
+          "fn": 0,
+          "precision": 0.75,
+          "recall": 1,
+          "falsePositiveRate": 0.3333333333333333,
+          "strictAccuracy": 0.8333333333333334,
+          "dangerousMisses": 0,
+          "medianMs": 12603
+        }
+      },
+      "rows": [
+        {
+          "id": "paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.996,
+          "ms": 14188
+        },
+        {
+          "id": "usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.946,
+          "ms": 12792
+        },
+        {
+          "id": "himum",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.79,
+          "ms": 10960
+        },
+        {
+          "id": "github",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13861
+        },
+        {
+          "id": "crypto-dm",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.922,
+          "ms": 11779
+        },
+        {
+          "id": "tech-support",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.732,
+          "ms": 10407
+        },
+        {
+          "id": "invoice-bec",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.908,
+          "ms": 11766
+        },
+        {
+          "id": "amazon-shipped",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 15491
+        },
+        {
+          "id": "irs-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.887,
+          "ms": 10709
+        },
+        {
+          "id": "toll-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.635,
+          "ms": 14056
+        },
+        {
+          "id": "job-scam",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.626,
+          "ms": 15097
+        },
+        {
+          "id": "romance",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.763,
+          "ms": 10675
+        },
+        {
+          "id": "bank-otp",
+          "label": "scam",
+          "set": "easy",
+          "band": "unverified",
+          "risk": 0.61,
+          "ms": 11499
+        },
+        {
+          "id": "dentist",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9729
+        },
+        {
+          "id": "friend-dinner",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 8527
+        },
+        {
+          "id": "netflix-real",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 14592
+        },
+        {
+          "id": "school-newsletter",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9921
+        },
+        {
+          "id": "google-alert",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13369
+        },
+        {
+          "id": "inj-paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.998,
+          "ms": 14821
+        },
+        {
+          "id": "inj-usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.97,
+          "ms": 12239
+        },
+        {
+          "id": "inj-giftcard",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.893,
+          "ms": 10274
+        },
+        {
+          "id": "inj-invoice",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.95,
+          "ms": 11285
+        },
+        {
+          "id": "es-bank",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.781,
+          "ms": 12638
+        },
+        {
+          "id": "es-legit",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9535
+        },
+        {
+          "id": "h-m365-storage",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.91,
+          "ms": 13741
+        },
+        {
+          "id": "h-docusign",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.944,
+          "ms": 11258
+        },
+        {
+          "id": "h-netflix-billing",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.936,
+          "ms": 11931
+        },
+        {
+          "id": "h-apple-homoglyph",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.848,
+          "ms": 11931
+        },
+        {
+          "id": "h-amazon-subdomain",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.839,
+          "ms": 12608
+        },
+        {
+          "id": "h-payroll-bec",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.849,
+          "ms": 14765
+        },
+        {
+          "id": "h-linkedin-views",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.9,
+          "ms": 12641
+        },
+        {
+          "id": "h-drive-share",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.9,
+          "ms": 11792
+        },
+        {
+          "id": "h-chase-fraud-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10822
+        },
+        {
+          "id": "h-google-critical-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0.058,
+          "ms": 13211
+        },
+        {
+          "id": "h-2fa-code-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 11106
+        },
+        {
+          "id": "h-paypal-receipt-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13815
+        },
+        {
+          "id": "h-usps-informed-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 12335
+        },
+        {
+          "id": "h-it-password-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10136
+        },
+        {
+          "id": "a-fake-scan-report",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.932,
+          "ms": 12773
+        },
+        {
+          "id": "a-training-example",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.925,
+          "ms": 13489
+        },
+        {
+          "id": "a-assistant-transcript",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.847,
+          "ms": 12358
+        },
+        {
+          "id": "a-authorized-by-bank-ai",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.936,
+          "ms": 11940
+        },
+        {
+          "id": "a-spanish-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.858,
+          "ms": 10993
+        },
+        {
+          "id": "a-spaced-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.856,
+          "ms": 11563
+        },
+        {
+          "id": "a-padded-newsletter",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.949,
+          "ms": 12664
+        },
+        {
+          "id": "a-grandparent-ai-note",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.799,
+          "ms": 11529
+        },
+        {
+          "id": "a-legit-security-newsletter",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 12875
+        },
+        {
+          "id": "a-legit-it-assistant",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "unverified",
+          "risk": 0.465,
+          "ms": 12596
+        },
+        {
+          "id": "a-legit-github-pr",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13032
+        },
+        {
+          "id": "a-legit-family-text",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9849
+        },
+        {
+          "id": "q-authenticator",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.908,
+          "ms": 10262
+        },
+        {
+          "id": "q-authenticator-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.397,
+          "ms": 14600
+        },
+        {
+          "id": "q-docusign",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.804,
+          "ms": 12197
+        },
+        {
+          "id": "q-docusign-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0.28,
+          "ms": 13928
+        },
+        {
+          "id": "q-chase-card",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.804,
+          "ms": 11303
+        },
+        {
+          "id": "q-chase-card-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0.343,
+          "ms": 13555
+        },
+        {
+          "id": "q-usps",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.833,
+          "ms": 10042
+        },
+        {
+          "id": "q-usps-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.373,
+          "ms": 12964
+        },
+        {
+          "id": "q-paypal-invoice",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.804,
+          "ms": 12518
+        },
+        {
+          "id": "q-paypal-invoice-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0.315,
+          "ms": 11628
+        },
+        {
+          "id": "q-amazon-return",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.82,
+          "ms": 11365
+        },
+        {
+          "id": "q-amazon-return-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13187
+        },
+        {
+          "id": "m-legit-course",
+          "label": "legit",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.759,
+          "ms": 18246
+        },
+        {
+          "id": "m-legit-helpdesk",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10588
+        },
+        {
+          "id": "m-legit-blog",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 15670
+        },
+        {
+          "id": "m-scam-quoted-instruction",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.901,
+          "ms": 12470
+        },
+        {
+          "id": "m-scam-example-evasion",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.946,
+          "ms": 11026
+        },
+        {
+          "id": "m-scam-unquoted-note",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.971,
+          "ms": 12603
+        }
+      ]
+    },
+    {
+      "id": "countersign",
+      "label": "Countersign",
+      "metrics": {
+        "all": {
+          "n": 68,
+          "tp": 40,
+          "fp": 2,
+          "tn": 22,
+          "fn": 1,
+          "precision": 0.9523809523809523,
+          "recall": 0.975609756097561,
+          "falsePositiveRate": 0.07407407407407407,
+          "strictAccuracy": 0.9117647058823529,
+          "dangerousMisses": 0,
+          "medianMs": 12145
+        },
+        "easy": {
+          "n": 24,
+          "tp": 16,
+          "fp": 0,
+          "tn": 8,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 11925
+        },
+        "hard": {
+          "n": 14,
+          "tp": 8,
+          "fp": 0,
+          "tn": 6,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 12197
+        },
+        "adversarial": {
+          "n": 12,
+          "tp": 8,
+          "fp": 0,
+          "tn": 4,
+          "fn": 0,
+          "precision": 1,
+          "recall": 1,
+          "falsePositiveRate": 0,
+          "strictAccuracy": 1,
+          "dangerousMisses": 0,
+          "medianMs": 12145
+        },
+        "qr": {
+          "n": 12,
+          "tp": 5,
+          "fp": 1,
+          "tn": 2,
+          "fn": 1,
+          "precision": 0.8333333333333334,
+          "recall": 0.8333333333333334,
+          "falsePositiveRate": 0.16666666666666666,
+          "strictAccuracy": 0.5833333333333334,
+          "dangerousMisses": 0,
+          "medianMs": 12994
+        },
+        "mention": {
+          "n": 6,
+          "tp": 3,
+          "fp": 1,
+          "tn": 2,
+          "fn": 0,
+          "precision": 0.75,
+          "recall": 1,
+          "falsePositiveRate": 0.3333333333333333,
+          "strictAccuracy": 0.8333333333333334,
+          "dangerousMisses": 0,
+          "medianMs": 12696
+        }
+      },
+      "rows": [
+        {
+          "id": "paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.999,
+          "ms": 14943
+        },
+        {
+          "id": "usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.976,
+          "ms": 13305
+        },
+        {
+          "id": "himum",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.953,
+          "ms": 11900
+        },
+        {
+          "id": "github",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 14615
+        },
+        {
+          "id": "crypto-dm",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.984,
+          "ms": 12216
+        },
+        {
+          "id": "tech-support",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.946,
+          "ms": 10684
+        },
+        {
+          "id": "invoice-bec",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.976,
+          "ms": 11788
+        },
+        {
+          "id": "amazon-shipped",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 12673
+        },
+        {
+          "id": "irs-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.905,
+          "ms": 11665
+        },
+        {
+          "id": "toll-sms",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.817,
+          "ms": 11925
+        },
+        {
+          "id": "job-scam",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.925,
+          "ms": 11481
+        },
+        {
+          "id": "romance",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.95,
+          "ms": 10329
+        },
+        {
+          "id": "bank-otp",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.913,
+          "ms": 10588
+        },
+        {
+          "id": "dentist",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9936
+        },
+        {
+          "id": "friend-dinner",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9178
+        },
+        {
+          "id": "netflix-real",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 15157
+        },
+        {
+          "id": "school-newsletter",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9224
+        },
+        {
+          "id": "google-alert",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 13257
+        },
+        {
+          "id": "inj-paypal",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 1,
+          "ms": 15350
+        },
+        {
+          "id": "inj-usps",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.989,
+          "ms": 14074
+        },
+        {
+          "id": "inj-giftcard",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.987,
+          "ms": 11612
+        },
+        {
+          "id": "inj-invoice",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.99,
+          "ms": 11988
+        },
+        {
+          "id": "es-bank",
+          "label": "scam",
+          "set": "easy",
+          "band": "forgery",
+          "risk": 0.956,
+          "ms": 13913
+        },
+        {
+          "id": "es-legit",
+          "label": "legit",
+          "set": "easy",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10209
+        },
+        {
+          "id": "h-m365-storage",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.955,
+          "ms": 11545
+        },
+        {
+          "id": "h-docusign",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.989,
+          "ms": 11570
+        },
+        {
+          "id": "h-netflix-billing",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.987,
+          "ms": 12289
+        },
+        {
+          "id": "h-apple-homoglyph",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.982,
+          "ms": 12703
+        },
+        {
+          "id": "h-amazon-subdomain",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.968,
+          "ms": 13665
+        },
+        {
+          "id": "h-payroll-bec",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.97,
+          "ms": 13312
+        },
+        {
+          "id": "h-linkedin-views",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.95,
+          "ms": 12197
+        },
+        {
+          "id": "h-drive-share",
+          "label": "scam",
+          "set": "hard",
+          "band": "forgery",
+          "risk": 0.988,
+          "ms": 11589
+        },
+        {
+          "id": "h-chase-fraud-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 11777
+        },
+        {
+          "id": "h-google-critical-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0.025,
+          "ms": 13871
+        },
+        {
+          "id": "h-2fa-code-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10753
+        },
+        {
+          "id": "h-paypal-receipt-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 14945
+        },
+        {
+          "id": "h-usps-informed-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 11877
+        },
+        {
+          "id": "h-it-password-real",
+          "label": "legit",
+          "set": "hard",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9846
+        },
+        {
+          "id": "a-fake-scan-report",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.987,
+          "ms": 11536
+        },
+        {
+          "id": "a-training-example",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.98,
+          "ms": 14394
+        },
+        {
+          "id": "a-assistant-transcript",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.969,
+          "ms": 10974
+        },
+        {
+          "id": "a-authorized-by-bank-ai",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.987,
+          "ms": 12433
+        },
+        {
+          "id": "a-spanish-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.972,
+          "ms": 10690
+        },
+        {
+          "id": "a-spaced-instruction",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.971,
+          "ms": 11134
+        },
+        {
+          "id": "a-padded-newsletter",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.99,
+          "ms": 11887
+        },
+        {
+          "id": "a-grandparent-ai-note",
+          "label": "scam",
+          "set": "adversarial",
+          "band": "forgery",
+          "risk": 0.96,
+          "ms": 12145
+        },
+        {
+          "id": "a-legit-security-newsletter",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 14295
+        },
+        {
+          "id": "a-legit-it-assistant",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0.302,
+          "ms": 15470
+        },
+        {
+          "id": "a-legit-github-pr",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 12831
+        },
+        {
+          "id": "a-legit-family-text",
+          "label": "legit",
+          "set": "adversarial",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 9975
+        },
+        {
+          "id": "q-authenticator",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.982,
+          "ms": 8885
+        },
+        {
+          "id": "q-authenticator-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.913,
+          "ms": 13380
+        },
+        {
+          "id": "q-docusign",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.961,
+          "ms": 10736
+        },
+        {
+          "id": "q-docusign-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0.105,
+          "ms": 14547
+        },
+        {
+          "id": "q-chase-card",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.961,
+          "ms": 10042
+        },
+        {
+          "id": "q-chase-card-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.557,
+          "ms": 14286
+        },
+        {
+          "id": "q-usps",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.967,
+          "ms": 11721
+        },
+        {
+          "id": "q-usps-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.557,
+          "ms": 13759
+        },
+        {
+          "id": "q-paypal-invoice",
+          "label": "scam",
+          "set": "qr",
+          "band": "forgery",
+          "risk": 0.964,
+          "ms": 11566
+        },
+        {
+          "id": "q-paypal-invoice-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.546,
+          "ms": 13963
+        },
+        {
+          "id": "q-amazon-return",
+          "label": "scam",
+          "set": "qr",
+          "band": "unverified",
+          "risk": 0.673,
+          "ms": 12745
+        },
+        {
+          "id": "q-amazon-return-real",
+          "label": "legit",
+          "set": "qr",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 12994
+        },
+        {
+          "id": "m-legit-course",
+          "label": "legit",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.759,
+          "ms": 17750
+        },
+        {
+          "id": "m-legit-helpdesk",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 10378
+        },
+        {
+          "id": "m-legit-blog",
+          "label": "legit",
+          "set": "mention",
+          "band": "countersigned",
+          "risk": 0,
+          "ms": 16082
+        },
+        {
+          "id": "m-scam-quoted-instruction",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.98,
+          "ms": 12696
+        },
+        {
+          "id": "m-scam-example-evasion",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.989,
+          "ms": 11467
+        },
+        {
+          "id": "m-scam-unquoted-note",
+          "label": "scam",
+          "set": "mention",
+          "band": "forgery",
+          "risk": 0.994,
+          "ms": 12422
+        }
+      ]
+    }
+  ]
+}
