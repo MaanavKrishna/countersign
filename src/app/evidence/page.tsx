@@ -137,6 +137,7 @@ export default function EvidencePage() {
               .
             </p>
           )}
+          <p className="m-0 text-sm text-muted">These tables are run 6. A final code review on the day of the deadline tightened four scoring rules; we haven&apos;t re-run since, so they describe the code at run 6.</p>
           <p className="m-0 text-sm text-muted">Percentages in brackets are 95% confidence intervals (Wilson). With sets this small, a difference of one or two cases is not significant, and we don&apos;t treat it as one.</p>
           {data.adversarialSetCommit && (
             <p className="m-0 text-sm text-muted">
