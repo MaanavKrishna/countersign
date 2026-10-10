@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { PrivateAnalytics } from "@/components/PrivateAnalytics";
 import { RegisterSW } from "@/components/RegisterSW";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <RegisterSW />
+        <PrivateAnalytics />
       </body>
     </html>
   );

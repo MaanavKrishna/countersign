@@ -1,5 +1,6 @@
-// Per-instance sliding-window limiter. Defense in depth behind the Vercel
-// Firewall rule: serverless instances don't share memory.
+// Per-instance sliding-window limiter. Serverless instances don't share memory, so this
+// bounds abuse per warm instance rather than globally; a shared store (or a platform
+// firewall rule) is the production upgrade.
 
 export function clientIp(headers: Headers): string {
   const fwd = headers.get("x-forwarded-for");

@@ -1,6 +1,6 @@
 // Countersign service worker: the Family Countersign and Call Shield screens
 // must open with no signal, because that's when a scam call can come in.
-const VERSION = "countersign-v5";
+const VERSION = "countersign-v6";
 const PAGES = ["/", "/family", "/family/practice", "/family/card", "/shield", "/check", "/vault"];
 const EXTRA = ["/manifest.webmanifest", "/icon"];
 
@@ -37,7 +37,7 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith("/api/")) return; // always live
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/_vercel/")) return; // always live
 
   // Build assets are content-hashed and immutable: cache first.
   if (url.pathname.startsWith("/_next/static/")) {
