@@ -6,6 +6,7 @@ import type { ShieldAssessment, ShieldStage, Tactic } from "@/lib/types";
 import { alertText, smsLink } from "@/lib/countersign/alert";
 import { useFamily } from "@/lib/countersign/store";
 import { matchesPerson } from "@/lib/people";
+import { assessLocally } from "@/lib/shieldLocal";
 import { questionsFor, useVault } from "@/lib/vault";
 import { MemberCode } from "./MemberCode";
 import { RollingCode } from "./RollingCode";
@@ -25,6 +26,29 @@ type Recognizer = {
   stop: () => void;
 };
 type RecognizerCtor = new () => Recognizer;
+
+// "Keep the call on this phone": assess with on-device rules only; no transcript goes to our server.
+const LOCAL_KEY = "countersign.shield.local";
+const localListeners = new Set<() => void>();
+const readLocalPref = () => {
+  try {
+    return window.localStorage.getItem(LOCAL_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+const subscribeLocalPref = (l: () => void) => {
+  localListeners.add(l);
+  return () => localListeners.delete(l);
+};
+const writeLocalPref = (on: boolean) => {
+  try {
+    window.localStorage.setItem(LOCAL_KEY, on ? "1" : "0");
+  } catch {
+    /* private mode: the toggle still works for this visit via the listeners below */
+  }
+  localListeners.forEach((l) => l());
+};
 
 const SCRIPTS = {
   grandparent: [
@@ -82,7 +106,11 @@ export function CallShield() {
   const [lines, setLines] = useState<Line[]>([]);
   const [assessment, setAssessment] = useState<ShieldAssessment | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const localOnly = useSyncExternalStore(subscribeLocalPref, readLocalPref, () => false);
+  const localOnlyRef = useRef(localOnly);
+  useEffect(() => {
+    localOnlyRef.current = localOnly;
+  }, [localOnly]);
   const [challengeIdx, setChallengeIdx] = useState(0);
   const [outcome, setOutcome] = useState<"passed" | "failed" | null>(null);
   const [startedAt, setStartedAt] = useState<number | null>(null);
@@ -108,17 +136,19 @@ export function CallShield() {
       const transcript = linesRef.current.filter((l) => l.final).map((l) => l.text).join("\n");
       if (transcript.trim().length < 8) return;
       const mine = ++seq.current;
+      if (localOnlyRef.current) {
+        setAssessment(assessLocally(transcript));
+        return;
+      }
       setAnalyzing(true);
       try {
         const res = await fetch("/api/shield", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ transcript }) });
         if (!res.ok) throw new Error(String(res.status));
         const a = (await res.json()) as ShieldAssessment;
-        if (mine === seq.current) {
-          setAssessment(a);
-          setPaused(false);
-        }
+        if (mine === seq.current) setAssessment(a);
       } catch {
-        if (mine === seq.current) setPaused(true);
+        // Offline or the service is down: keep protecting with the on-device rules.
+        if (mine === seq.current) setAssessment(assessLocally(transcript));
       } finally {
         if (mine === seq.current) setAnalyzing(false);
       }
@@ -287,7 +317,7 @@ export function CallShield() {
                 Prove it&apos;s really them.
               </h1>
               <p className="m-0 max-w-[640px] text-xl leading-normal" style={{ color: s.text }}>
-                Put the call on speaker and start listening. Countersign transcribes on your device, spots scam scripts as they unfold, and gives you a question a voice clone can&apos;t answer.
+                Put the call on speaker and start listening. Countersign spots scam scripts as they unfold and gives you a question a voice clone can&apos;t answer.
               </p>
               <div className="flex flex-wrap gap-3">
                 <button type="button" onClick={startMic} className="flex min-h-14 items-center gap-2.5 rounded bg-white px-6 text-lg font-extrabold tracking-[0.04em] text-ink uppercase">
@@ -304,6 +334,12 @@ export function CallShield() {
                   Play demo: genuine call
                 </button>
               </div>
+              <label className="flex max-w-[640px] cursor-pointer items-start gap-3 rounded bg-white/10 p-3 text-base">
+                <input type="checkbox" checked={localOnly} onChange={(e) => writeLocalPref(e.target.checked)} className="mt-1 h-5 w-5 flex-none" />
+                <span>
+                  <b>Keep the call on this phone.</b> Uses built-in scam-script rules instead of our AI, so no transcript is sent to our server. Less nuanced, works offline. (Your browser&apos;s speech recognition may still use its own cloud service: Chrome sends audio to Google.)
+                </span>
+              </label>
               {micError && <p className="m-0 rounded bg-white/10 px-3 py-2 text-sm">{micError}</p>}
               {!canListen && (
                 <p className="m-0 rounded bg-white/10 px-3 py-2 text-sm">Live listening needs Chrome, Edge or Safari. The demo calls work everywhere.</p>
@@ -459,7 +495,7 @@ export function CallShield() {
                   Live transcript
                 </h2>
                 <span className="font-mono text-xs" style={{ color: s.muted }}>
-                  {paused ? "analysis paused" : analyzing ? "analyzing…" : mode === "sim" ? "simulated call" : "on-device speech"}
+                  {analyzing ? "analyzing…" : assessment?.source === "device" ? "checked on this phone" : mode === "sim" ? "simulated call" : "live speech"}
                 </span>
               </div>
               <div ref={transcriptBox} className="flex max-h-[460px] flex-col gap-4 overflow-y-auto scroll-smooth p-5 text-base leading-normal">

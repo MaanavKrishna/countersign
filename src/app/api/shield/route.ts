@@ -1,4 +1,5 @@
 import { assessCall } from "@/lib/agent/shield";
+import { assessLocally } from "@/lib/shieldLocal";
 import { clientIp, shieldLimiter } from "@/lib/ratelimit";
 
 export const maxDuration = 30;
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
   try {
     return Response.json(await assessCall(transcript));
   } catch (err) {
-    return Response.json({ error: (err as Error).message }, { status: 502 });
+    // AI unavailable (outage, quota): degrade to the on-device rules rather than going silent mid-call.
+    console.error("shield: AI assessment failed, using rules", (err as Error).message);
+    return Response.json(assessLocally(transcript));
   }
 }

@@ -6,22 +6,9 @@ import { judgmentFinding } from "../judgment";
 import type { Finding, Tactic } from "../types";
 import { MODEL, UNTRUSTED_RULE, anthropic, untrusted } from "./client";
 
-const CATEGORIES = [
-  "urgency", "threat", "authority", "secrecy", "reward", "payment", "credentials", "remote_access", "relationship", "emotional",
-] as const;
+import { CATEGORIES, TACTIC_LABELS } from "./tacticLabels";
 
-export const TACTIC_LABELS: Record<(typeof CATEGORIES)[number], string> = {
-  urgency: "Urgency",
-  threat: "Threat",
-  authority: "Authority",
-  secrecy: "Secrecy",
-  reward: "Reward bait",
-  payment: "Untraceable payment",
-  credentials: "Credential request",
-  remote_access: "Remote access",
-  relationship: "Relationship claim",
-  emotional: "Emotional pressure",
-};
+export { TACTIC_LABELS };
 
 const TacticsSchema = z.object({
   messageText: z.string().describe("The message's full visible text. If the input is a screenshot, transcribe it."),

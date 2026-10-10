@@ -1,9 +1,10 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { finding, score } from "../scoring";
-import type { ShieldAssessment, ShieldStage } from "../types";
+import type { ShieldAssessment } from "../types";
 import { MODEL, anthropic, untrusted } from "./client";
-import { TACTIC_LABELS } from "./tactics";
+import { stageFor } from "../shieldStage";
+import { TACTIC_LABELS } from "./tacticLabels";
 
 const CATEGORIES = Object.keys(TACTIC_LABELS) as [keyof typeof TACTIC_LABELS, ...(keyof typeof TACTIC_LABELS)[]];
 
@@ -31,11 +32,7 @@ Report only tactics actually present, each with a verbatim quote. Ordinary chit-
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9$ ]/g, " ").replace(/\s+/g, " ").trim();
 
-export function stageFor(risk: number): ShieldStage {
-  if (risk >= 0.6) return "danger";
-  if (risk >= 0.25) return "caution";
-  return "calm";
-}
+export { stageFor };
 
 export async function assessCall(transcript: string): Promise<ShieldAssessment> {
   const res = await anthropic().messages.parse({
@@ -61,5 +58,6 @@ export async function assessCall(transcript: string): Promise<ShieldAssessment> 
     advice: out.advice,
     challengeNow: out.challengeNow && stage !== "calm",
     challengeTopic: out.challengeTopic,
+    source: "ai",
   };
 }
