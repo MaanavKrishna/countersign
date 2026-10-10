@@ -2,6 +2,7 @@
 
 import QRCode from "qrcode";
 import { useState } from "react";
+import { FamilyCircles } from "@/components/FamilyCircles";
 import { RollingCode } from "@/components/RollingCode";
 import { newSecret, pairingLink } from "@/lib/countersign/protocol";
 import { useFamily, type TrustedContact } from "@/lib/countersign/store";
@@ -65,6 +66,13 @@ export default function FamilyPage() {
         </p>
       </header>
 
+      <FamilyCircles />
+
+      <div className="flex flex-col gap-2 border-t border-line pt-8">
+        <h2 className="condensed m-0 text-[30px] font-black uppercase">Two-person pairing (strongest)</h2>
+        <p className="m-0 max-w-[760px] text-body">For the people you talk to most. Each direction gets its own words, so even someone who tricks one of you can&apos;t relay them to the other.</p>
+      </div>
+
       {pairings.length > 0 && (
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-2" aria-label="Paired family">
           {pairings.map((p) => (
@@ -97,7 +105,7 @@ export default function FamilyPage() {
             void createInvite();
           }}
         >
-          <h2 className="condensed m-0 text-2xl font-black uppercase">Pair a family member</h2>
+          <h2 className="condensed m-0 text-2xl font-black uppercase">Pair two phones</h2>
           <label className="flex flex-col gap-1.5 text-sm font-bold">
             Your name (what they call you)
             <input value={me} onChange={(e) => setMe(e.target.value)} placeholder="Grandma" className="min-h-11 rounded border-[1.5px] border-faint px-3 text-base font-normal" />

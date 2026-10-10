@@ -7,7 +7,9 @@ import { alertText, smsLink } from "@/lib/countersign/alert";
 import { useFamily } from "@/lib/countersign/store";
 import { matchesPerson } from "@/lib/people";
 import { questionsFor, useVault } from "@/lib/vault";
+import { MemberCode } from "./MemberCode";
 import { RollingCode } from "./RollingCode";
+import { normalizeName } from "@/lib/countersign/circle";
 import { Logo, Nav } from "./SiteHeader";
 
 // Minimal typing for the Web Speech API (Chrome / Edge / Safari).
@@ -67,7 +69,7 @@ function Highlight({ text, tactics, hot }: { text: string; tactics: Tactic[]; ho
 
 export function CallShield() {
   const { entries } = useVault();
-  const { pairings, contact } = useFamily();
+  const { pairings, circles, contact } = useFamily();
   const [mode, setMode] = useState<"idle" | "mic" | "sim">("idle");
   const [lines, setLines] = useState<Line[]>([]);
   const [assessment, setAssessment] = useState<ShieldAssessment | null>(null);
@@ -221,6 +223,10 @@ export function CallShield() {
   const s = STAGE[stage];
   const candidates = questionsFor(entries, assessment?.claimedIdentity ?? null);
   const paired = pairings.find((p) => matchesPerson(p.them, assessment?.claimedIdentity ?? null)) ?? null;
+  const circleHit =
+    circles
+      .flatMap((c) => c.members.filter((m) => normalizeName(m) !== normalizeName(c.me)).map((member) => ({ circle: c, member })))
+      .find((x) => matchesPerson(x.member, assessment?.claimedIdentity ?? null)) ?? null;
   const question = candidates.length ? candidates[challengeIdx % candidates.length] : null;
   const showChallenge = !!assessment && (assessment.challengeNow || stage === "danger") && outcome === null;
   const who = assessment?.claimedIdentity ?? "them";
@@ -332,7 +338,7 @@ export function CallShield() {
               {showChallenge && (
                 <div className="animate-pop flex flex-col gap-4 rounded-md bg-white p-7 text-ink" style={{ boxShadow: `10px 10px 0 ${s.hot}` }}>
                   <p className="m-0 font-mono text-xs tracking-[0.12em] text-alert-deep uppercase">
-                    {paired ? "Countersign challenge · from your paired phones" : "Countersign challenge · from your Memory Vault"}
+                    {paired ? "Countersign challenge · from your paired phones" : circleHit ? `Countersign challenge · ${circleHit.circle.name}` : "Countersign challenge · from your Memory Vault"}
                   </p>
                   {paired ? (
                     <>
@@ -344,6 +350,24 @@ export function CallShield() {
                         <RollingCode pairing={paired} which="theirs" size="lg" />
                       </div>
                       <p className="m-0 text-[15px] text-muted">A cloned voice can&apos;t know these words. They change every minute.</p>
+                      <div className="flex flex-wrap gap-3">
+                        <button type="button" onClick={() => setOutcome("passed")} className="min-h-[52px] rounded border-2 border-ink px-5.5 font-extrabold tracking-[0.04em] uppercase">
+                          Words match
+                        </button>
+                        <button type="button" onClick={() => setOutcome("failed")} className="min-h-[52px] rounded bg-alert-ink px-5.5 font-extrabold tracking-[0.04em] text-white uppercase">
+                          Wrong or refused
+                        </button>
+                      </div>
+                    </>
+                  ) : circleHit ? (
+                    <>
+                      <p className="m-0 text-lg text-body">
+                        Ask: <b>&ldquo;{circleHit.member}, what&apos;s our countersign?&rdquo;</b> The real {circleHit.member} will read it from their phone.
+                      </p>
+                      <p className="m-0 font-mono text-xs tracking-[0.12em] text-trust-ink uppercase">They should say</p>
+                      <div className="text-ink">
+                        <MemberCode circle={circleHit.circle} member={circleHit.member} size="lg" readAloud />
+                      </div>
                       <div className="flex flex-wrap gap-3">
                         <button type="button" onClick={() => setOutcome("passed")} className="min-h-[52px] rounded border-2 border-ink px-5.5 font-extrabold tracking-[0.04em] uppercase">
                           Words match

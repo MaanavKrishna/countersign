@@ -20,7 +20,9 @@ Detecting fakes is an arms race the defender loses, because generators keep impr
 3. **When "Ethan" calls asking for money,** Call Shield detects the scam script and shows Grandma the words Ethan must say. The real Ethan reads them off his phone; a clone can't.
 4. **Break the secrecy.** Scams rely on "don't tell Mom", so one tap texts a trusted family member.
 
-### Protocol (v1)
+**Family Circle (v2).** One QR code for a whole family: each member scans it once and picks their name, and each has their own rolling words, `HMAC-SHA256(secret, "countersign/v2|member|" + name + "|" + minute)`. A **"Who's calling?"** screen built for grandparents shows the expected words in huge type, with a read-aloud button and two big buttons: *the words match* or *hang up*.
+
+### Protocol (v1, two-person pairing)
 
 ```
 pairing:   secret = 32 random bytes (crypto.getRandomValues)
@@ -47,6 +49,7 @@ storage:   localStorage only; nothing leaves the device
 | Pairing secret intercepted | Pairing happens in person by QR, and the secret travels only in the URL fragment, which browsers never send to servers. It's removed from the address bar after pairing |
 | Lost phone | Phone lock protects it; unpair and pair again to rotate the secret |
 | No internet during the call | Fully offline: Web Crypto + local storage |
+| Family Circle trade-off | A circle shares one secret, and each member's words come from HMAC(secret, name, minute). That means any member's phone can show any member's words, which is convenient but weaker against relay than a two-person pairing. Every screen says "never read words to someone who called you", and two-person pairing remains available for the people who matter most |
 
 ## The problem
 

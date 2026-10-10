@@ -39,13 +39,18 @@ function hmacKey(secret: string): Promise<CryptoKey> {
 }
 
 export async function codeFor(secret: string, from: Role, to: Role, step: number): Promise<string[]> {
-  const msg = new TextEncoder().encode(`countersign/v1|${from}>${to}|${step}`);
+  return wordsFor(secret, `countersign/v1|${from}>${to}|${step}`);
+}
+
+/** HMAC-SHA256(secret, message) → three words from the first 33 bits. */
+export async function wordsFor(secret: string, message: string, words: readonly string[] = WORDS): Promise<string[]> {
+  const msg = new TextEncoder().encode(message);
   const mac = new Uint8Array(await crypto.subtle.sign("HMAC", await hmacKey(secret), msg));
   // First 33 bits of the MAC → three 11-bit indexes into the 2048-word list.
   const i0 = (mac[0] << 3) | (mac[1] >> 5);
   const i1 = ((mac[1] & 0x1f) << 6) | (mac[2] >> 2);
   const i2 = ((mac[2] & 0x03) << 9) | (mac[3] << 1) | (mac[4] >> 7);
-  return [WORDS[i0], WORDS[i1], WORDS[i2]];
+  return [words[i0], words[i1], words[i2]];
 }
 
 export async function codesForDisplay(p: Pairing, ms: number) {

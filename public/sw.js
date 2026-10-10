@@ -1,6 +1,6 @@
 // Countersign service worker: the Family Countersign and Call Shield screens
 // must open with no signal, because that's when a scam call can come in.
-const VERSION = "countersign-v1";
+const VERSION = "countersign-v2";
 const PRECACHE = ["/", "/family", "/shield", "/vault", "/manifest.webmanifest", "/icon"];
 
 self.addEventListener("install", (event) => {
