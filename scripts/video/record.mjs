@@ -233,7 +233,7 @@ await scene("evidence", [ev], async () => {
   await caption("Pre-registered tests. <b>Every result published.</b>");
   await sleep(2500);
   const s = page.frameLocator("#screen");
-  await s.getByRole("heading", { name: /Run-6 hold-out/ }).scrollIntoViewIfNeeded();
+  await s.getByRole("heading", { name: /Run-6 hold-out/ }).evaluate((h) => h.scrollIntoView({ behavior: "smooth", block: "start" }));
   await sleep(1500);
 });
 
