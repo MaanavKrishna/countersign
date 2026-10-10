@@ -1,23 +1,26 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { EVAL_CASES } from "../eval/cases";
+import { ADVERSARIAL_CASES } from "../eval/adversarialCases";
 import { HARD_CASES } from "../eval/hardCases";
 import { llmOnlyBand } from "../eval/baseline";
 import { summarize, type ArmMetrics, type EvalRow } from "../eval/metrics";
 import { collectCase } from "../report/collect";
 
 // Opt-in: calls the model API and the network. EVAL=1 npx vitest run eval
-type Row = EvalRow & { set: "easy" | "hard" };
+type Row = EvalRow & { set: "easy" | "hard" | "adversarial" };
 type ArmId = "llm-only" | "evidence-only" | "countersign-v1" | "countersign";
 type EvalResults = {
   generatedAt: string;
   hardSetCommit: string;
-  arms: { id: ArmId; label: string; metrics: { all: ArmMetrics; easy: ArmMetrics; hard: ArmMetrics }; rows: Row[] }[];
+  adversarialSetCommit: string;
+  arms: { id: ArmId; label: string; metrics: { all: ArmMetrics; easy: ArmMetrics; hard: ArmMetrics; adversarial: ArmMetrics }; rows: Row[] }[];
 };
 
 const CASES = [
   ...EVAL_CASES.map((c) => ({ ...c, set: "easy" as const })),
   ...HARD_CASES.map((c) => ({ ...c, set: "hard" as const })),
+  ...ADVERSARIAL_CASES.map((c) => ({ ...c, set: "adversarial" as const })),
 ];
 
 async function runArm(fn: (text: string) => Promise<{ band: EvalRow["band"]; risk: number }>, concurrency = 3): Promise<Row[]> {
@@ -45,6 +48,7 @@ const metrics = (rows: Row[]) => ({
   all: summarize(rows),
   easy: summarize(rows.filter((r) => r.set === "easy")),
   hard: summarize(rows.filter((r) => r.set === "hard")),
+  adversarial: summarize(rows.filter((r) => r.set === "adversarial")),
 });
 
 const full = (v: "v1" | "final") => async (t: string) => {
@@ -64,6 +68,7 @@ describe.skipIf(!process.env.EVAL)("ablation eval", () => {
     const results: EvalResults = {
       generatedAt: new Date().toISOString(),
       hardSetCommit: "34e3ba0",
+      adversarialSetCommit: process.env.ADVERSARIAL_COMMIT ?? "",
       arms: [
         { id: "llm-only", label: "Single LLM prompt (typical entry)", metrics: metrics(llm), rows: llm },
         { id: "evidence-only", label: "Deterministic checks only (no AI)", metrics: metrics(det), rows: det },
