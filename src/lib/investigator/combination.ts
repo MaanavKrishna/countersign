@@ -1,3 +1,5 @@
+import { brandByName, brandForDomain } from "@/lib/core/brands";
+import { hostFromUrl, registrableDomain } from "@/lib/core/domain";
 import { finding } from "@/lib/core/scoring";
 import type { Finding } from "@/lib/core/types";
 
@@ -17,10 +19,30 @@ const ASK_WORDS: Record<string, string> = {
 };
 
 export function impersonationAsk(findings: Finding[], claimedBrands: string[]): Finding[] {
-  if (findings.some((f) => f.signalId === "trust_auth_aligned")) return [];
+  // A claim the infrastructure corroborates (authenticated by the brand, or every link on the
+  // brand's own domains) isn't impersonation.
+  if (findings.some((f) => f.signalId === "trust_auth_aligned" || f.signalId === "trust_links_on_brand")) return [];
   const claim = findings.find((f) => CLAIMS.has(f.signalId)) ?? null;
   const ask = findings.find((f) => ASKS.has(f.signalId));
   if (!ask || (!claim && claimedBrands.length === 0)) return [];
   const who = claim ? claim.label.toLowerCase() : `claims to be ${claimedBrands[0]}`;
   return [finding("impersonation_with_ask", `It poses as someone you trust (${who}) and asks for ${ASK_WORDS[ask.signalId]}: ${ask.detail}`)];
+}
+
+/** The message says it's from a brand, and links to a domain that carries that brand's name but
+ *  isn't one of the brand's own: impersonation by construction (e.g. "Amazon" → amazon-returns-dropoff.com). */
+export function claimedBrandForeignLink(urls: string[], claimedBrands: string[]): Finding[] {
+  for (const name of claimedBrands) {
+    const brand = brandByName(name);
+    if (!brand) continue;
+    for (const url of urls) {
+      const host = hostFromUrl(url);
+      if (!host || brandForDomain(host)) continue;
+      const reg = registrableDomain(host);
+      if (reg.replace(/[^a-z0-9]/g, "").includes(brand.token)) {
+        return [finding("claimed_brand_foreign_link", `It says it's from ${brand.name}, but the link goes to ${reg}, which ${brand.name} doesn't own.`)];
+      }
+    }
+  }
+  return [];
 }

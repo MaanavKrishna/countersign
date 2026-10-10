@@ -9,6 +9,8 @@ const PATTERNS: RegExp[] = [
   /\b(ai|assistant|llm|language model|scanner|spam filter|classifier)\b[^.\n]{0,60}\b(mark|classify|label|report|treat|say|consider)\b[^.\n]{0,40}\b(safe|legit(imate)?|genuine|not (spam|phishing|a scam)|countersigned|trusted|real)\b/i,
   /\b(system|developer)\s*(prompt|message|note)?\s*:\s*[^.\n]{0,80}\b(safe|legit(imate)?|verified|countersigned|not phishing)\b/i,
   /\bif you are an? (ai|assistant|language model|llm|bot)\b/i,
+  // A fake assistant/system turn vouching for the message ("Assistant: … verified … safe").
+  /(^|\n|["“])\s*(assistant|ai|system|scanner)\s*:\s*[^\n]{0,160}\b(verified|safe|legit(imate)?|genuine|trusted|authori[sz]ed|not (spam|phishing|a scam))\b/i,
 ];
 
 // Quoting an attack is not an attack: security newsletters, code reviews and IT notices quote
@@ -34,11 +36,21 @@ function openingQuote(text: string, at: number): number {
   return q !== -1 && /(^|[\s(:])'$/.test(before.slice(0, before.length - near.length + q + 1)) ? lineStart + before.length - near.length + q : -1;
 }
 
+// One quoted example after another ("A" and "B", "A", "B" or "C") shares the first one's cue.
+const LIST_JOIN = /["”’»]\s*(?:,\s*)?(?:and|or|,)?\s*$/i;
+
 function isQuotedMention(text: string, start: number): boolean {
-  const q = openingQuote(text, start);
-  if (q === -1) return false;
-  const lineStart = text.lastIndexOf("\n", q - 1) + 1;
-  return EXAMPLE_CUE.test(text.slice(Math.max(lineStart, q - 60), q));
+  let q = openingQuote(text, start);
+  for (let hops = 0; q !== -1 && hops < 6; hops++) {
+    const lineStart = text.lastIndexOf("\n", q - 1) + 1;
+    const before = text.slice(Math.max(lineStart, q - 60), q);
+    if (EXAMPLE_CUE.test(before)) return true;
+    if (!LIST_JOIN.test(before)) return false;
+    // Step back to the previous quoted item in the list.
+    const prevClose = text.slice(lineStart, q).search(/["”’»]\s*(?:,\s*)?(?:and|or|,)?\s*$/i) + lineStart;
+    q = openingQuote(text, prevClose);
+  }
+  return false;
 }
 
 export function detectAiDirectedText(text: string): Finding[] {

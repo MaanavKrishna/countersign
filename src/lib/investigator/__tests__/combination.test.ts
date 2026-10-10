@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { impersonationAsk } from "@/lib/investigator/combination";
+import { claimedBrandForeignLink, impersonationAsk } from "@/lib/investigator/combination";
 import { finding, score } from "@/lib/core/scoring";
 
 describe("impersonation + ask", () => {
@@ -29,5 +29,21 @@ describe("impersonation + ask", () => {
     const base = [finding("tactic_authority", "a"), finding("tactic_credentials", "b"), finding("tactic_urgency", "c")];
     expect(score(base).band).toBe("unverified");
     expect(score([...base, ...impersonationAsk(base, [])]).band).toBe("forgery");
+  });
+  it("doesn't fire when every link is on the claimed brand's own domains: the infrastructure corroborates the claim", () => {
+    const f = impersonationAsk([finding("tactic_authority", "Microsoft"), finding("tactic_credentials", "re-register"), finding("trust_links_on_brand", "all on microsoft.com")], ["Microsoft"]);
+    expect(f).toEqual([]);
+  });
+});
+
+describe("claimed brand, foreign link", () => {
+  it("flags a link to a domain that carries the claimed brand's name but isn't the brand's", () => {
+    const f = claimedBrandForeignLink(["https://amazon-returns-dropoff.com/label/1"], ["Amazon"]);
+    expect(f.map((x) => x.signalId)).toEqual(["claimed_brand_foreign_link"]);
+    expect(score(f).band).toBe("unverified");
+  });
+  it("leaves the brand's real domains and unclaimed brands alone", () => {
+    expect(claimedBrandForeignLink(["https://www.amazon.com/spr/returns"], ["Amazon"])).toEqual([]);
+    expect(claimedBrandForeignLink(["https://amazon-returns-dropoff.com/x"], ["PayPal"])).toEqual([]);
   });
 });

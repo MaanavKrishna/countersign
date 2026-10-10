@@ -2,10 +2,10 @@ import results from "../../../eval/results.json";
 import { wilson } from "@/lib/eval/metrics";
 
 type Metrics = { n: number; recall: number; falsePositiveRate: number; strictAccuracy: number; dangerousMisses: number; tp: number; fp: number; tn: number; fn: number };
-type SetId = "easy" | "hard" | "adversarial";
+type SetId = "easy" | "hard" | "adversarial" | "qr" | "mention";
 type Row = { id: string; label: "scam" | "legit"; set: SetId; band: string };
 type Arm = { id: string; label: string; metrics: { all: Metrics } & Partial<Record<SetId, Metrics>>; rows: Row[] };
-const data = results as unknown as { generatedAt: string; hardSetCommit?: string; adversarialSetCommit?: string; arms: Arm[] };
+const data = results as unknown as { generatedAt: string; hardSetCommit?: string; adversarialSetCommit?: string; freshSetCommit?: string; arms: Arm[] };
 const arms = data.arms ?? [];
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 /** Rate with its 95% Wilson interval, so small samples don't look more certain than they are. */
@@ -104,6 +104,25 @@ export default function EvidencePage() {
             title="Adversarial set: scams written to fool AI screeners"
             blurb="Scams carrying fake security-scan reports, fake assistant transcripts, 'training example' framing, and instructions in another language or spaced out, plus genuine messages that talk about AI."
           />
+          <ResultsTable
+            set="qr"
+            title="Beyond the text: QR codes"
+            blurb="Six pairs of messages with identical wording. Only the QR code differs: one points to a lookalike site, the other to the real one. Every system gets the picture; Countersign also decodes the code, as it does for any screenshot."
+          />
+          <ResultsTable
+            set="mention"
+            title="Fresh hold-out: quoting versus attacking"
+            blurb="New cases written after run 4's fix: genuine messages that quote injection text as examples, and scams that use it, including one built to slip past the fix."
+          />
+          {data.freshSetCommit && (
+            <p className="m-0 text-sm text-muted">
+              Both run-5 sets were committed before any system was run on them:{" "}
+              <a className="font-semibold text-trust" href={`${REPO}/commit/${data.freshSetCommit}`}>
+                commit {data.freshSetCommit}
+              </a>
+              .
+            </p>
+          )}
           <p className="m-0 text-sm text-muted">Percentages in brackets are 95% confidence intervals (Wilson). With sets this small, a difference of one or two cases is not significant, and we don&apos;t treat it as one.</p>
           {data.adversarialSetCommit && (
             <p className="m-0 text-sm text-muted">

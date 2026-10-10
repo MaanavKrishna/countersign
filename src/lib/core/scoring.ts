@@ -39,6 +39,7 @@ export const SIGNALS: Record<string, Signal> = {
   sandbox_brand_phish: { weight: 0.5, label: "Page imitates a brand", kind: "risk" },
   ai_directed_instructions: { weight: 0.55, label: "Hidden instructions aimed at AI scanners", kind: "risk" },
   provider_phishing_flag: { weight: 0.35, label: "Mail provider's phishing model flagged it", kind: "risk" },
+  claimed_brand_foreign_link: { weight: 0.55, label: "Says it's a brand, links to a site the brand doesn't own", kind: "risk" },
   impersonation_with_ask: { weight: 0.6, label: "Claims an identity and asks for money, codes or access", kind: "risk" },
   model_judgment_scam: { weight: 0.5, label: "The AI's overall read: a scam", kind: "risk" },
   // Manipulation tactics (from the message text)
@@ -66,7 +67,7 @@ export const SIGNALS: Record<string, Signal> = {
 const IMPERSONATION = new Set([
   "lookalike_brand_domain", "homoglyph_domain", "brand_in_subdomain", "brand_token_unrelated_domain",
   "brand_mismatch_sender", "freemail_claims_brand", "dmarc_fail", "sandbox_brand_phish", "impersonation_with_ask",
-  "ai_directed_instructions",
+  "ai_directed_instructions", "claimed_brand_foreign_link",
 ]);
 
 // Trust evidence that an impersonation or an injection attempt can fake or sway.

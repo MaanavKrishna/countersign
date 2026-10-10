@@ -7,7 +7,7 @@ import { brandByName, brandForDomain, type Brand } from "@/lib/core/brands";
 import { hostFromUrl, registrableDomain } from "@/lib/core/domain";
 import { extractIndicators } from "@/lib/investigator/indicators";
 import { detectAiDirectedText } from "@/lib/investigator/injection";
-import { impersonationAsk } from "@/lib/investigator/combination";
+import { claimedBrandForeignLink, impersonationAsk } from "@/lib/investigator/combination";
 import { finding, score } from "@/lib/core/scoring";
 import { runTool, type ToolRun } from "./tools";
 import { EXHIBIT_ID, factNodeId } from "@/lib/investigator/tools/graphIds";
@@ -124,7 +124,7 @@ export async function runInvestigation(input: InvestigationInput, emit: Emit, op
 
   const tacticsResult = await tacticsPromise;
   if (opts.combination !== false) {
-    const combo = impersonationAsk(all, ind.claimedBrands);
+    const combo = [...claimedBrandForeignLink(ind.urls, ind.claimedBrands), ...impersonationAsk(all, ind.claimedBrands)];
     if (combo.length) {
       all.push(...combo);
       emit({ type: "tool_start", id: "combination", name: "impersonation_check", args: {} });
