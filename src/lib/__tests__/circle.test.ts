@@ -16,6 +16,12 @@ describe("Family Circle protocol", () => {
     expect(e).not.toEqual(p);
     expect(await memberCode(SECRET, "Ethan", 1001)).not.toEqual(e);
   });
+  it("treats composed and decomposed accents as the same name", async () => {
+    const composed = "Luc\u00eda"; // í as one character
+    const decomposed = "Luci\u0301a"; // i + combining acute
+    expect(normalizeName(composed)).toBe(normalizeName(decomposed));
+    expect(await memberCode(SECRET, composed, 9)).toEqual(await memberCode(SECRET, decomposed, 9));
+  });
   it("is the same on every device regardless of how the name is typed", async () => {
     expect(normalizeName("  ethan   RAY ")).toBe("ethan ray");
     expect(await memberCode(SECRET, "Ethan Ray", 5)).toEqual(await memberCode(SECRET, " ethan  ray", 5));

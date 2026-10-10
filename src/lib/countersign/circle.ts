@@ -13,7 +13,7 @@ export const MAX_MEMBERS = 30;
 /** The one rule every phone applies to a name before storing or sharing it.
  *  Commas are the link's member separator, so they can never be part of a name. */
 export function cleanName(name: string): string {
-  return name.replace(/,/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_NAME).trim();
+  return name.normalize("NFC").replace(/,/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_NAME).trim();
 }
 
 /** Unique, cleaned member list (case/spacing duplicates removed, first spelling kept). */
@@ -31,7 +31,8 @@ export function cleanMembers(names: string[]): string[] {
 }
 
 export function normalizeName(name: string): string {
-  return name.trim().toLowerCase().replace(/\s+/g, " ");
+  // NFC first, so "í" typed as one character or as i + accent is the same name.
+  return name.normalize("NFC").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 export async function memberCode(secret: string, member: string, step: number, lang: WordLang = "en"): Promise<string[]> {

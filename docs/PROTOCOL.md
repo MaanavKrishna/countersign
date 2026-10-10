@@ -30,7 +30,7 @@ This document is complete enough to build a compatible app in any language. The 
 ## v2: Family Circle
 
 - One secret is shared by the whole family; each member chooses a name.
-- `normalize(name)` = trim, lowercase, and collapse runs of whitespace to a single space.
+- `normalize(name)` = Unicode NFC normalization, then trim, then lowercase using the default Unicode case mapping (JavaScript `toLowerCase()`, not locale-specific), then collapse each run of Unicode whitespace to a single U+0020 space. Names never contain commas (they're the member separator in join links), and they're capped at 60 characters after cleaning.
 - A member's code is `words(MAC("countersign/v2|member|" + normalize(name) + "|" + step))`, using the circle's word list.
 - Word lists: `en` (English, default), `es`, `fr`, `it`, `pt`. They are the official BIP-39 lists, so indexes are the same in every language and only the displayed words differ.
 - Join link: `https://<site>/family/join#v=2&s=<secret>&c=<circle name>&m=<comma-separated members>&l=<lang>`
