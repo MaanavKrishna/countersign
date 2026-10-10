@@ -44,10 +44,10 @@ We test it like a product: unit tests for the protocol vectors and detectors, br
 - Keeping the verdict deterministic while still using AI judgment.
 - Prompt injection inside the very messages we analyze.
 - Getting the facts about a link without ever visiting it.
-- **Being honest about accuracy.** Our first evaluation showed a single model prompt beat us on textbook scams. We pre-registered a hard set, fixed real bugs we found, and published every run, including the losses.
+- **Being honest about accuracy.** Our first evaluation showed a single model prompt beat us on textbook scams. We pre-registered a hard set, fixed real bugs we found, then pre-registered an adversarial set and lost it, and published every run.
 
 ## Accomplishments
-- On 24 textbook cases plus 14 pre-registered hard cases (polished fakes and scary-but-real alerts), Countersign got 38/38 with zero false alarms and zero scams cleared as genuine. It matches a strong single-prompt model while showing the evidence behind every verdict. The full methodology and history are at /evidence.
+- Three test sets, two of them pre-registered before any system ran: 24 textbook cases, 14 polished fakes and scary-but-real alerts, and 12 adversarial cases written to fool AI screeners. Countersign got 24/24 and 14/14, caught all 8 adversarial scams, and never stamped a genuine message FORGERY or cleared a scam. It lost the adversarial set 10/12 to a single prompt's 12/12, rating two genuine messages that quote injection text as UNVERIFIED. We publish that loss, with confidence intervals, at /evidence.
 - A working, offline, cryptographic identity check for whole families, in five languages, specified openly: the defense against voice clones that doesn't depend on detecting them.
 
 ## What we learned

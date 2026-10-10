@@ -134,7 +134,10 @@ export default function EvidencePage() {
                 <b className="text-ink">We pre-registered a hard set</b> of 14 polished fakes and scary-but-real alerts, and added one signal: an identity claim combined with a request for money, codes or access. Run 2: single prompt 38/38, Countersign 36/38 with one false alarm (a genuine verification-code text).
               </li>
               <li>
-                <b className="text-ink">Two fixes after run 2</b>, and we say so: a message that <i>gives</i> a code is no longer read as one that <i>asks</i> for it, and the model&apos;s overall read now counts as one weighted signal, which code can still outvote. The tables above are run 3.
+                <b className="text-ink">Two fixes after run 2</b>, and we say so: a message that <i>gives</i> a code is no longer read as one that <i>asks</i> for it, and the model&apos;s overall read now counts as one weighted signal, which code can still outvote.
+              </li>
+              <li>
+                <b className="text-ink">Run 4: we pre-registered an adversarial set, and lost it.</b> Twelve new cases: eight scams written to persuade an AI screener (fake security-scan reports, a fake assistant transcript, &ldquo;training example&rdquo; framing, instructions in Spanish or spaced out), and four genuine messages that talk about AI. Neither system was fooled by any of the eight scams. But Countersign rated two genuine messages that <i>quote</i> injection text (a security newsletter and a GitHub pull request) as UNVERIFIED, so the single prompt won 12/12 to 10/12. That&apos;s the cost of treating any text aimed at an AI as suspicious. We publish it unchanged and haven&apos;t tuned anything on these cases. The tables above are run 4, which also re-ran the earlier sets.
               </li>
               <li>
                 <b className="text-ink">What this means.</b> On classification alone, a strong model is hard to beat, and we don&apos;t claim to. Countersign&apos;s job is different: show the evidence behind every verdict, never let the AI set the verdict alone, and, with Family Countersign, prove identity in the one case no detector can: a perfect voice clone.
